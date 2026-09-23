@@ -46,10 +46,21 @@ weather API. This plan describes turning that design into an actual running app.
     (e.g. `16x16` or `20x25x1`) — free text, not validated, blank for items that don't
     need them (e.g. a lightbulb). This is not the same as arbitrary custom fields per
     item (see below) — it's two specific optional fields every item shares.
-  - Interaction is a single "I did this today" action → date appended to that item's
+  - Interaction is a single "I did this today" tap with **no confirmation step** — a
+    stray tap is fixed afterward in the item's History view (see below), not prevented
+    up front. The tap appends the date to that item's
     history. If today's date is already in that item's history, the action silently
     no-ops (no gray/disabled button state, no error) rather than adding a duplicate
     entry. No due-date/cadence logic in the MVP.
+  - **History view** (per the mockup): a modal opened from each item's "History" link,
+    listing that item's dates with an edit (pencil) and delete (trash) button on each,
+    plus an "Add Entry" button for backdated entries. This is the safety net for stray
+    taps. Editing or adding a date that already exists in that item's history is
+    rejected with a red inline message ("That date is already logged") — unlike the
+    Log button, which silently no-ops, since here the person is deliberately entering a
+    date. When editing, compare against the other entries so saving an unchanged date
+    doesn't flag itself. Dates are stored as ISO `YYYY-MM-DD` and formatted for display
+    (e.g. "August 12, 2026").
   - "Today" must be computed from the device's **local** date (`getFullYear`/
     `getMonth`/`getDate`), never `Date.toISOString()` (UTC) — the tablet is a fixed
     physical device in one household, so local time is simply correct, but a

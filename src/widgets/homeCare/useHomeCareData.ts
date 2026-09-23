@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { getTodayISO } from '../../lib/dates'
-type HomeCareItem = {
+
+export type HomeCareItem = {
     id: string
     name: string
     icon: string

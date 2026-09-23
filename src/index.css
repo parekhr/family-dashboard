@@ -10,3 +10,11 @@ body,
 body {
   background: #ffffff;
 }
+
+@theme {
+  --color-page: #edf3f0;
+  --color-card: #fffdf8;
+  --color-ink: #2b241d;
+  --color-muted: #948b80;
+  --color-primary: #3d7a6a;
+}

@@ -6,8 +6,8 @@ function App() {
   const rows = buildRows(household.widgetLayout, registry)
 
   return (
-    <div className="flex flex-col w-[1280px] h-[800px]">
-      <div className="bg-blue-200">Header</div>
+    <div className="flex flex-col w-[1280px] h-[800px] bg-page">
+      <div>Header</div>
 
       <div className="flex-1 flex flex-col">
         {rows.map((row) => (
@@ -15,7 +15,7 @@ function App() {
             {row.map((id) => {
               const Component = registry[id].component
               return (
-                <div key={id} className="flex-1 bg-gray-200">
+                <div key={id} className="flex-1 p-4">
                   <Component />
                 </div>
               )
