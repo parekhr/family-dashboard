@@ -33,14 +33,39 @@ weather API. This plan describes turning that design into an actual running app.
 - **Calendar**
   - Add appointments (single-day, timed) and events (multi-day, e.g. vacations).
   - Color coding by type; "what's expected today" surfaced separately from the grid.
+  - The "today" reminder banner also fires **the day before** an event, labeled
+    "Tomorrow" instead of "Today" (currently only fires on the event's own day).
+    Implies checking a date range (today or today+1) rather than an exact match, and a
+    label that depends on which of the two matched. Decide later whether both a
+    today-event and a tomorrow-event can show at once, or only the nearer one.
   - Seasonal theming (color/decoration) for a **few key months only** (e.g. Halloween
     in October, winter holidays in December) — not all 12 months for the MVP.
 - **Home Care tracking**
-  - Each tracked item = name + icon + a history log of dates.
-  - Interaction is a single "I did this today" action → confirmation → date appended
-    to that item's history. No due-date/cadence logic in the MVP.
-  - Full CRUD on which items exist (add/rename/delete/reorder), not on custom fields
-    per item — the model itself is intentionally simple.
+  - Each tracked item = name + icon + a history log of dates, plus two **fixed, optional**
+    text fields available on every item: `model` (e.g. a filter's part number) and `size`
+    (e.g. `16x16` or `20x25x1`) — free text, not validated, blank for items that don't
+    need them (e.g. a lightbulb). This is not the same as arbitrary custom fields per
+    item (see below) — it's two specific optional fields every item shares.
+  - Interaction is a single "I did this today" action → date appended to that item's
+    history. If today's date is already in that item's history, the action silently
+    no-ops (no gray/disabled button state, no error) rather than adding a duplicate
+    entry. No due-date/cadence logic in the MVP.
+  - "Today" must be computed from the device's **local** date (`getFullYear`/
+    `getMonth`/`getDate`), never `Date.toISOString()` (UTC) — the tablet is a fixed
+    physical device in one household, so local time is simply correct, but a
+    UTC-based date string can be a day off for several hours around local midnight
+    (US timezones are behind UTC). Same rule applies to the Calendar "today/tomorrow"
+    banner. Shared as a `getTodayISO()` helper in `src/lib/dates.ts` rather than
+    duplicated per widget.
+  - Full CRUD on which items exist (add/rename/delete/reorder), not on user-defined
+    custom fields per item — the model itself is intentionally simple. If item data ever
+    needs to diverge more (different "kinds" of item with structurally different extra
+    fields), model it as a discriminated union (`type: 'filter' | 'generic'`, etc.)
+    rather than a free-form schema. **The rule this all serves**: a widget's outer shape
+    (full/half, on the dashboard) never changes to accommodate its data — only the
+    widget's *internal* layout adapts (e.g. how an item's card lays out its optional
+    fields). Same discipline one level down: an item's varying data changes how its card
+    looks inside the widget, never the widget's footprint on the dashboard.
 - **Settings**
   - Pre-built themes, layout control (see Widget System below), family members list,
     appointment types, event types. Expected to grow over time.
@@ -52,7 +77,7 @@ weather API. This plan describes turning that design into an actual running app.
 
 ## Architecture
 
-- **Frontend**: React + Vite.
+- **Frontend**: React + Vite + TypeScript (strict mode). Tailwind CSS v4 for styling.
 - **Backend**: Supabase (Postgres + Auth + Realtime), **one shared project** for all
   households.
 - **Multi-tenancy / household isolation**: every table carries a `household_id`;
@@ -194,45 +219,48 @@ and in what order — a settings change, not a code change or a per-household fo
 Not final — a starting point to build from and adjust as the widget system proves
 itself out in practice.
 
+Stack is TypeScript (see Architecture above), so this tree uses `.ts`/`.tsx`, not
+`.js`/`.jsx`.
+
 ```
 family-dashboard/
 ├── PROJECT_PLAN.md
 ├── index.html
 ├── package.json
-├── vite.config.js
+├── vite.config.ts
 ├── .env.example              # SUPABASE_URL / SUPABASE_ANON_KEY placeholders
 ├── src/
-│   ├── main.jsx
-│   ├── App.jsx                # top-level shell; switches wall vs. phone layout
+│   ├── main.tsx
+│   ├── App.tsx                # top-level shell; switches wall vs. phone layout
 │   ├── lib/
-│   │   └── supabaseClient.js
+│   │   └── supabaseClient.ts
 │   ├── auth/
-│   │   └── useDeviceSession.js   # setup-code exchange + persisted session
+│   │   └── useDeviceSession.ts   # setup-code exchange + persisted session
 │   ├── hooks/
-│   │   └── useHouseholdData.js   # realtime subscription to this household's data
+│   │   └── useHouseholdData.ts   # realtime subscription to this household's data
 │   ├── widgets/
-│   │   ├── registry.js           # widget id -> { component, shape, label }
+│   │   ├── registry.ts           # widget id -> { component, shape, label }
 │   │   ├── weather/
-│   │   │   ├── WeatherWidget.jsx
-│   │   │   ├── useWeatherData.js     # NWS fetch/normalize
-│   │   │   └── severeBackgrounds.jsx
+│   │   │   ├── WeatherWidget.tsx
+│   │   │   ├── useWeatherData.ts     # NWS fetch/normalize
+│   │   │   └── severeBackgrounds.tsx
 │   │   ├── calendar/
-│   │   │   ├── CalendarWidget.jsx
-│   │   │   ├── AppointmentForm.jsx
-│   │   │   └── seasonalThemes.js
+│   │   │   ├── CalendarWidget.tsx
+│   │   │   ├── AppointmentForm.tsx
+│   │   │   └── seasonalThemes.ts
 │   │   └── homeCare/
-│   │       ├── HomeCareWidget.jsx
-│   │       └── ConfirmModal.jsx
+│   │       ├── HomeCareWidget.tsx
+│   │       └── ConfirmModal.tsx
 │   ├── dashboard/
-│   │   ├── DashboardLayout.jsx   # renders enabled widgets per shape rules
-│   │   └── layoutEngine.js       # ordered widget list -> rows/columns
+│   │   ├── DashboardLayout.tsx   # renders enabled widgets per shape rules
+│   │   └── layoutEngine.ts       # ordered widget list -> rows/columns
 │   ├── settings/
-│   │   ├── SettingsPanel.jsx
-│   │   ├── WidgetToggleList.jsx
-│   │   ├── ThemePicker.jsx
-│   │   └── PeopleAndTypes.jsx
+│   │   ├── SettingsPanel.tsx
+│   │   ├── WidgetToggleList.tsx
+│   │   ├── ThemePicker.tsx
+│   │   └── PeopleAndTypes.tsx
 │   ├── phone/
-│   │   └── QuickActionsView.jsx
+│   │   └── QuickActionsView.tsx
 │   ├── components/               # shared/generic UI (buttons, modals, date picker)
 │   └── styles/
 │       └── tokens.css            # design tokens ported from the mockup

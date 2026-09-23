@@ -1,12 +1,15 @@
+import type React from 'react'
+import HomeCareWidget from './homeCare/HomeCareWidget'
+
 export type Shape = 'full' | 'half'
 export type WidgetId = 'weather' | 'calendar' | 'homeCare'
 
-export type WidgetDef = { label: string; shape: Shape }
+export type WidgetDef = { label: string; shape: Shape; component: React.ComponentType }
 
 export const registry: Record<WidgetId, WidgetDef> = {
-  weather: { label: 'Weather', shape: 'full' },
-  calendar: { label: 'Calendar', shape: 'half' },
-  homeCare: { label: 'Home Care', shape: 'half' },
+  weather: { label: 'Weather', shape: 'full', component: () => null },
+  calendar: { label: 'Calendar', shape: 'half', component: () => null },
+  homeCare: { label: 'Home Care', shape: 'half', component: HomeCareWidget },
 }
 
 export function buildRows(
