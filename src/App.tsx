@@ -6,16 +6,16 @@ function App() {
   const rows = buildRows(household.widgetLayout, registry)
 
   return (
-    <div className="flex flex-col w-[1280px] h-[800px] bg-page">
+    <div className="flex flex-col w-[1280px] h-[800px] bg-page relative">
       <div>Header</div>
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0">
         {rows.map((row) => (
-          <div key={row.join('-')} className={registry[row[0]].shape === 'full' ? 'flex h-[200px]' : 'flex flex-1'}>
+          <div key={row.join('-')} className={registry[row[0]].shape === 'full' ? 'flex h-[200px]' : 'flex flex-1 min-h-0'}>
             {row.map((id) => {
               const Component = registry[id].component
               return (
-                <div key={id} className="flex-1 p-4">
+                <div key={id} className="flex-1 flex flex-col min-h-0 p-4">
                   <Component />
                 </div>
               )

@@ -8,7 +8,7 @@ type Household = {
 function useHouseholdData(): Household {
     return {
         id: 'household-1',
-        widgetLayout: ['weather', 'calendar', 'homeCare']
+        widgetLayout: ['weather', 'homeCare', 'calendar']
     }
 }
 
