@@ -11,7 +11,7 @@ const icons: Record<string, LucideIcon> = {
 }
 
 function HomeCareWidget() {
-  const { items, logToday, deleteHistoryEntry, addHistoryEntry } = useHomeCareData()
+  const { items, logToday, deleteHistoryEntry, addHistoryEntry, editHistoryEntry } = useHomeCareData()
   const [historyItemId, setHistoryItemId] = useState<string | null>(null)
   const historyItem = items.find((i) => i.id === historyItemId)
 
@@ -66,6 +66,7 @@ function HomeCareWidget() {
           onClose={() => setHistoryItemId(null)}
           onDelete={(date) => deleteHistoryEntry(historyItem.id, date)}
           onAdd={(date) => addHistoryEntry(historyItem.id, date)}
+          onEdit={(oldDate, newDate) => editHistoryEntry(historyItem.id, oldDate, newDate)}
         />
       )}
     </div>

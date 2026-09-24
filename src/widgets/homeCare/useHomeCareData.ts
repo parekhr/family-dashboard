@@ -55,6 +55,14 @@ export function useHomeCareData() {
         ))
     }
 
-    return { items, logToday, deleteHistoryEntry, addHistoryEntry }
+    function editHistoryEntry(id: string, oldDate: string, newDate: string) {
+        setItems(items.map(i =>
+            i.id === id && i.history.includes(oldDate) && !i.history.includes(newDate)
+                ? { ...i, history: i.history.map(d => d === oldDate ? newDate : d) }
+                : i
+        ))
+    }
+
+    return { items, logToday, deleteHistoryEntry, addHistoryEntry, editHistoryEntry }
 }
 
