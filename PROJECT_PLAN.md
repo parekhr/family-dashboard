@@ -35,10 +35,13 @@ weather API. This plan describes turning that design into an actual running app.
     NWS's gridpoint forecast fields, so this is a close match rather than a rework.
 - **Calendar**
   - **One model: everything is an event.** A single "+ Add event" button; the event's
-    type is picked inside the form (appointment, day off, vacation, etc. are all just
-    types, not separate kinds of record).
-  - **Event types control only the look** (name, color, maybe an icon). Households add,
-    rename, and delete their own types in Settings. Types never define fields.
+    category is picked inside the form (appointment, day off, vacation, etc. are all just
+    categories, not separate kinds of record).
+  - **Categories control only the look** (name, color, maybe an icon). Households add,
+    rename, and delete their own categories in Settings. Categories never define fields.
+    Each event points to one category by `categoryId`; many events share a category.
+    (Named "category", not "event type", to avoid clashing with TypeScript's `type`
+    keyword and to match Outlook's term for the same idea.)
   - **Fields are fixed in code** and identical for every event: start date, end date,
     an all-day flag, and a time when not all-day. Only the developer changes them, and a
     change ships to every household with one push. When a household asks for a new
@@ -51,16 +54,16 @@ weather API. This plan describes turning that design into an actual running app.
     `start: Mon, end: Fri` (Friday is the last day; Saturday is clear), and a single day
     is `start === end`. "Does this event cover day X?" is `start <= X && X <= end`. Do not
     copy Outlook/Google's exclusive "ends next midnight" storage.
-  - **Type choice sets form defaults only** (e.g. "Vacation" shows the end date,
+  - **Category choice sets form defaults only** (e.g. "Vacation" shows the end date,
     "Appointment" shows the time); it never changes the data shape.
-  - **Title is optional.** An untitled event displays its type name (e.g. "Dad ·
-    Appointment"). The fallback is computed at display time (`title || type.name`) and
-    never saved into the event, so renaming a type updates old untitled events. Trim
+  - **Title is optional.** An untitled event displays its category name (e.g. "Dad ·
+    Appointment"). The fallback is computed at display time (`title || category.name`)
+    and never saved into the event, so renaming a category updates old untitled events. Trim
     whitespace before saving so `"   "` counts as no title. A title can be added later by
     editing the event.
   - **People**: each event is for zero or more household members, picked with the
     People picker in the add-event form. Households add, rename, and remove people
-    themselves in Settings — like event types, they're data, not code.
+    themselves in Settings — like categories, they're data, not code.
     - **Whole family = every person selected.** It's stored as the list of selected
       people, i.e. a snapshot: someone added to the household later is not retroactively
       part of older events.
@@ -68,7 +71,7 @@ weather API. This plan describes turning that design into an actual running app.
       only; it stores the same list.
     - **Zero people is allowed**, for household-wide events that aren't about anyone in
       particular (e.g. "Trash pickup", "Halloween").
-  - Type colors appear where there's room for text — the "what's expected today" chips
+  - Category colors appear where there's room for text — the "what's expected today" chips
     (surfaced separately from the grid) and the day modal — not on the month grid.
   - **Month grid** (replaces the mockup's split-color chips, which were hard to read
     from a distance and broke down at 3+ events). The grid is a calm summary of the
@@ -76,7 +79,7 @@ weather API. This plan describes turning that design into an actual running app.
     - **Always 6 rows (42 days)**, with the previous/next month's days grayed out, so
       the grid never changes size between months.
     - **Single-day events**: the day number sits on a solid chip in the **theme accent**,
-      identical for every event type.
+      identical for every category.
     - **Multi-day events**: one soft tint of the theme accent, **1 lane**. A day gets band
       color if *any* multi-day event covers it; the band's ends are rounded and inset
       where the neighboring day has no band and at the week-row edges (Sun/Sat), and
@@ -215,7 +218,7 @@ weather API. This plan describes turning that design into an actual running app.
     looks inside the widget, never the widget's footprint on the dashboard.
 - **Settings**
   - Pre-built themes, layout control (see Widget System below), family members list,
-    appointment types, event types. Expected to grow over time.
+    event categories. Expected to grow over time.
 - **Phone companion ("Quick Actions")**
   - Matches the mockup's Phone artboard: add-to-calendar button, today's appointments
     (dismissible), and the Home Care list with the same "did this today" action.
@@ -404,7 +407,7 @@ family-dashboard/
 │   │   ├── SettingsPanel.tsx
 │   │   ├── WidgetToggleList.tsx
 │   │   ├── ThemePicker.tsx
-│   │   └── PeopleAndTypes.tsx
+│   │   └── PeopleAndCategories.tsx
 │   ├── phone/
 │   │   └── QuickActionsView.tsx
 │   ├── components/               # shared/generic UI (buttons, modals, date picker)

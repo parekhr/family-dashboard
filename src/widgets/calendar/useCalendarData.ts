@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-export type EventType = {
+export type Category = {
     id: string
     name: string
     color: string          
@@ -13,7 +13,7 @@ export type Person = {
 
 export type CalendarEvent = {
     id: string
-    typeId: string        
+    categoryId: string        
     title?: string         
     start: string          //ISO YYYY-MM-DD
     end: string            //ISO YYYY-MM-DD, inclusive
@@ -24,39 +24,104 @@ export type CalendarEvent = {
 
 
 export function useCalendarData() {
-    const [eventTypes, setEventTypes] = useState<EventType[]>([
-        { id: "1", name: "Meeting", color: "#378ADD" },
-        { id: "2", name: "Appointment", color: "#FF5733" },
-        { id: "3", name: "Holiday", color: "#28A745" }
+    const [categories, setCategories] = useState<Category[]>([
+        { id: "c1", name: "Meeting", color: "#378ADD" },
+        { id: "c2", name: "Appointment", color: "#FF5733" },
+        { id: "c3", name: "Vacation", color: "#33FF57" }
     ])
 
     const [people] = useState<Person[]>([
-        { id: "1", name: "Alice" },
-        { id: "2", name: "Bob" },
-        { id: "3", name: "Charlie" }
+        { id: "p1", name: "Alice" },
+        { id: "p2", name: "Bob" },
+        { id: "p3", name: "Charlie" }
     ])
 
     const [events] = useState<CalendarEvent[]>([
         {
-            id: "1",
-            typeId: "1",
+            id: "e1",
+            categoryId: "c1",
             title: "Team Meeting",
-            start: "2024-06-01",
-            end: "2024-06-01",
+            start: "2026-09-01",
+            end: "2026-09-01",
             allDay: false,
             time: "10:00",
-            personIds: ["1", "2"]
+            personIds: ["p1", "p2"]
         },
         {
-            id: "2",
-            typeId: "2",
+            id: "e2",
+            categoryId: "c2",
             title: "Doctor Appointment",
-            start: "2024-06-02",
-            end: "2024-06-02",
+            start: "2026-09-02",
+            end: "2026-09-02",
             allDay: false,
             time: "14:00",
-            personIds: ["3"]
+            personIds: ["p3"]
+        },
+        {
+            id: "e3",
+            categoryId: "c2",
+            title: "Trash Pick Up",
+            start: "2026-09-03",
+            end: "2026-09-03",
+            allDay: true,
+            personIds: []
+        },
+        {
+            id: "e4",
+            categoryId: "c1",
+            title: "Project Kickoff",
+            start: "2026-09-03",
+            end: "2026-09-03",
+            allDay: false,
+            time: "09:00",
+            personIds: ["p1", "p3"]
+        },
+        {
+            id: "e5",
+            categoryId: "c2",
+            start: "2026-09-04",
+            end: "2026-09-04",
+            allDay: false,
+            time: "15:00",
+            personIds: ["p2"]
+        },
+        {
+            id: "e6",
+            categoryId: "c1",
+            title: "Team Lunch",
+            start: "2026-09-05",
+            end: "2026-09-05",
+            allDay: false,
+            time: "12:30",
+            personIds: []
+        },
+        {
+            id: "e7",
+            categoryId: "c3",
+            title: "Company Retreat",
+            start: "2026-09-06",
+            end: "2026-09-14",
+            allDay: true,
+            personIds: ["p1", "p2", "p3"]
+        },
+        {
+            id: "e8",
+            categoryId: "c3",
+            title: "Vacation",
+            start: "2026-08-30",
+            end: "2026-09-07",
+            allDay: true,
+            personIds: ["p2"]
+        },
+        {
+            id: "e9",
+            categoryId: "c2",
+            title: "School Starts",
+            start: "2026-09-25",
+            end: "2026-09-25",
+            allDay: true,
+            personIds: ["p1", "p3"]
         }
     ])
-    return { eventTypes, setEventTypes, people, events }
+    return { categories, setCategories, people, events }
 }
