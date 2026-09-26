@@ -28,19 +28,15 @@ export function useHomeCareData() {
 
         const today = getTodayISO()
 
-        const item = items.find(i => i.id === id)
-
-        if (item && !item.history.includes(today)) {
-            setItems(items.map(i =>
-                i.id === id
-                    ? { ...i, history: [...i.history, today] }
-                    : i
-            ))
-        }
+        setItems(prev => prev.map(i =>
+            i.id === id && !i.history.includes(today)
+                ? { ...i, history: [...i.history, today] }
+                : i
+        ))
     }
 
     function deleteHistoryEntry(id: string, date: string) {
-        setItems(items.map(i =>
+        setItems(prev => prev.map(i =>
             i.id === id
                 ? { ...i, history: i.history.filter(d => d !== date) }
                 : i
@@ -48,7 +44,7 @@ export function useHomeCareData() {
     }
 
     function addHistoryEntry(id: string, date: string) {
-        setItems(items.map(i =>
+        setItems(prev => prev.map(i =>
             i.id === id && !i.history.includes(date)
                 ? { ...i, history: [...i.history, date] }
                 : i
@@ -56,7 +52,7 @@ export function useHomeCareData() {
     }
 
     function editHistoryEntry(id: string, oldDate: string, newDate: string) {
-        setItems(items.map(i =>
+        setItems(prev => prev.map(i =>
             i.id === id && i.history.includes(oldDate) && !i.history.includes(newDate)
                 ? { ...i, history: i.history.map(d => d === oldDate ? newDate : d) }
                 : i

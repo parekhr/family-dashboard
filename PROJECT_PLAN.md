@@ -1,6 +1,9 @@
 # Family Dashboard — Project Plan
 
-Status: planning complete for MVP scope and architecture. No code written yet.
+Status: MVP build in progress. Layout shell, widget registry + `buildRows`, and the Home
+Care widget (log today, History modal with add/edit/delete) are built on mock data. Next
+up: Calendar widget. Home Care item management (add/rename/delete/reorder) is deferred to
+Settings.
 
 ## Working agreement
 
@@ -31,15 +34,145 @@ weather API. This plan describes turning that design into an actual running app.
     no API key, and the mockup's own code comments already model its hourly data on
     NWS's gridpoint forecast fields, so this is a close match rather than a rework.
 - **Calendar**
-  - Add appointments (single-day, timed) and events (multi-day, e.g. vacations).
-  - Color coding by type; "what's expected today" surfaced separately from the grid.
+  - **One model: everything is an event.** A single "+ Add event" button; the event's
+    type is picked inside the form (appointment, day off, vacation, etc. are all just
+    types, not separate kinds of record).
+  - **Event types control only the look** (name, color, maybe an icon). Households add,
+    rename, and delete their own types in Settings. Types never define fields.
+  - **Fields are fixed in code** and identical for every event: start date, end date,
+    an all-day flag, and a time when not all-day. Only the developer changes them, and a
+    change ships to every household with one push. When a household asks for a new
+    field, generalize it into a **generic, optional** field every event can use (e.g. a
+    `location` or `notes` rather than "vacation destination"), so events saved before the
+    field existed stay valid.
+  - **All-day events** may span multiple days; **timed events** are single-day for the
+    MVP.
+  - **End dates are inclusive**, stored as ISO `YYYY-MM-DD`: a Mon–Fri vacation is
+    `start: Mon, end: Fri` (Friday is the last day; Saturday is clear), and a single day
+    is `start === end`. "Does this event cover day X?" is `start <= X && X <= end`. Do not
+    copy Outlook/Google's exclusive "ends next midnight" storage.
+  - **Type choice sets form defaults only** (e.g. "Vacation" shows the end date,
+    "Appointment" shows the time); it never changes the data shape.
+  - **Title is optional.** An untitled event displays its type name (e.g. "Dad ·
+    Appointment"). The fallback is computed at display time (`title || type.name`) and
+    never saved into the event, so renaming a type updates old untitled events. Trim
+    whitespace before saving so `"   "` counts as no title. A title can be added later by
+    editing the event.
+  - **People**: each event is for zero or more household members, picked with the
+    People picker in the add-event form. Households add, rename, and remove people
+    themselves in Settings — like event types, they're data, not code.
+    - **Whole family = every person selected.** It's stored as the list of selected
+      people, i.e. a snapshot: someone added to the household later is not retroactively
+      part of older events.
+    - An **"Everyone" chip** in the picker selects all people in one tap. UI shortcut
+      only; it stores the same list.
+    - **Zero people is allowed**, for household-wide events that aren't about anyone in
+      particular (e.g. "Trash pickup", "Halloween").
+  - Type colors appear where there's room for text — the "what's expected today" chips
+    (surfaced separately from the grid) and the day modal — not on the month grid.
+  - **Month grid** (replaces the mockup's split-color chips, which were hard to read
+    from a distance and broke down at 3+ events). The grid is a calm summary of the
+    month's shape; details live in the Today chips and the day modal.
+    - **Always 6 rows (42 days)**, with the previous/next month's days grayed out, so
+      the grid never changes size between months.
+    - **Single-day events**: the day number sits on a solid chip in the **theme accent**,
+      identical for every event type.
+    - **Multi-day events**: one soft tint of the theme accent, **1 lane**. A day gets band
+      color if *any* multi-day event covers it; the band's ends are rounded and inset
+      where the neighboring day has no band and at the week-row edges (Sun/Sat), and
+      square/flush otherwise. Back-to-back or overlapping multi-day events merge into one
+      shape — accepted; the badge and day modal tell them apart.
+    - **Holidays**: a colored **ring** around the date. **Every ring is the same fixed
+      outer size**, whether or not the day has an event: on a plain day it circles the
+      number with empty space inside; on a chip day the chip shrinks to fit inside the
+      ring with a small gap (chips on non-holiday days stay normal size). Sizing the ring
+      around whatever is inside made chip-day rings visibly bigger than neighbors. Ring
+      color depends on the
+      holiday (e.g. Halloween orange), from a **developer-owned list** in code
+      (`{ name, date rule, color }`) with a default ring color for any holiday without
+      one. Moving holidays (e.g. Thanksgiving, Labor Day) need a date rule, not a fixed
+      date. Test each ring color against the chip accent at real size. Holidays are code,
+      not household settings.
+      - **The list**: the 11 US federal holidays plus the common observances most
+        calendars show. Only holidays with a strong color association get their own
+        color; the rest use the default ring (slate `#6B7B8C`), so colored rings stay
+        meaningful and never need a key.
+
+        | Holiday | Date rule | Ring |
+        |---|---|---|
+        | New Year's Day | Jan 1 | Gold `#D4A017` |
+        | MLK Jr. Day | 3rd Mon of Jan | default |
+        | Valentine's Day | Feb 14 | Pink `#E75480` |
+        | Presidents' Day | 3rd Mon of Feb | default |
+        | St. Patrick's Day | Mar 17 | Green `#2E8B57` |
+        | Easter | computed (lunar) | Lavender `#A58BD8` |
+        | Mother's Day | 2nd Sun of May | Pink `#E75480` |
+        | Memorial Day | last Mon of May | default |
+        | Father's Day | 3rd Sun of Jun | default |
+        | Juneteenth | Jun 19 | default |
+        | Independence Day | Jul 4 | Red `#C8102E` |
+        | Labor Day | 1st Mon of Sep | default |
+        | Columbus / Indigenous Peoples' Day | 2nd Mon of Oct | default |
+        | Halloween | Oct 31 | Orange `#F28C28` |
+        | Veterans Day | Nov 11 | default |
+        | Thanksgiving | 4th Thu of Nov | Harvest brown `#B5651D` |
+        | Christmas Eve | Dec 24 | Green `#1E7B45` |
+        | Christmas Day | Dec 25 | Red `#C8102E` |
+        | New Year's Eve | Dec 31 | Gold `#D4A017` |
+
+      - **Date rules**: 9 of these are "Nth (or last) weekday of a month", so that helper
+        is needed regardless. Easter is the only hard one; leaning toward a date library
+        for it (see Open).
+      - **Ring the actual date, never the "observed" day off** (e.g. July 4 on a Saturday
+        still rings Saturday, not Friday). Not everyone gets the federal day off.
+      - **Ring colors are fixed and ignore the household theme.** No secondary/fallback
+        ring colors. Themes are a developer-owned list (households pick from pre-built
+        themes, never a custom color), so any ring-vs-theme clash is caught once at
+        design time: when adding or changing a theme, check it next to the rings that
+        fall in its months. The gap between ring and chip (showing the cell background)
+        keeps a ring readable even over a similar-colored chip; widen the gap if testing
+        shows it's too subtle.
+    - **Badge**: one per day, on the date's corner, showing the **total** number of
+      events that day. Shown only when there's more than the cell can show (2+
+      single-day events or 2+ multi-day events). Holidays are **not** counted.
+    - **Layers never compete**: band (background), chip (fill), ring (outline), badge
+      (corner). A cell never grows, however busy the day is.
+    - **Tapping**: any day with a chip, band, or holiday opens a **day modal** listing
+      the holiday first, then every event on that day. Multi-day events always show
+      their **full date range** (e.g. "Vacation · Sep 21–25 · Mom, Dad"), even when the
+      tapped day is in the middle of the event. (Later, maybe: tapping an empty day opens
+      "+ Add event" with that date prefilled.)
+    - **No color key**: bands share one tint, so there's nothing to decode, and the space
+      goes to the grid. The day modal and Today chips answer "what is this?" (A
+      non-color "This month" list of multi-day events could be added later if missed.)
   - The "today" reminder banner also fires **the day before** an event, labeled
     "Tomorrow" instead of "Today" (currently only fires on the event's own day).
     Implies checking a date range (today or today+1) rather than an exact match, and a
     label that depends on which of the two matched. Decide later whether both a
     today-event and a tomorrow-event can show at once, or only the nearer one.
-  - Seasonal theming (color/decoration) for a **few key months only** (e.g. Halloween
-    in October, winter holidays in December) — not all 12 months for the MVP.
+  - **Seasonal theming covers all 12 months.** Each month's calendar card gets a subtle
+    tinted **background**, a slightly stronger tinted **header**, and one large, faint
+    **watermark icon** in the bottom-right corner (from the icon library, never
+    hand-drawn in CSS; a faint repeating icon pattern was tried and rejected as too
+    busy/hard to see).
+
+    | Months | Theme | Watermark |
+    |---|---|---|
+    | Jan–Mar | Winter | Snowman (snowflake if the icon set lacks one) |
+    | Apr–May | Spring | Flower |
+    | Jun–Aug | Summer | Sun |
+    | Sep, Nov | Fall | Autumn leaf |
+    | Oct | Halloween | Pumpkin |
+    | Dec | Christmas | Tree |
+
+    - Stored in `seasonalThemes.ts` as a small set of named themes (`winter`, `spring`,
+      `summer`, `fall`, `halloween`, `christmas`), each `{ background, header,
+      watermarkIcon }` with **light and dark** values, plus a **12-entry month → theme
+      lookup**. Every month has an entry, so there's no "is this month themed?" check;
+      October and December are just entries pointing at a different theme.
+    - Developer-owned code, not a household setting (same as holidays).
+  - **Grid numbers use tabular digits** (`font-variant-numeric: tabular-nums` /
+    Tailwind `tabular-nums`) so "11" and "28" don't look like different sizes.
 - **Home Care tracking**
   - Each tracked item = name + icon + a history log of dates, plus two **fixed, optional**
     text fields available on every item: `model` (e.g. a filter's part number) and `size`
@@ -69,7 +202,10 @@ weather API. This plan describes turning that design into an actual running app.
     banner. Shared as a `getTodayISO()` helper in `src/lib/dates.ts` rather than
     duplicated per widget.
   - Full CRUD on which items exist (add/rename/delete/reorder), not on user-defined
-    custom fields per item — the model itself is intentionally simple. If item data ever
+    custom fields per item — the model itself is intentionally simple. **Item management
+    lives in Settings, not on the widget face**: the wall widget only logs taps and opens
+    History; adding/renaming/deleting/reordering items (and editing `model`/`size`) is a
+    rare admin task done from Settings on the device. If item data ever
     needs to diverge more (different "kinds" of item with structurally different extra
     fields), model it as a discriminated union (`type: 'filter' | 'generic'`, etc.)
     rather than a free-form schema. **The rule this all serves**: a widget's outer shape
@@ -102,7 +238,7 @@ weather API. This plan describes turning that design into an actual running app.
   single-use setup code per household. Entering it once on a tablet/phone exchanges
   it for a long-lived session stored on that device — no email/password, no login
   screen ever again on that device. Per-person attribution (e.g. "Mom" vs "Dad" on an
-  appointment) is handled by the existing People picker in the UI, not by per-person
+  event) is handled by the existing People picker in the UI, not by per-person
   authentication.
 - **Weather API**: National Weather Service (`api.weather.gov`) — free, no key,
   covers both forecast (hourly/weekly) and active alerts by lat/long.
@@ -136,7 +272,7 @@ and in what order — a settings change, not a code change or a per-household fo
 
 - **Default layout**: every new household starts with `[weather, calendar, homeCare]`
   (Weather as a full-width band, Calendar and Home Care side by side). That list is
-  seeded as data and passes through `layoutEngine.js` like any custom layout. Changing
+  seeded as data and passes through `buildRows()` like any custom layout. Changing
   the default later only affects households created afterward.
 - **Weather is optional but on by default.** It is the only widget with external
   dependencies (location, NWS, US-only coverage), so it must be removable. A separate
@@ -244,27 +380,26 @@ family-dashboard/
 │   ├── main.tsx
 │   ├── App.tsx                # top-level shell; switches wall vs. phone layout
 │   ├── lib/
+│   │   ├── dates.ts              # getTodayISO(), formatDate() (local time, never UTC)
 │   │   └── supabaseClient.ts
 │   ├── auth/
 │   │   └── useDeviceSession.ts   # setup-code exchange + persisted session
 │   ├── hooks/
 │   │   └── useHouseholdData.ts   # realtime subscription to this household's data
 │   ├── widgets/
-│   │   ├── registry.ts           # widget id -> { component, shape, label }
+│   │   ├── registry.ts           # widget id -> { component, shape, label } + buildRows()
 │   │   ├── weather/
 │   │   │   ├── WeatherWidget.tsx
 │   │   │   ├── useWeatherData.ts     # NWS fetch/normalize
 │   │   │   └── severeBackgrounds.tsx
 │   │   ├── calendar/
 │   │   │   ├── CalendarWidget.tsx
-│   │   │   ├── AppointmentForm.tsx
+│   │   │   ├── EventForm.tsx
 │   │   │   └── seasonalThemes.ts
 │   │   └── homeCare/
 │   │       ├── HomeCareWidget.tsx
-│   │       └── ConfirmModal.tsx
-│   ├── dashboard/
-│   │   ├── DashboardLayout.tsx   # renders enabled widgets per shape rules
-│   │   └── layoutEngine.ts       # ordered widget list -> rows/columns
+│   │       ├── HistoryModal.tsx      # per-item history: add/edit/delete dates
+│   │       └── useHomeCareData.ts    # mock items + log/add/edit/delete history
 │   ├── settings/
 │   │   ├── SettingsPanel.tsx
 │   │   ├── WidgetToggleList.tsx
@@ -295,7 +430,8 @@ family-dashboard/
 
 ## Open / not yet decided
 
-- Exact months to theme for the calendar (beyond "a few key ones").
+- Whether a date library computes Easter (leaning yes) or it's hand-written.
+- Exact seasonal theme color values (the rendered mockup values are a starting point).
 - Full Supabase schema details (exact tables/columns beyond `household_id` + RLS).
 - Which kiosk browser APK to sideload on the Fire HD 10.
 - Any widgets beyond the MVP three (Weather, Calendar, Home Care).
