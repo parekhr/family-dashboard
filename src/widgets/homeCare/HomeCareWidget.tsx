@@ -10,7 +10,7 @@ const icons: Record<string, LucideIcon> = {
   'droplet': Droplet,
 }
 
-function HomeCareWidget() {
+export function HomeCareWidget() {
   const { items, logToday, deleteHistoryEntry, addHistoryEntry, editHistoryEntry } = useHomeCareData()
   const [historyItemId, setHistoryItemId] = useState<string | null>(null)
   const historyItem = items.find((i) => i.id === historyItemId)
@@ -72,5 +72,3 @@ function HomeCareWidget() {
     </div>
   )
 }
-
-export default HomeCareWidget
