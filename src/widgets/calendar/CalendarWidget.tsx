@@ -1,6 +1,7 @@
 import { buildMonthGrid } from './buildMonthGrid'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useCalendarData } from './useCalendarData'
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -29,25 +30,34 @@ export function CalendarWidget() {
             setMonth(month + 1)
         }
     }
-    
 
     const grid = buildMonthGrid(year, month)
 
     return (
         <div className="flex flex-col flex-1 min-h-0 gap-3">
-            <div className="flex justify-between items-center">
-                <button onClick={handlePrevMonth} className="p-2 border h-[42px] cursor-pointer"><ChevronLeft /></button>
-                <h2 className="text-[22px] font-extrabold text-ink">{monthNames[month - 1]} {year}</h2>
-                <button onClick={handleNextMonth} className="p-2 border h-[42px] cursor-pointer"><ChevronRight /></button>
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+                <button className="justify-self-start p-2 border h-[42px] rounded-xl cursor-pointer text-white bg-blue-500 hover:bg-blue-600" onClick={() => { setMonth(today.getMonth() + 1); setYear(today.getFullYear()); }}>Today</button>
+                <div className="flex items-center gap-2">
+                    <button onClick={handlePrevMonth} className="p-2 border h-[42px] rounded-xl cursor-pointer text-ink hover:bg-muted/10">
+                        <ChevronLeft />
+                    </button>
+                    <h2 className="w-[200px] text-center text-[22px] font-extrabold text-ink">
+                        {monthNames[month - 1]} {year}
+                    </h2>
+                    <button onClick={handleNextMonth} className="p-2 border h-[42px] rounded-xl cursor-pointer text-ink hover:bg-muted/10">
+                        <ChevronRight />
+                    </button>
+                </div>
+                <button className="justify-self-end p-2 border h-[42px] rounded-xl cursor-pointer bg-primary text-white">+ Add Event</button>
             </div>
             <div className="grid grid-cols-7 gap-2 flex-1 min-h-0">
                 {weekdays.map((weekday) => (
-                    <div key={weekday} className="p-2 font-bold text-center">
+                    <div key={weekday} className="p-2 text-center font-bold text-muted text-sm">
                         {weekday}
                     </div>
                 ))}
                 {grid.map((day) => (
-                    <div key={day.iso} className={`p-2 border ${day.inMonth ? '' : 'text-muted'}`}>
+                    <div key={day.iso} className={`p-2 text-center font-bold ${day.inMonth ? '' : 'text-muted'}`}>
                         {Number(day.iso.slice(-2))}
                     </div>
                 ))}

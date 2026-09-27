@@ -140,6 +140,18 @@ weather API. This plan describes turning that design into an actual running app.
       single-day events or 2+ multi-day events). Holidays are **not** counted.
     - **Layers never compete**: band (background), chip (fill), ring (outline), badge
       (corner). A cell never grows, however busy the day is.
+    - **Today**: two light red (`#C8102E`) markers, nothing heavier:
+      - today's **weekday label** in the header row (e.g. "Sun") turns red instead of
+        `muted`, pointing the eye down the right column;
+      - a **short red underline** under today's date number (bottom of the cell)
+        picks out which day in that column.
+      Every other in-cell style was already taken (filled circle = chip, ring =
+      holiday, tint = band) or crowded the grid, and the always-visible clock/date
+      header already says what today is, so the grid only needs a light "you are here"
+      hint. The underline is the one style no other layer uses, and it stays visible
+      over chips and bands. Both show **only when viewing today's month**, or navigating
+      to another month would leave a red weekday with no matching day. Uses
+      `getTodayISO()` (local time) like everything else.
     - **Tapping**: any day with a chip, band, or holiday opens a **day modal** listing
       the holiday first, then every event on that day. Multi-day events always show
       their **full date range** (e.g. "Vacation · Sep 21–25 · Mom, Dad"), even when the
@@ -383,7 +395,7 @@ family-dashboard/
 │   ├── main.tsx
 │   ├── App.tsx                # top-level shell; switches wall vs. phone layout
 │   ├── lib/
-│   │   ├── dates.ts              # getTodayISO(), formatDate() (local time, never UTC)
+│   │   ├── dates.ts              # toISO(), getTodayISO(), formatDate() (local time, never UTC)
 │   │   └── supabaseClient.ts
 │   ├── auth/
 │   │   └── useDeviceSession.ts   # setup-code exchange + persisted session
@@ -397,6 +409,8 @@ family-dashboard/
 │   │   │   └── severeBackgrounds.tsx
 │   │   ├── calendar/
 │   │   │   ├── CalendarWidget.tsx
+│   │   │   ├── buildMonthGrid.ts     # 42-day Sun-first grid for a month (month is 1-based)
+│   │   │   ├── useCalendarData.ts    # mock categories, people, and events
 │   │   │   ├── EventForm.tsx
 │   │   │   └── seasonalThemes.ts
 │   │   └── homeCare/
