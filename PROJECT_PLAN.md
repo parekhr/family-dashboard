@@ -33,6 +33,18 @@ weather API. This plan describes turning that design into an actual running app.
   - **Chosen data source: National Weather Service API (`api.weather.gov`)** — free,
     no API key, and the mockup's own code comments already model its hourly data on
     NWS's gridpoint forecast fields, so this is a close match rather than a rework.
+  - **Note for when we build Weather: iOS-style next-hour precipitation chart.** Idea
+    (from the iOS Weather widget): when rain is expected soon, the "Now" card shows a
+    small precipitation bar chart ("Now · 15m · 30m…") plus a one-line summary, and
+    it's hidden on dry hours. That moves the routine rain heads-up out of the middle
+    banner, leaving the banner for real alerts only (wind, storm, tornado…).
+    - **Data catch:** NWS's finest resolution is hourly, so it can't drive a
+      minute-level chart. MVP keeps the simple "Rain likely next hour" line from NWS.
+    - **Likely upgrade path:** Open-Meteo (free, no key) `minutely_15` precipitation →
+      4 bars/hour; e.g. next 2 hours as 8 bars, which also reads better from across a
+      room than iOS's 60 thin bars. True per-minute sources (OpenWeather, Pirate
+      Weather, Apple WeatherKit) need keys/have limits or cost money. Decide when
+      building the Weather widget.
 - **Calendar**
   - **One model: everything is an event.** A single "+ Add event" button; the event's
     category is picked inside the form (appointment, day off, vacation, etc. are all just

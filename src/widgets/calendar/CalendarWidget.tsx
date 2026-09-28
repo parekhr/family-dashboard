@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { getTodayISO } from '../../lib/dates'
 import { useCalendarData } from './useCalendarData'
+import { dayEvents } from './dayEvents'
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -10,9 +11,10 @@ const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'Jul
 export function CalendarWidget() {
 
     const today = new Date()
-
+    const { events } = useCalendarData()
     const [month, setMonth] = useState(today.getMonth() + 1)
     const [year, setYear] = useState(today.getFullYear())
+
 
     function handlePrevMonth() {
         if (month === 1) {
@@ -35,6 +37,8 @@ export function CalendarWidget() {
     const grid = buildMonthGrid(year, month)
 
     const todayISO = getTodayISO()
+
+    console.log(dayEvents(events, "2026-09-03"))
 
     const isViewingTodaysMonth = month === (today.getMonth() + 1) && year === today.getFullYear()
 
@@ -61,14 +65,19 @@ export function CalendarWidget() {
                         {weekday}
                     </div>
                 ))}
-                {grid.map((day) => (
-                    <div key={day.iso} className={`p-2 text-center font-bold relative${day.inMonth ? '' : 'text-muted'}`}>
-                        {Number(day.iso.slice(-2))}
-                        {day.iso === todayISO && day.inMonth && (
-                            <span className="absolute bottom-3.5 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full bg-today"></span>
-                        )}
-                    </div>
-                ))}
+                {grid.map((day) => {
+                    const hasSingleDayEvent = dayEvents(events, day.iso).some(event => event.start === event.end)
+                    return (
+                        <div key={day.iso} className={`p-2 text-center font-bold relative ${day.inMonth ? '' : 'text-muted'}`}>
+
+                            <span className={`inline-flex items-center justify-center w-8 h-8 rounded-lg ${hasSingleDayEvent ? 'bg-primary text-card' : ''}`}>{Number(day.iso.slice(-2))}</span>
+                            {day.iso === todayISO && day.inMonth && (
+                                <span className="absolute bottom-3.5 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full bg-today"></span>
+                            )}
+                            
+                        </div>
+                    )
+                })}
             </div>
         </div>
     )
