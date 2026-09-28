@@ -1,6 +1,7 @@
 import { buildMonthGrid } from './buildMonthGrid'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { getTodayISO } from '../../lib/dates'
 import { useCalendarData } from './useCalendarData'
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -33,6 +34,10 @@ export function CalendarWidget() {
 
     const grid = buildMonthGrid(year, month)
 
+    const todayISO = getTodayISO()
+
+    const isViewingTodaysMonth = month === (today.getMonth() + 1) && year === today.getFullYear()
+
     return (
         <div className="flex flex-col flex-1 min-h-0 gap-3">
             <div className="grid grid-cols-[1fr_auto_1fr] items-center">
@@ -52,13 +57,16 @@ export function CalendarWidget() {
             </div>
             <div className="grid grid-cols-7 gap-2 flex-1 min-h-0">
                 {weekdays.map((weekday) => (
-                    <div key={weekday} className="p-2 text-center font-bold text-muted text-sm">
+                    <div key={weekday} className={`${ isViewingTodaysMonth && weekday === weekdays[today.getDay()] ? 'text-today' : 'text-muted' } p-2 text-center font-bold text-sm`}>
                         {weekday}
                     </div>
                 ))}
                 {grid.map((day) => (
-                    <div key={day.iso} className={`p-2 text-center font-bold ${day.inMonth ? '' : 'text-muted'}`}>
+                    <div key={day.iso} className={`p-2 text-center font-bold relative${day.inMonth ? '' : 'text-muted'}`}>
                         {Number(day.iso.slice(-2))}
+                        {day.iso === todayISO && day.inMonth && (
+                            <span className="absolute bottom-3.5 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full bg-today"></span>
+                        )}
                     </div>
                 ))}
             </div>

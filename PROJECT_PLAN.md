@@ -140,7 +140,9 @@ weather API. This plan describes turning that design into an actual running app.
       single-day events or 2+ multi-day events). Holidays are **not** counted.
     - **Layers never compete**: band (background), chip (fill), ring (outline), badge
       (corner). A cell never grows, however busy the day is.
-    - **Today**: two light red (`#C8102E`) markers, nothing heavier:
+    - **Today**: two light red (`#E5484D`) markers, nothing heavier. The red is its own
+      theme color (`--color-today` in `@theme` → `text-today` / `bg-today`), separate
+      from the holiday-ring reds, so it can be tuned without touching holidays:
       - today's **weekday label** in the header row (e.g. "Sun") turns red instead of
         `muted`, pointing the eye down the right column;
       - a **short red underline** under today's date number (bottom of the cell)
