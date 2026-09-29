@@ -66,6 +66,15 @@ weather API. This plan describes turning that design into an actual running app.
     `start: Mon, end: Fri` (Friday is the last day; Saturday is clear), and a single day
     is `start === end`. "Does this event cover day X?" is `start <= X && X <= end`. Do not
     copy Outlook/Google's exclusive "ends next midnight" storage.
+  - **Add Event validation**: a timed (not all-day) event can't be saved without a
+    time, and the end date can't be before the start date (either one silently breaks
+    display: a missing time has nothing to show, and an end before start makes
+    `start <= X && X <= end` match no day at all, so the event vanishes). The type
+    (`time?: string`) doesn't enforce the first rule, so the form must; the same rules
+    should eventually be enforced in the database too, not just the form. The day
+    modal's "when" text has a fallback for a missing time, but that's only a safety
+    net. (Later option: make the type itself enforce it with a discriminated union —
+    all-day with no time vs. timed with a required time.)
   - **Category choice sets form defaults only** (e.g. "Vacation" shows the end date,
     "Appointment" shows the time); it never changes the data shape.
   - **Title is optional.** An untitled event displays its category name (e.g. "Dad ·

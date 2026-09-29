@@ -89,8 +89,8 @@ export function useCalendarData() {
             id: "e6",
             categoryId: "c1",
             title: "Team Lunch",
-            start: "2026-10-02",
-            end: "2026-10-02",
+            start: "2026-09-05",
+            end: "2026-09-05",
             allDay: false,
             time: "12:30",
             personIds: []
@@ -111,7 +111,7 @@ export function useCalendarData() {
             start: "2026-08-30",
             end: "2026-09-07",
             allDay: true,
-            personIds: ["p2"]
+            personIds: ["p2", "p3"]
         },
         {
             id: "e9",
