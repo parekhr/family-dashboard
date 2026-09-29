@@ -90,6 +90,13 @@ weather API. This plan describes turning that design into an actual running app.
     month's shape; details live in the Today chips and the day modal.
     - **Always 6 rows (42 days)**, with the previous/next month's days grayed out, so
       the grid never changes size between months.
+    - **Spillover days never show events.** The grayed previous/next-month days are
+      context for the grid's shape only; the viewed month is only about that month
+      (same rule as the Today markers). A spillover cell treats its event list as
+      empty, so chips, bands, and badges all disappear there from one check. A
+      multi-day event that crosses the month edge (e.g. Vacation Aug 30 → Sep 7)
+      therefore draws its band only on the in-month days, with a rounded end at the
+      1st; the day modal still shows its full date range.
     - **Single-day events**: the day number sits on a solid chip in the **theme accent**,
       identical for every category.
     - **Multi-day events**: one soft tint of the theme accent, **1 lane**. A day gets band
@@ -150,6 +157,10 @@ weather API. This plan describes turning that design into an actual running app.
     - **Badge**: one per day, on the date's corner, showing the **total** number of
       events that day. Shown only when there's more than the cell can show (2+
       single-day events or 2+ multi-day events). Holidays are **not** counted.
+      Colored with its own theme color, `--color-badge: #60584F` (`bg-badge`, cream
+      `text-card`), a warm gray between `ink` and `muted`: `ink` read as a heavy black
+      dot that out-shouted the chips, `muted` risked being too faint from across the
+      room, and darker green blended into adjacent chips.
     - **Layers never compete**: band (background), chip (fill), ring (outline), badge
       (corner). A cell never grows, however busy the day is.
     - **Today**: two light red (`#E5484D`) markers, nothing heavier. The red is its own

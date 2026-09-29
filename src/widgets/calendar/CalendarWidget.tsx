@@ -35,7 +35,6 @@ export function CalendarWidget() {
     }
 
     const grid = buildMonthGrid(year, month)
-
     const todayISO = getTodayISO()
 
     console.log(dayEvents(events, "2026-09-03"))
@@ -66,7 +65,11 @@ export function CalendarWidget() {
                     </div>
                 ))}
                 {grid.map((day) => {
-                    const hasSingleDayEvent = dayEvents(events, day.iso).some(event => event.start === event.end)
+                    const cellEvents = day.inMonth? dayEvents(events, day.iso) : []
+                    const singleDayCount = cellEvents.filter(event => event.start === event.end).length
+                    const multiDayCount = cellEvents.filter(event => event.start !== event.end).length
+                    const hasSingleDayEvent = singleDayCount > 0
+                    const showBadge = singleDayCount >= 2 || multiDayCount >= 2
                     return (
                         <div key={day.iso} className={`p-2 text-center font-bold relative ${day.inMonth ? '' : 'text-muted'}`}>
 
@@ -74,7 +77,9 @@ export function CalendarWidget() {
                             {day.iso === todayISO && day.inMonth && (
                                 <span className="absolute bottom-3.5 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full bg-today"></span>
                             )}
-                            
+                            {showBadge && (
+                                <span className="absolute top-[-0.25rem] right-[0.5rem] inline-flex items-center justify-center w-5 h-5 rounded-full bg-badge text-card text-xs">{cellEvents.length}</span>
+                            )}
                         </div>
                     )
                 })}
