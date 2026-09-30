@@ -32,8 +32,8 @@ function getCategoryText(categories: Category[], categoryId: string): string {
 
 export function DayModal({ iso, onClose, events, people, categories }: DayModalProps) {
     return (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-            <div className="w-[480px] rounded-3xl bg-card p-6 text-ink">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-50" onClick={onClose}>
+            <div className="w-[480px] rounded-3xl bg-card p-6 text-ink" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center justify-between">
                         <div className="flex flex-col">
@@ -48,7 +48,7 @@ export function DayModal({ iso, onClose, events, people, categories }: DayModalP
 
                     </div>
                     <button
-                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg"
+                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors"
                         onClick={onClose}
                     >
                         ✕

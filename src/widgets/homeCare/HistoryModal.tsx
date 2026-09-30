@@ -78,12 +78,12 @@ export function HistoryModal({ item, onClose, onDelete, onAdd, onEdit }: History
     }
 
     return (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-            <div className="w-[480px] rounded-3xl bg-card p-6 text-ink">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-50" onClick={onClose}>
+            <div className="w-[480px] rounded-3xl bg-card p-6 text-ink" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between">
                     <h3 className="text-xl font-extrabold">{item.name} History</h3>
                     <button
-                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg"
+                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors"
                         onClick={onClose}
                     >
                         ✕
