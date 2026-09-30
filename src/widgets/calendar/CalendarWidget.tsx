@@ -50,19 +50,22 @@ export function CalendarWidget() {
     return (
         <div className="flex flex-col flex-1 min-h-0 gap-3">
             <div className="grid grid-cols-[1fr_auto_1fr] items-center">
-                <button className="justify-self-start p-2 border h-[42px] rounded-xl cursor-pointer text-white bg-blue-500 hover:bg-blue-600" onClick={() => { setMonth(today.getMonth() + 1); setYear(today.getFullYear()); }}>Today</button>
+                <button className="justify-self-start px-2 h-11 rounded-lg cursor-pointer text-primary font-semibold active:bg-muted/15 hover:bg-muted/10" 
+                    onClick={() => { setMonth(today.getMonth() + 1); setYear(today.getFullYear()); }}>
+                    Today
+                </button>
                 <div className="flex items-center gap-2">
-                    <button onClick={handlePrevMonth} className="p-2 border h-[42px] rounded-xl cursor-pointer text-ink hover:bg-muted/10">
+                    <button onClick={handlePrevMonth} className="flex items-center justify-center cursor-pointer text-ink w-11 h-11 rounded-full active:bg-muted/15 hover:bg-muted/10">
                         <ChevronLeft />
                     </button>
                     <h2 className="w-[200px] text-center text-[22px] font-extrabold text-ink">
                         {monthNames[month - 1]} {year}
                     </h2>
-                    <button onClick={handleNextMonth} className="p-2 border h-[42px] rounded-xl cursor-pointer text-ink hover:bg-muted/10">
+                    <button onClick={handleNextMonth} className="flex items-center justify-center cursor-pointer text-ink w-11 h-11 rounded-full active:bg-muted/15 hover:bg-muted/10">
                         <ChevronRight />
                     </button>
                 </div>
-                <button className="justify-self-end p-2 border h-[42px] rounded-xl cursor-pointer bg-primary text-white">+ Add Event</button>
+                <button className="justify-self-end p-2 border h-11 rounded-xl cursor-pointer bg-primary text-white active:bg-primary-hover hover:bg-primary-hover">+ Add Event</button>
             </div>
             <div className="grid grid-cols-7 gap-x-0 gap-y-2 flex-1 min-h-0">
                 {weekdays.map((weekday) => (
@@ -84,11 +87,11 @@ export function CalendarWidget() {
                     const roundRight = isSaturdayEdge || !bandDays[index + 1]
                     const hasEvent = hasSingleDayEvent || hasMultiDayEvent
                     return (
-                        <div key={day.iso} className={`p-2 text-center font-bold relative ${day.inMonth ? '' : 'text-muted'} ${hasEvent ? 'cursor-pointer' : ''}`} onClick={() => { if(hasEvent) setSelectedDay(day.iso) }}>
+                        <div key={day.iso} className={`p-2 text-center font-bold relative ${day.inMonth ? '' : 'text-muted'} ${hasEvent ? 'group cursor-pointer' : ''}`} onClick={() => { if(hasEvent) setSelectedDay(day.iso) }}>
                             {hasMultiDayEvent && (
                                 <span className={`absolute inset-x-0 top-1 h-10 bg-primary/20 ${roundLeft ? 'rounded-l-full' : ''} ${roundRight ? 'rounded-r-full' : ''}`}></span>
                             )}
-                            <span className={`relative inline-flex items-center justify-center w-8 h-8 rounded-lg ${hasSingleDayEvent ? 'bg-primary text-card' : ''}`}>{Number(day.iso.slice(-2))}</span>
+                            <span className={`relative inline-flex items-center justify-center w-8 h-8 rounded-lg transition-transform group-hover:scale-112 group-active:scale-95 ${hasSingleDayEvent ? 'bg-primary text-card' : ''}`}>{Number(day.iso.slice(-2))}</span>
                             {day.iso === todayISO && day.inMonth && (
                                 <span className="absolute bottom-3.5 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full bg-today"></span>
                             )}
