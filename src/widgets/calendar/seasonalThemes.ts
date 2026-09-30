@@ -27,7 +27,7 @@ const januaryTheme: SeasonalTheme = {
         { icon: Snowflake, className: 'right-[400px] bottom-[-41px] w-[221px] h-[221px] rotate-[8deg] text-jan-icon/20' },
         { icon: Snowflake, className: 'right-[170px] bottom-[71px] w-[105px] h-[105px] rotate-[-12deg] text-jan-icon/15' },
         { icon: Snowflake, className: 'right-[48px] bottom-[207px] w-[71px] h-[71px] rotate-[20deg] text-jan-icon/15' },
-        { icon: Snowflake, className: 'right-[298px] bottom-[207px] w-[125px] h-[171px] rotate-[20deg] text-jan-icon/10' },
+        { icon: Snowflake, className: 'right-[298px] bottom-[230px] w-[125px] h-[125px] rotate-[20deg] text-jan-icon/10' },
     ]
 }
 
@@ -126,8 +126,8 @@ const octoberTheme: SeasonalTheme = {
     header: 'bg-oct-header',
     watermarks: [
         { icon: SpiderWeb, className: 'left-[-75px] bottom-[-75px] w-[204px] h-[204px] text-oct-icon4/10' },
-        { icon: SpiderWeb, className: 'left-[-25px] bottom-[-75px] w-[102px] h-[1024px] text-oct-icon4/10' },
-        { icon: Spider, className: 'left-[0px] bottom-[112px] w-[65px] h-[535px] text-oct-icon4/20' },
+        { icon: SpiderWeb, className: 'left-[-25px] bottom-[386px] w-[102px] h-[102px] text-oct-icon4/10' },
+        { icon: Spider, className: 'left-[0px] bottom-[347px] w-[65px] h-[65px] text-oct-icon4/20' },
         { icon: Ghost, className: 'right-[-24px] bottom-[-24px] w-[204px] h-[204px] text-oct-icon/50' },
         { icon: Pumpkin, className: 'right-[167px] bottom-[-14px] w-[112px] h-[112px] text-oct-icon3/30' },
         { icon: Skull, className: 'right-[41px] bottom-[184px] w-[71px] h-[71px] rotate-[-8deg] text-oct-icon4/15' },
