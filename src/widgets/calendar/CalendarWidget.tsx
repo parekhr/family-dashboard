@@ -41,8 +41,6 @@ export function CalendarWidget() {
     const grid = buildMonthGrid(year, month)
     const todayISO = getTodayISO()
     const seasonalTheme = getDefaultSeasonalTheme(month)
-    const Watermark = seasonalTheme.watermarkIcon
-    const SecondaryWatermark = seasonalTheme.secondaryIcon
     const isViewingTodaysMonth = month === (today.getMonth() + 1) && year === today.getFullYear()
 
     const bandDays = grid.map(day =>
@@ -71,10 +69,12 @@ export function CalendarWidget() {
                 <button className="justify-self-end px-3 h-11 rounded-xl cursor-pointer bg-primary text-white active:bg-primary-hover hover:bg-primary-hover whitespace-nowrap">+ Add Event</button>
             </div>
             <div className={`relative flex flex-col flex-1 min-h-0 p-4 ${seasonalTheme.background}`}>
-                <Watermark className={`absolute -bottom-6 -right-6 w-56 h-56 pointer-events-none ${seasonalTheme.watermarkColor}`} />
-                {SecondaryWatermark && (
-                    <SecondaryWatermark className={`absolute -bottom-4 -left-4 w-40 h-40 opacity-10 pointer-events-none ${seasonalTheme.secondaryColor ?? ''}`} />
-                )}
+                {seasonalTheme.watermarks.map((watermark, index) => {
+                    const Icon = watermark.icon
+                    return (
+                        <Icon key={index} className={`absolute pointer-events-none ${watermark.className}`} />
+                    )
+                })}
                 <div className="grid grid-cols-7 gap-x-0 gap-y-2 flex-1 min-h-0">
                     {weekdays.map((weekday) => (
                         <div key={weekday} className={`${isViewingTodaysMonth && weekday === weekdays[today.getDay()] ? 'text-today' : 'text-muted'} p-2 text-center font-bold text-sm`}>

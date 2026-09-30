@@ -219,7 +219,7 @@ weather API. This plan describes turning that design into an actual running app.
     | Sep | Squirrel & maple | pumpkin `#EDB983` / peach `#F8ECDD` | `Squirrel` BR + 2 × `Nut` (acorns), brown; 3 × **maple leaf** (custom) in rust/orange/gold |
     | Oct | Halloween | plum `#C3B2D1` / pumpkin `#F5DFC6` | `Ghost` BR in cream at `/50` + **pumpkin** (custom, orange) + `Skull` (charcoal); cropped **spider web** in the BL corner with a **spider** hanging off it (custom, charcoal) + `Candy` in plum `#6B4F8A` |
     | Nov | Thanksgiving dinner | rust `#DDB59C` / `#F7ECE3` | `Ham` BR (main) + smaller `Drumstick`; `UtensilsCrossed` + `Wheat` BL; a `Leaf` above |
-    | Dec | Christmas | pine `#CFDCCB` / cranberry `#F0D6CF` | `TreePine` BR (holly `#2E9E5B` at `/25`) with a gold `Star` on its tip; 2 × `Gift` under it (red + green); `CandyCane` BL; 2 small cream `Snowflake`s drifting |
+    | Dec | Christmas | pine `#C2D4C0` / cranberry `#F6E6E1` | `TreePine` BR (holly `#2E9E5B` at `/25`) with a gold `Star` on its tip; 2 × `Gift` under it (red + green); `CandyCane` BL; 2 small cream `Snowflake`s drifting |
 
     (BR = bottom-right, BL = bottom-left.)
 

@@ -20,15 +20,77 @@ body {
   --color-primary-hover: #33685a;
   --color-today: #E5484D;
   --color-badge: #60584F;
-  --color-fall-bg: #F8ECDD;      
-  --color-fall-header: #EDB983;  
-  --color-fall-icon: #C8773A;
-  --color-halloween-header: #C3B2D1;  /* dusky plum, clearly purple */
---color-halloween-bg: #F5DFC6;      /* soft pumpkin */
---color-halloween-icon: #FFFDF8;   /* ghost white (your card cream) */
---color-halloween-icon2: #6B4F8A;   /* deep plum candy */
-  --color-christmas-header: #CFDCCB;  
-  --color-christmas-bg: #F0D6CF;      
-  --color-christmas-icon: #2E9E5B;    
-  --color-christmas-icon2: #B3423A;   
+
+  /* Monthly calendar themes: header, body, and watermark icon colors */
+  /* January: snowflake flurry */
+  --color-jan-header: #D3E2EE;
+  --color-jan-bg: #EFF4F8;
+  --color-jan-icon: #4A7FA8;
+  /* February: rose */
+  --color-feb-header: #E9CBC6;
+  --color-feb-bg: #FBF1EE;
+  --color-feb-icon: #B0324A;
+  /* March: clover cluster */
+  --color-mar-header: #D4E6D0;
+  --color-mar-bg: #F0F6EC;
+  --color-mar-icon: #3E8E4F;
+  /* April: cherry blossom */
+  --color-apr-header: #EFCAD3;
+  --color-apr-bg: #FBEFF1;
+  --color-apr-icon: #D67892;
+  /* May: birdhouse garden */
+  --color-may-header: #E3E9CC;
+  --color-may-bg: #F7F8EC;
+  --color-may-icon: #8C643C;   /* birdhouse */
+  --color-may-icon2: #4678A0;  /* bird */
+  --color-may-icon3: #508246;  /* sprout */
+  --color-may-icon4: #D66E50;  /* flower */
+  /* June: beach */
+  --color-jun-header: #CDE5E1;
+  --color-jun-bg: #FAF3E4;
+  --color-jun-icon: #288C82;   /* palm */
+  --color-jun-icon2: #E06E50;  /* shell */
+  --color-jun-icon3: #E28C32;  /* starfish */
+  /* July: firework festival */
+  --color-jul-header: #B8ABE0;
+  --color-jul-bg: #E9E4F7;
+  --color-jul-icon: #CE3C46;   /* red */
+  --color-jul-icon2: #2896BE;  /* cyan */
+  --color-jul-icon3: #D6A01E;  /* gold */
+  --color-jul-icon4: #DC5AA0;  /* pink */
+  /* August: summer fruit */
+  --color-aug-header: #EFBBAA;
+  --color-aug-bg: #FCEEE7;
+  --color-aug-icon: #E2781E;   /* orange */
+  --color-aug-icon2: #78468C;  /* grape */
+  --color-aug-icon3: #C42D37;  /* apple, cherry */
+  --color-aug-icon4: #C8AA14;  /* lemon */
+  /* September: squirrel & maple */
+  --color-sep-header: #EDB983;
+  --color-sep-bg: #F8ECDD;
+  --color-sep-icon: #C8773A;   /* orange maple */
+  --color-sep-icon2: #825532;  /* squirrel, acorns */
+  --color-sep-icon3: #B04028;  /* rust maple */
+  --color-sep-icon4: #C89628;  /* gold maple */
+  /* October: Halloween */
+  --color-oct-header: #C3B2D1;
+  --color-oct-bg: #F5DFC6;
+  --color-oct-icon: #FFFDF8;   /* ghost (cream, needs high opacity) */
+  --color-oct-icon2: #6B4F8A;  /* candy */
+  --color-oct-icon3: #D66A1F;  /* pumpkin */
+  --color-oct-icon4: #3B3530;  /* skull, spider, web */
+  /* November: Thanksgiving dinner */
+  --color-nov-header: #DDB59C;
+  --color-nov-bg: #F7ECE3;
+  --color-nov-icon: #C4605A;   /* ham */
+  --color-nov-icon2: #AA502D;  /* drumstick, leaf */
+  --color-nov-icon3: #825532;  /* utensils */
+  --color-nov-icon4: #BE8C28;  /* wheat */
+  /* December: Christmas */
+  --color-dec-header: #C2D4C0;
+  --color-dec-bg: #F6E6E1;
+  --color-dec-icon: #2E9E5B;   /* tree, green gift */
+  --color-dec-icon2: #B3423A;  /* red gift, candy cane */
+  --color-dec-icon3: #D6A01E;  /* star */
+  --color-dec-icon4: #FFFDF8;  /* snowflakes (cream, needs high opacity) */
 }
