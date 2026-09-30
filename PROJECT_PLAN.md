@@ -220,6 +220,18 @@ weather API. This plan describes turning that design into an actual running app.
       lookup**. Every month has an entry, so there's no "is this month themed?" check;
       October and December are just entries pointing at a different theme.
     - Developer-owned code, not a household setting (same as holidays).
+    - **Layout:** the tinted header runs **full-width** (edge to edge across the top
+      of the card, no inset strip or divider line) in the stronger `header` tint; the
+      area below it (weekday row + grid) is the lighter `background` tint, and the
+      watermark sits in that lower area. Compared against a cream header with only a
+      seasonal body (calmer, but loses seasonal color) and a divider line between the
+      two (unneeded; the tint step is the edge).
+    - Colors are `@theme` tokens per season (e.g. `--color-fall-bg`, `--color-fall-header`,
+      `--color-fall-icon`), not Tailwind's stock palette, so they match the app's warm
+      palette and can be tuned in one place. Each theme also has a `watermarkColor`
+      (the icon is drawn in the season's color at low opacity, not gray). Starting
+      values for fall: bg `#F8ECDD`, header `#F0D9BE`, icon `#C8773A`. Watch that the
+      green "+ Add Event" button stays pleasant on every header tint (e.g. Christmas).
   - **Grid numbers use tabular digits** (`font-variant-numeric: tabular-nums` /
     Tailwind `tabular-nums`) so "11" and "28" don't look like different sizes.
 - **Home Care tracking**

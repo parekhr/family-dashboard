@@ -20,4 +20,7 @@ body {
   --color-primary-hover: #33685a;
   --color-today: #E5484D;
   --color-badge: #60584F;
+  --color-fall-bg: #F8ECDD;      
+  --color-fall-header: #F0D9BE;  
+  --color-fall-icon: #C8773A;    
 }
