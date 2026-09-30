@@ -199,39 +199,76 @@ weather API. This plan describes turning that design into an actual running app.
     Implies checking a date range (today or today+1) rather than an exact match, and a
     label that depends on which of the two matched. Decide later whether both a
     today-event and a tomorrow-event can show at once, or only the nearer one.
-  - **Seasonal theming covers all 12 months.** Each month's calendar card gets a subtle
-    tinted **background**, a slightly stronger tinted **header**, and one large, faint
-    **watermark icon** in the bottom-right corner (from the icon library, never
-    hand-drawn in CSS; a faint repeating icon pattern was tried and rejected as too
-    busy/hard to see).
+  - **Every month has its own theme** (changed from six shared seasonal themes). Each
+    month's calendar card gets a tinted **background**, a stronger tinted **header**,
+    and a small **scene of faint watermark icons** tucked into the bottom corners of the
+    grid area (a faint repeating icon pattern was tried and rejected as too
+    busy/hard to see). Hex values below are the starting values from the design pass;
+    tune on the real screen.
 
-    | Months | Theme | Watermark |
-    |---|---|---|
-    | Jan–Mar | Winter | Snowman (snowflake if the icon set lacks one) |
-    | Apr–May | Spring | Flower |
-    | Jun–Aug | Summer | Sun |
-    | Sep, Nov | Fall | Autumn leaf |
-    | Oct | Halloween | Pumpkin |
-    | Dec | Christmas | Tree |
+    | Month | Theme | Header / body | Watermark scene |
+    |---|---|---|---|
+    | Jan | Snowflake flurry | icy blue `#D3E2EE` / `#EFF4F8` | 3 × `Snowflake` (big BR, two small drifting above), blue `#4A7FA8` |
+    | Feb | Rose | blush `#E9CBC6` / `#FBF1EE` | `Rose` BR + 2 small `Heart` BL, berry `#B0324A` |
+    | Mar | Clover cluster | shamrock `#D4E6D0` / `#F0F6EC` | 3 × `Clover` cluster, green `#3E8E4F` |
+    | Apr | Cherry blossom | blossom pink `#EFCAD3` / `#FBEFF1` | 3 × `Flower` cluster at slight angles, sakura `#D67892` |
+    | May | Birdhouse garden | garden green `#E3E9CC` / `#F7F8EC` | `Birdhouse` BR with `Bird` perched on its roof (brown `#8C643C` / blue `#4678A0`); `Sprout` (green) + `Flower2` (coral `#D66E50`) BL |
+    | Jun | Beach | aqua `#CDE5E1` / sand `#FAF3E4` | `TreePalm` BR (teal `#288C82`); `Shell` (coral) + `Star` as a starfish (orange `#E28C32`) BL |
+    | Jul | Firework festival | violet `#B8ABE0` / `#E9E4F7` | `Sparkles` + 4 × `Sparkle` bursts across both corners in red `#CE3C46`, cyan `#2896BE`, gold `#D6A01E`, pink `#DC5AA0` |
+    | Aug | Summer fruit | coral red `#EFBBAA` / `#FCEEE7` | `Citrus` BR (orange), `Grape` (purple), `Apple`; `Cherry` + 2nd `Citrus` in lemon yellow, rotated, BL |
+    | Sep | Squirrel & maple | pumpkin `#EDB983` / peach `#F8ECDD` | `Squirrel` BR + 2 × `Nut` (acorns), brown; 3 × **maple leaf** (custom) in rust/orange/gold |
+    | Oct | Halloween | plum `#C3B2D1` / pumpkin `#F5DFC6` | `Ghost` BR in cream at `/50` + **pumpkin** (custom, orange) + `Skull` (charcoal); cropped **spider web** in the BL corner with a **spider** hanging off it (custom, charcoal) + `Candy` in plum `#6B4F8A` |
+    | Nov | Thanksgiving dinner | rust `#DDB59C` / `#F7ECE3` | `Ham` BR (main) + smaller `Drumstick`; `UtensilsCrossed` + `Wheat` BL; a `Leaf` above |
+    | Dec | Christmas | pine `#CFDCCB` / cranberry `#F0D6CF` | `TreePine` BR (holly `#2E9E5B` at `/25`) with a gold `Star` on its tip; 2 × `Gift` under it (red + green); `CandyCane` BL; 2 small cream `Snowflake`s drifting |
 
-    - Stored in `seasonalThemes.ts` as a small set of named themes (`winter`, `spring`,
-      `summer`, `fall`, `halloween`, `christmas`), each `{ background, header,
-      watermarkIcon }` with **light and dark** values, plus a **12-entry month → theme
-      lookup**. Every month has an entry, so there's no "is this month themed?" check;
-      October and December are just entries pointing at a different theme.
+    (BR = bottom-right, BL = bottom-left.)
+
+    - **Data shape:** `seasonalThemes.ts` holds 12 theme objects (one per month) and a
+      12-entry month → theme array, looked up with `[month - 1]`. Each theme is
+      `{ background, header, watermarks }`, where `watermarks` is a **list** of
+      `{ icon, className }` entries (icon component + full Tailwind classes for size,
+      position, rotation and color). This replaces the earlier fixed
+      `watermarkIcon` / `secondaryIcon` fields, since most months now use 3–7 icons.
+      Tailwind classes must be written out in full in the data (never built with
+      `${…}`), or Tailwind won't generate them.
+    - **Paired icons** (icons that touch: May's bird on the birdhouse roof, December's
+      star on the tree tip) only line up at their exact sizes/positions. Keep each pair
+      next to each other in the list with a comment. Align to the icon's *visible* edge:
+      a big icon's scaled-up stroke makes its visible tip sit well above its geometric
+      point (the first star placement was off because of this).
+    - **Custom icons** are allowed only where Lucide has no match: **maple leaf**
+      (Sep), **pumpkin**, **spider**, **spider web** (Oct). Draw them on Lucide's 24×24
+      grid with 2px round-capped outline strokes and build them with lucide-react's
+      `createLucideIcon`, so they behave exactly like Lucide icons (same `className`
+      handling and `LucideIcon` type). A custom turkey was tried and dropped (it read
+      as a generic bird); a turkey, maple leaf, pumpkin and spider don't exist in
+      Lucide as of v1.47.
     - Developer-owned code, not a household setting (same as holidays).
     - **Layout:** the tinted header runs **full-width** (edge to edge across the top
       of the card, no inset strip or divider line) in the stronger `header` tint; the
       area below it (weekday row + grid) is the lighter `background` tint, and the
-      watermark sits in that lower area. Compared against a cream header with only a
+      watermarks sit in that lower area. Compared against a cream header with only a
       seasonal body (calmer, but loses seasonal color) and a divider line between the
       two (unneeded; the tint step is the edge).
-    - Colors are `@theme` tokens per season (e.g. `--color-fall-bg`, `--color-fall-header`,
-      `--color-fall-icon`), not Tailwind's stock palette, so they match the app's warm
-      palette and can be tuned in one place. Each theme also has a `watermarkColor`
-      (the icon is drawn in the season's color at low opacity, not gray). Starting
-      values for fall: bg `#F8ECDD`, header `#F0D9BE`, icon `#C8773A`. Watch that the
-      green "+ Add Event" button stays pleasant on every header tint (e.g. Christmas).
+    - Colors are `@theme` tokens per month (e.g. `--color-sep-bg`, `--color-sep-header`,
+      `--color-sep-icon`, plus extra icon tokens for multi-color scenes), not Tailwind's
+      stock palette, so they match the app's warm palette and can be tuned in one
+      place. Icons are drawn in the month's colors at low opacity, not gray. Watch that
+      the green "+ Add Event" button stays pleasant on every header tint (green headers
+      in Mar/May/Dec especially), and that gray spillover numbers stay readable on the
+      deeper bodies (Jul, Oct, Dec).
+    - **Watermark strength is per icon**, set by the color's `/` opacity in the class
+      (e.g. `text-sep-icon/20`), never also an `opacity-*` on the element (the two
+      multiply: 10% of 10% = invisible, which is how the Halloween candy disappeared).
+      Typical range `/15`–`/25`. Exceptions: **light icons on a light body need much
+      more** (Halloween's cream ghost `/50`, Christmas snowflakes `/70`), and **a green
+      icon on a red body** cancels toward muddy gray, so it needs a brighter, more
+      saturated color and a higher value (Christmas tree `/25` in `#2E9E5B`).
+    - Neighboring months must look different when arrowing between them (e.g. Sep's
+      pumpkin header vs. Oct's plum vs. Nov's rust; Aug's coral vs. Sep's orange).
+    - Lessons from the design pass: bright mint + pink reads as "watermelon" (keep
+      Christmas tints muted and warm); purple as a *body* felt foreign to the palette,
+      but as a *header* (Oct) or twilight (Jul) it works.
   - **Grid numbers use tabular digits** (`font-variant-numeric: tabular-nums` /
     Tailwind `tabular-nums`) so "11" and "28" don't look like different sizes.
 - **Home Care tracking**

@@ -21,6 +21,14 @@ body {
   --color-today: #E5484D;
   --color-badge: #60584F;
   --color-fall-bg: #F8ECDD;      
-  --color-fall-header: #F0D9BE;  
-  --color-fall-icon: #C8773A;    
+  --color-fall-header: #EDB983;  
+  --color-fall-icon: #C8773A;
+  --color-halloween-header: #C3B2D1;  /* dusky plum, clearly purple */
+--color-halloween-bg: #F5DFC6;      /* soft pumpkin */
+--color-halloween-icon: #FFFDF8;   /* ghost white (your card cream) */
+--color-halloween-icon2: #6B4F8A;   /* deep plum candy */
+  --color-christmas-header: #CFDCCB;  
+  --color-christmas-bg: #F0D6CF;      
+  --color-christmas-icon: #2E9E5B;    
+  --color-christmas-icon2: #B3423A;   
 }
