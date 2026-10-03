@@ -35,15 +35,18 @@ export const fixedHolidays: FixedHoliday[] = [
 // Memorial Day        – LAST Monday of May         (month 5,  weekday 1, occurrence last)
 // Father's Day        – 3rd Sunday of June         (month 6,  weekday 0, occurrence 3)
 // Labor Day           – 1st Monday of September    (month 9,  weekday 1, occurrence 1)
-// Columbus / Indigenous Peoples' Day – 2nd Monday of October (month 10, weekday 1, occurrence 2)
+// Columbus Day – 2nd Monday of October (month 10, weekday 1, occurrence 2)
 // Thanksgiving        – 4th Thursday of November   (month 11, weekday 4, occurrence 4)
-// Easter              – moon-based formula, not weekday counting (skip for now)
+// Easter              – moon-based formula, not weekday counting
 
 export const floatingHolidays: FloatingHoliday[] = [
     { name: "Martin Luther King Jr. Day", month: 1, weekday: 1, occurrence: 3, color: '#1E7B45' },
     { name: "Presidents' Day", month: 2, weekday: 1, occurrence: 3, color: '#C8102E' },
+    { name: "Mother's Day", month: 5, weekday: 0, occurrence: 2, color: '#E75480' },
     { name: "Memorial Day", month: 5, weekday: 1, occurrence: 'last', color: '#2E8B57' },
+    { name: "Father's Day", month: 6, weekday: 0, occurrence: 3, color: '#E75480' },
     { name: "Labor Day", month: 9, weekday: 1, occurrence: 1, color: '#D4A017' },
+    { name: "Columbus Day", month: 10, weekday: 1, occurrence: 2, color: '#8E6BBF' },
     { name: "Thanksgiving", month: 11, weekday: 4, occurrence: 4, color: '#F28C28' }
 ]
 
@@ -55,6 +58,23 @@ export function checkHoliday(iso: string): Holiday | undefined {
     const occurrence = Math.ceil(day / 7)
     const monthLength = new Date(year, month, 0).getDate()
 
+    const easter = getEaster(year)
+
     return fixedHolidays.find(holiday => holiday.month === month && holiday.day === day) ?? 
-           floatingHolidays.find(holiday => holiday.month === month && holiday.weekday === weekday && (holiday.occurrence === occurrence || (holiday.occurrence === 'last' && day + 7 > monthLength)))
+           floatingHolidays.find(holiday => holiday.month === month && holiday.weekday === weekday && (holiday.occurrence === occurrence || (holiday.occurrence === 'last' && day + 7 > monthLength))) ??
+           (easter.month === month && easter.day === day ? easter : undefined)
+}
+
+// Calculate the date of Easter for a given year using the Anonymous Gregorian algorithm
+export function getEaster(year: number): FixedHoliday {
+    const f = Math.floor,
+          G = year % 19,
+          C = f(year / 100),
+          H = (C - f(C / 4) - f((8 * C + 13) / 25) + 19 * G + 15) % 30,
+          I = H - f(H / 28) * (1 - f(29 / (H + 1)) * f((21 - G) / 11)),
+          J = (year + f(year / 4) + I + 2 - C + f(C / 4)) % 7,
+          L = I - J,
+          month = 3 + f((L + 40) / 44),
+          day = L + 28 - 31 * f(month / 4);
+    return { name: "Easter", month, day, color: '#8E6BBF' }
 }
