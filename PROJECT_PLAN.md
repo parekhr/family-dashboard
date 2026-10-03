@@ -113,47 +113,59 @@ weather API. This plan describes turning that design into an actual running app.
       where the neighboring day has no band and at the week-row edges (Sun/Sat), and
       square/flush otherwise. Back-to-back or overlapping multi-day events merge into one
       shape — accepted; the badge and day modal tell them apart.
-    - **Holidays**: a colored **ring** around the date. **Every ring is the same fixed
-      outer size**, whether or not the day has an event: on a plain day it circles the
-      number with empty space inside; on a chip day the chip shrinks to fit inside the
-      ring with a small gap (chips on non-holiday days stay normal size). Sizing the ring
-      around whatever is inside made chip-day rings visibly bigger than neighbors. Ring
-      color depends on the
-      holiday (e.g. Halloween orange), from a **developer-owned list** in code
-      (`{ name, date rule, color }`) with a default ring color for any holiday without
-      one. Moving holidays (e.g. Thanksgiving, Labor Day) need a date rule, not a fixed
-      date. Test each ring color against the chip accent at real size. Holidays are code,
-      not household settings.
-      - **The list**: the 11 US federal holidays plus the common observances most
-        calendars show. Only holidays with a strong color association get their own
-        color; the rest use the default ring (slate `#6B7B8C`), so colored rings stay
-        meaningful and never need a key.
+    - **Holidays**: a colored **ring** around the date. The ring is an `outline-4
+      outline-offset-2` on the date's existing number chip (normal size), so it sits just
+      outside the chip with a small gap; on an event day it outlines the filled accent
+      chip, and it scales with the chip on hover. An outline (not a border) takes no
+      space, so the number never shifts. Ring color depends on the holiday (e.g.
+      Halloween orange), from a **developer-owned list** in code (`holidays.ts`) with a
+      default ring color (slate `#6B7B8C`) for any holiday without one. The color comes
+      from data, so it's applied with React's `style` (`outlineColor`), not a Tailwind
+      class. Holidays are code, not household settings.
+      - **Spillover days never show rings** (same rule as events): the cell's holiday
+        lookup is skipped when `!day.inMonth`.
+      - **Lookup**: `checkHoliday(iso)` returns the matching `Holiday` or `undefined`,
+        trying each kind in turn with `??`: fixed → floating → Easter → Chinese New Year.
+        `Holiday` is a union, `FixedHoliday | FloatingHoliday`; the UI only reads `name`
+        and `color`, which both share.
+      - **Four kinds of date rule**:
+        - *Fixed* (`fixedHolidays`): `{ name, month, day, color? }`.
+        - *Floating* (`floatingHolidays`): `{ name, month, weekday, occurrence, color? }`,
+          where `weekday` matches `getDay()` (0 = Sun) and `occurrence` is `1`–`5` or
+          `'last'`. A date's occurrence is `Math.ceil(day / 7)`; it is the last of its
+          weekday when `day + 7` exceeds the month length
+          (`new Date(year, month, 0).getDate()`). The weekday is computed from
+          `new Date(year, month - 1, day)` (local), never `new Date(iso)` (UTC).
+        - *Easter*: hand-written Anonymous Gregorian algorithm (`getEaster(year)`), no
+          date library. Returns a `FixedHoliday` for that year.
+        - *Chinese New Year*: follows the real lunar calendar, so no formula — a hardcoded
+          lookup table of dates for **2026–2050** (`getChineseNewYear(year)`, sourced from
+          Wikipedia and the Hong Kong Observatory). Years outside the table show no ring.
+      - **The list**: US federal holidays plus the common observances a family cares
+        about (not strictly federal).
 
         | Holiday | Date rule | Ring |
         |---|---|---|
         | New Year's Day | Jan 1 | Gold `#D4A017` |
-        | MLK Jr. Day | 3rd Mon of Jan | default |
+        | MLK Jr. Day | 3rd Mon of Jan | Green `#1E7B45` |
+        | Chinese New Year | lookup table (2026–2050) | Red `#C8102E` |
         | Valentine's Day | Feb 14 | Pink `#E75480` |
-        | Presidents' Day | 3rd Mon of Feb | default |
+        | Presidents' Day | 3rd Mon of Feb | Red `#C8102E` |
         | St. Patrick's Day | Mar 17 | Green `#2E8B57` |
-        | Easter | computed (lunar) | Lavender `#A58BD8` |
+        | Easter | computed (Anonymous Gregorian) | Purple `#8E6BBF` |
         | Mother's Day | 2nd Sun of May | Pink `#E75480` |
-        | Memorial Day | last Mon of May | default |
-        | Father's Day | 3rd Sun of Jun | default |
+        | Memorial Day | last Mon of May | Green `#2E8B57` |
+        | Father's Day | 3rd Sun of Jun | Pink `#E75480` |
         | Juneteenth | Jun 19 | default |
         | Independence Day | Jul 4 | Red `#C8102E` |
-        | Labor Day | 1st Mon of Sep | default |
-        | Columbus / Indigenous Peoples' Day | 2nd Mon of Oct | default |
+        | Labor Day | 1st Mon of Sep | Gold `#D4A017` |
+        | Columbus Day | 2nd Mon of Oct | Purple `#8E6BBF` |
         | Halloween | Oct 31 | Orange `#F28C28` |
         | Veterans Day | Nov 11 | default |
-        | Thanksgiving | 4th Thu of Nov | Harvest brown `#B5651D` |
+        | Thanksgiving | 4th Thu of Nov | Orange `#F28C28` |
         | Christmas Eve | Dec 24 | Green `#1E7B45` |
         | Christmas Day | Dec 25 | Red `#C8102E` |
         | New Year's Eve | Dec 31 | Gold `#D4A017` |
-
-      - **Date rules**: 9 of these are "Nth (or last) weekday of a month", so that helper
-        is needed regardless. Easter is the only hard one; leaning toward a date library
-        for it (see Open).
       - **Ring the actual date, never the "observed" day off** (e.g. July 4 on a Saturday
         still rings Saturday, not Friday). Not everyone gets the federal day off.
       - **Ring colors are fixed and ignore the household theme.** No secondary/fallback
@@ -186,8 +198,9 @@ weather API. This plan describes turning that design into an actual running app.
       over chips and bands. Both show **only when viewing today's month**, or navigating
       to another month would leave a red weekday with no matching day. Uses
       `getTodayISO()` (local time) like everything else.
-    - **Tapping**: any day with a chip, band, or holiday opens a **day modal** listing
-      the holiday first, then every event on that day. Multi-day events always show
+    - **Tapping**: any in-month day with a chip, band, or holiday opens a **day modal**.
+      The holiday's name shows as a subtitle under the date, then every event on that day
+      is listed. (The modal has no "N events" count line; the event cards show it.) Multi-day events always show
       their **full date range** (e.g. "Vacation · Sep 21–25 · Mom, Dad"), even when the
       tapped day is in the middle of the event. (Later, maybe: tapping an empty day opens
       "+ Add event" with that date prefilled.)
@@ -530,7 +543,6 @@ family-dashboard/
 
 ## Open / not yet decided
 
-- Whether a date library computes Easter (leaning yes) or it's hand-written.
 - Exact seasonal theme color values (the rendered mockup values are a starting point).
 - Full Supabase schema details (exact tables/columns beyond `household_id` + RLS).
 - Which kiosk browser APK to sideload on the Fire HD 10.

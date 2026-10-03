@@ -103,8 +103,8 @@ export function CalendarWidget() {
                                     <span className={`absolute inset-x-0 top-1 h-10 bg-primary/20 ${roundLeft ? 'rounded-l-full' : ''} ${roundRight ? 'rounded-r-full' : ''}`}></span>
                                 )}
                                 <span 
-                                className={`relative inline-flex items-center justify-center w-8 h-8 rounded-lg transition-transform group-hover:scale-112 group-active:scale-95 ${hasSingleDayEvent ? 'bg-primary text-card' : ''} ${holiday && day.inMonth ? 'outline-4 outline-offset-2' : ''}`}
-                                style={holiday ? { outlineColor: holiday.color ?? '#888' } : undefined}>
+                                className={`relative inline-flex items-center justify-center w-8 h-8 rounded-lg transition-transform group-hover:scale-112 group-active:scale-95 ${hasSingleDayEvent ? 'bg-primary text-card' : ''} ${holiday ? 'outline-4 outline-offset-2' : ''}`}
+                                style={holiday ? { outlineColor: holiday.color ?? '#6B7B8C' } : undefined}>
                                     {Number(day.iso.slice(-2))}
                                 </span>
                                 {day.iso === todayISO && day.inMonth && (
