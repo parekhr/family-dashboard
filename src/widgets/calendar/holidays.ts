@@ -50,6 +50,35 @@ export const floatingHolidays: FloatingHoliday[] = [
     { name: "Thanksgiving", month: 11, weekday: 4, occurrence: 4, color: '#F28C28' }
 ]
 
+// Source: Wikipedia (2026–2037) and Hong Kong Observatory lunar calendar tables (2038–2050)
+const chineseNewYearDates: Record<number, { month: number, day: number }> = {
+    2026: { month: 2, day: 17 },
+    2027: { month: 2, day: 6 },
+    2028: { month: 1, day: 26 },
+    2029: { month: 2, day: 13 },
+    2030: { month: 2, day: 3 },
+    2031: { month: 1, day: 23 },
+    2032: { month: 2, day: 11 },
+    2033: { month: 1, day: 31 },
+    2034: { month: 2, day: 19 },
+    2035: { month: 2, day: 8 },
+    2036: { month: 1, day: 28 },
+    2037: { month: 2, day: 15 },
+    2038: { month: 2, day: 4 },
+    2039: { month: 1, day: 24 },
+    2040: { month: 2, day: 12 },
+    2041: { month: 2, day: 1 },
+    2042: { month: 1, day: 22 },
+    2043: { month: 2, day: 10 },
+    2044: { month: 1, day: 30 },
+    2045: { month: 2, day: 17 },
+    2046: { month: 2, day: 6 },
+    2047: { month: 1, day: 26 },
+    2048: { month: 2, day: 14 },
+    2049: { month: 2, day: 2 },
+    2050: { month: 1, day: 23 },
+}
+
 export function checkHoliday(iso: string): Holiday | undefined {
     const month = Number(iso.slice(-5, -3))
     const day = Number(iso.slice(-2))
@@ -62,7 +91,8 @@ export function checkHoliday(iso: string): Holiday | undefined {
 
     return fixedHolidays.find(holiday => holiday.month === month && holiday.day === day) ?? 
            floatingHolidays.find(holiday => holiday.month === month && holiday.weekday === weekday && (holiday.occurrence === occurrence || (holiday.occurrence === 'last' && day + 7 > monthLength))) ??
-           (easter.month === month && easter.day === day ? easter : undefined)
+           (easter?.month === month && easter?.day === day ? easter : undefined) ??
+           (getChineseNewYear(year)?.month === month && getChineseNewYear(year)?.day === day ? getChineseNewYear(year) : undefined)
 }
 
 // Calculate the date of Easter for a given year using the Anonymous Gregorian algorithm
@@ -77,4 +107,11 @@ export function getEaster(year: number): FixedHoliday {
           month = 3 + f((L + 40) / 44),
           day = L + 28 - 31 * f(month / 4);
     return { name: "Easter", month, day, color: '#8E6BBF' }
+}
+
+
+export function getChineseNewYear(year: number): FixedHoliday | undefined {
+    const date = chineseNewYearDates[year]
+    if (!date) return undefined
+    return { name: "Chinese New Year", month: date.month, day: date.day, color: '#C8102E' }
 }
