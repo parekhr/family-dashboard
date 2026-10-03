@@ -1,5 +1,6 @@
 import { formatDate, formatTime, formatShortDate } from '../../lib/dates'
 import type { CalendarEvent, Person, Category } from './useCalendarData'
+import type { Holiday } from './holidays'
 import { User, CalendarDays } from 'lucide-react'
 
 type DayModalProps = {
@@ -8,6 +9,7 @@ type DayModalProps = {
     events: CalendarEvent[]
     people: Person[]
     categories: Category[]
+    holiday?: Holiday
 }
 
 function getWhenText(event: CalendarEvent): string {
@@ -30,7 +32,7 @@ function getCategoryText(categories: Category[], categoryId: string): string {
     return categories.find(category => category.id === categoryId)?.name ?? ''
 }
 
-export function DayModal({ iso, onClose, events, people, categories }: DayModalProps) {
+export function DayModal({ iso, onClose, events, people, categories, holiday }: DayModalProps) {
     return (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-50" onClick={onClose}>
             <div className="w-[480px] rounded-3xl bg-card p-6 text-ink" onClick={(e) => e.stopPropagation()}>
@@ -41,9 +43,11 @@ export function DayModal({ iso, onClose, events, people, categories }: DayModalP
                                 <CalendarDays className="w-5 h-5 text-muted" />
                                 {formatDate(iso)}
                             </h3>
-                            <span className="ml-7 text-sm text-muted">
-                                {events.length} {events.length === 1 ? 'event' : 'events'}
-                            </span>
+                            {holiday && (
+                                <span className="ml-7 text-sm text-muted">
+                                    {holiday.name}
+                                </span>
+                            )}
                         </div>
 
                     </div>

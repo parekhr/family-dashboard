@@ -5,7 +5,7 @@ export type Holiday = {
     color?: string
 }
 
-const fixedHolidays: Holiday[] = [
+export const fixedHolidays: Holiday[] = [
     { name: "New Year's Day", month: 1, day: 1, color: '#D4A017'},
     { name: "Valentine's Day", month: 2, day: 14, color: '#E75480'},
     { name: "St. Patrick's Day", month: 3, day: 17, color: '#2E8B57'},
@@ -18,3 +18,9 @@ const fixedHolidays: Holiday[] = [
     { name: "New Year's Eve", month: 12, day: 31, color: '#D4A017' }
 ]
 
+export function checkHoliday(iso: string): Holiday | undefined {
+    const month = Number(iso.slice(-5, -3))
+    const day = Number(iso.slice(-2))
+
+    return fixedHolidays.find(holiday => holiday.month === month && holiday.day === day)
+}

@@ -99,8 +99,8 @@ export function useCalendarData() {
             id: "e7",
             categoryId: "c3",
             title: "Company Retreat",
-            start: "2026-09-06",
-            end: "2026-09-14",
+            start: "2026-10-01",
+            end: "2026-10-14",
             allDay: true,
             personIds: ["p1", "p2", "p3"]
         },

@@ -5,6 +5,7 @@ import { getTodayISO } from '../../lib/dates'
 import { useCalendarData } from './useCalendarData'
 import { dayEvents } from './dayEvents'
 import { DayModal } from './DayModal'
+import { checkHoliday } from '../../widgets/calendar/holidays'
 import { getDefaultSeasonalTheme } from './seasonalThemes'
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -94,14 +95,20 @@ export function CalendarWidget() {
                         const roundLeft = isSundayEdge || !bandDays[index - 1]
                         const roundRight = isSaturdayEdge || !bandDays[index + 1]
                         const hasEvent = hasSingleDayEvent || hasMultiDayEvent
+                        const holiday = day.inMonth ? checkHoliday(day.iso) : undefined
+                        const isClickable = hasEvent || holiday
                         return (
-                            <div key={day.iso} className={`p-2 text-center font-bold relative ${day.inMonth ? '' : 'text-muted'} ${hasEvent ? 'group cursor-pointer' : ''}`} onClick={() => { if (hasEvent) setSelectedDay(day.iso) }}>
+                            <div key={day.iso} className={`p-2 text-center font-bold relative ${day.inMonth ? '' : 'text-muted'} ${isClickable ? 'group cursor-pointer' : ''}`} onClick={() => { if (isClickable) setSelectedDay(day.iso) }}>
                                 {hasMultiDayEvent && (
                                     <span className={`absolute inset-x-0 top-1 h-10 bg-primary/20 ${roundLeft ? 'rounded-l-full' : ''} ${roundRight ? 'rounded-r-full' : ''}`}></span>
                                 )}
-                                <span className={`relative inline-flex items-center justify-center w-8 h-8 rounded-lg transition-transform group-hover:scale-112 group-active:scale-95 ${hasSingleDayEvent ? 'bg-primary text-card' : ''}`}>{Number(day.iso.slice(-2))}</span>
+                                <span 
+                                className={`relative inline-flex items-center justify-center w-8 h-8 rounded-lg transition-transform group-hover:scale-112 group-active:scale-95 ${hasSingleDayEvent ? 'bg-primary text-card' : ''} ${holiday && day.inMonth ? 'outline-4 outline-offset-2' : ''}`}
+                                style={holiday ? { outlineColor: holiday.color ?? '#888' } : undefined}>
+                                    {Number(day.iso.slice(-2))}
+                                </span>
                                 {day.iso === todayISO && day.inMonth && (
-                                    <span className="absolute bottom-3.5 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full bg-today"></span>
+                                    <span className="absolute bottom-2.5 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full bg-today"></span>
                                 )}
                                 {showBadge && (
                                     <span className="absolute top-[-0.25rem] right-[0.5rem] inline-flex items-center justify-center w-5 h-5 rounded-full bg-badge text-card text-xs">{cellEvents.length}</span>
@@ -112,7 +119,7 @@ export function CalendarWidget() {
                 </div>
             </div>
             {selectedDay && (
-                <DayModal iso={selectedDay} onClose={() => setSelectedDay(null)} events={dayEvents(events, selectedDay)} people={people} categories={categories} />
+                <DayModal iso={selectedDay} onClose={() => setSelectedDay(null)} events={dayEvents(events, selectedDay)} people={people} categories={categories} holiday={checkHoliday(selectedDay)} />
             )}
         </div>
     )
