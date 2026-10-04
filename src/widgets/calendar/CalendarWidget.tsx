@@ -2,11 +2,12 @@ import { buildMonthGrid } from './buildMonthGrid'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { getTodayISO } from '../../lib/dates'
-import { useCalendarData } from './useCalendarData'
+import { useCalendarData, type CalendarEvent } from './useCalendarData'
 import { dayEvents } from './dayEvents'
 import { DayModal } from './DayModal'
 import { checkHoliday } from '../../widgets/calendar/holidays'
 import { getDefaultSeasonalTheme } from './seasonalThemes'
+import { EventForm } from './EventForm'
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -14,12 +15,31 @@ const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'Jul
 export function CalendarWidget() {
 
     const today = new Date()
-    const { events, people, categories } = useCalendarData()
+    const { events, people, categories, addEvent, deleteEvent, editEvent } = useCalendarData()
     const [month, setMonth] = useState(today.getMonth() + 1)
     const [year, setYear] = useState(today.getFullYear())
-
     const [selectedDay, setSelectedDay] = useState<string | null>(null)
+    const [showEventModal, setShowEventModal] = useState(false)
+    const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null)   // which event is being edited (null = none)
 
+    // after an edit or delete, close the day modal if its day has nothing left to show
+    function closeDayIfEmpty(nextEvents: CalendarEvent[]) {
+        if (selectedDay && dayEvents(nextEvents, selectedDay).length === 0 && !checkHoliday(selectedDay)) {
+            setSelectedDay(null)
+        }
+    }
+
+    function handleDeleteEvent(id: string) {
+        deleteEvent(id)
+        closeDayIfEmpty(events.filter(event => event.id !== id))
+    }
+
+    function handleEditSave(updatedEvent: Omit<CalendarEvent, 'id'>) {
+        if (!editingEvent) return
+        const id = editingEvent.id
+        editEvent(id, updatedEvent)
+        closeDayIfEmpty(events.map(event => event.id === id ? { ...updatedEvent, id } : event))
+    }
 
     function handlePrevMonth() {
         if (month === 1) {
@@ -67,7 +87,11 @@ export function CalendarWidget() {
                         <ChevronRight />
                     </button>
                 </div>
-                <button className="justify-self-end px-3 h-11 rounded-xl cursor-pointer bg-primary text-white active:bg-primary-hover hover:bg-primary-hover whitespace-nowrap">+ Add Event</button>
+                <button 
+                    className="justify-self-end px-3 h-11 rounded-xl cursor-pointer bg-primary text-white active:bg-primary-hover hover:bg-primary-hover whitespace-nowrap"
+                    onClick={() => setShowEventModal(true)}
+                    >+ Add Event
+                    </button>
             </div>
             <div className={`relative flex flex-col flex-1 min-h-0 p-4 ${seasonalTheme.background}`}>
                 {seasonalTheme.watermarks.map((watermark, index) => {
@@ -103,7 +127,7 @@ export function CalendarWidget() {
                                     <span className={`absolute inset-x-0 top-1 h-10 bg-primary/20 ${roundLeft ? 'rounded-l-full' : ''} ${roundRight ? 'rounded-r-full' : ''}`}></span>
                                 )}
                                 <span 
-                                className={`relative inline-flex items-center justify-center w-8 h-8 rounded-lg transition-transform group-hover:scale-112 group-active:scale-95 ${hasSingleDayEvent ? 'bg-primary text-card' : ''} ${holiday ? 'outline-4 outline-offset-2' : ''}`}
+                                className={`relative inline-flex items-center justify-center w-8 h-8 rounded-lg transition-transform group-hover:scale-112 group-active:scale-95 tabular-nums ${hasSingleDayEvent ? 'bg-primary text-card' : ''} ${holiday ? 'outline-4 outline-offset-2' : ''}`}
                                 style={holiday ? { outlineColor: holiday.color ?? '#6B7B8C' } : undefined}>
                                     {Number(day.iso.slice(-2))}
                                 </span>
@@ -118,8 +142,14 @@ export function CalendarWidget() {
                     })}
                 </div>
             </div>
-            {selectedDay && (
-                <DayModal iso={selectedDay} onClose={() => setSelectedDay(null)} events={dayEvents(events, selectedDay)} people={people} categories={categories} holiday={checkHoliday(selectedDay)} />
+            {selectedDay && !editingEvent && (
+                <DayModal iso={selectedDay} onClose={() => setSelectedDay(null)} events={dayEvents(events, selectedDay)} people={people} categories={categories} holiday={checkHoliday(selectedDay)} onEdit={setEditingEvent} onDelete={handleDeleteEvent} />
+            )}
+            {showEventModal && (
+                <EventForm onClose={() => setShowEventModal(false)} onSave={addEvent} categories={categories} people={people} />
+            )}
+            {editingEvent && (
+                <EventForm event={editingEvent} onClose={() => setEditingEvent(null)} onSave={handleEditSave} categories={categories} people={people} />
             )}
         </div>
     )

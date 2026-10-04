@@ -128,13 +128,13 @@ export function HistoryModal({ item, onClose, onDelete, onAdd, onEdit }: History
 
                                     <div className="flex items-center gap-2">
                                         <button
-                                            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-muted"
+                                            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-muted hover:bg-muted/10"
                                             onClick={() => startEditing(date)}
                                         >
                                             <Pencil size={18} />
                                         </button>
                                         <button
-                                            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-red-600"
+                                            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-red-600 hover:bg-red-100"
                                             onClick={() => onDelete(date)}
                                         >
                                             <Trash2 size={18} />

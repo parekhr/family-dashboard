@@ -36,7 +36,7 @@ export function useCalendarData() {
         { id: "p3", name: "Charlie" }
     ])
 
-    const [events] = useState<CalendarEvent[]>([
+    const [events, setEvents] = useState<CalendarEvent[]>([
         {
             id: "e1",
             categoryId: "c1",
@@ -123,5 +123,20 @@ export function useCalendarData() {
             personIds: ["p1", "p3"]
         }
     ])
-    return { categories, setCategories, people, events }
+
+    function addEvent(newEvent: Omit<CalendarEvent, 'id'>) {
+        setEvents(prevEvents => [...prevEvents, { ...newEvent, id: crypto.randomUUID() }])
+    }
+
+    function deleteEvent(id: string) {
+        setEvents(prevEvents => prevEvents.filter(event => event.id !== id))
+    }
+
+    function editEvent(id: string, updatedEvent: Omit<CalendarEvent, 'id'>) {
+        setEvents(prevEvents => prevEvents.map(event =>
+            event.id === id ? { ...updatedEvent, id } : event
+        ))
+    }
+
+    return { categories, setCategories, people, events, addEvent, deleteEvent, editEvent }
 }

@@ -1,9 +1,14 @@
 # Family Dashboard — Project Plan
 
 Status: MVP build in progress. Layout shell, widget registry + `buildRows`, and the Home
-Care widget (log today, History modal with add/edit/delete) are built on mock data. Next
-up: Calendar widget. Home Care item management (add/rename/delete/reorder) is deferred to
-Settings.
+Care widget (log today, History modal with add/edit/delete) are built on mock data. Home
+Care item management (add/rename/delete/reorder) is deferred to Settings.
+
+The Calendar widget is mostly built on mock data: month grid (chips, bands, badge, today
+markers), monthly themes, holiday rings (fixed, floating, Easter, Chinese New Year), the
+day modal, and add/edit/delete events through `EventForm`. **Still to build for
+Calendar**: the today/tomorrow reminder chips, category colors (in those chips and the
+day modal), and category-based form defaults. After that: Weather.
 
 ## Working agreement
 
@@ -75,8 +80,51 @@ weather API. This plan describes turning that design into an actual running app.
     modal's "when" text has a fallback for a missing time, but that's only a safety
     net. (Later option: make the type itself enforce it with a discriminated union —
     all-day with no time vs. timed with a required time.)
+  - **The event form** (`EventForm.tsx`, built). One modal for both adding and editing.
+    - **Fields**: Title and Category share the first row; an All Day checkbox; then a
+      two-column row that depends on All Day: **timed** = Date + Time, **all-day** =
+      Start + End. That is how "timed events are single-day" is enforced: a timed event
+      has no End field and saves `end = start`; an all-day event saves no `time`. Then
+      the People chips and Save. Sharing rows keeps the form short enough to fit inside
+      the calendar widget without scrolling (the modal is confined to the widget).
+    - **Defaults**: today for both dates, the first category, not all-day, no people.
+    - **Validation** runs on Save and shows one red message above the button: a category
+      is required, a timed event needs a time, and an all-day end can't be before its
+      start (the End picker also sets `min` to the start date).
+    - **Category** is a `<select>` built from the household's categories; the form
+      stores the category's id.
+    - **People** are toggle chips, one per person. The **Everyone** chip looks different
+      from the name chips (green outline + `Users` icon, with a thin divider after it)
+      so it reads as an action; it fills in when everyone is selected, and tapping it
+      again clears the selection.
+    - **Data flow**: the form builds an event without an `id` (`Omit<CalendarEvent,
+      'id'>`) and hands it to `onSave`. The hook owns ids: `addEvent` creates one with
+      `crypto.randomUUID()`. The form never knows where data is stored, so swapping in
+      Supabase only changes the hook's function bodies.
+  - **Edit and delete events** (built). Both live in the **day modal**, on each event's
+    card, mirroring Home Care's History modal (pencil + trash per entry).
+    - **Delete asks first.** Tapping the trash puts that card into a confirm state
+      without changing its size: the "when" text becomes a red "Delete?", and the two
+      round buttons become a filled red trash (confirm) and an ✕ (cancel). **Cancel sits
+      where the trash was**, so an accidental double tap cancels rather than deletes.
+      (Text "Delete / Cancel" buttons were tried first; they were wider than the icons,
+      wrapped the title, and made the card grow.) Only one card can be asking at a time.
+    - `deleteEvent(id)` in the hook filters the event out. Deleting a multi-day event
+      removes the whole event, whichever day's modal it was deleted from.
+    - **Edit**: the pencil opens `EventForm` prefilled with the event's values (heading
+      "Edit Event"). The form takes an optional `event` prop: present = editing, absent
+      = adding. Saving calls `editEvent(id, updatedEvent)` in the hook, which replaces
+      the event and keeps its `id`. The same validation applies. This is also how a
+      title gets added to an untitled event later.
+    - **The day modal hides while the edit form is open** and returns when it closes, so
+      two dark backdrops never stack.
+    - **After an edit or delete, the day modal closes itself if its day has nothing left
+      to show** (no events and not a holiday), e.g. when the last event is deleted or an
+      edit moves it to another day.
   - **Category choice sets form defaults only** (e.g. "Vacation" shows the end date,
-    "Appointment" shows the time); it never changes the data shape.
+    "Appointment" shows the time); it never changes the data shape. **Not built yet**,
+    and needs a design decision first: categories are household data, so a category
+    would need its own field saying which default it wants (e.g. `defaultAllDay`).
   - **Title is optional.** An untitled event displays its category name (e.g. "Dad ·
     Appointment"). The fallback is computed at display time (`title || category.name`)
     and never saved into the event, so renaming a category updates old untitled events. Trim
@@ -93,7 +141,8 @@ weather API. This plan describes turning that design into an actual running app.
     - **Zero people is allowed**, for household-wide events that aren't about anyone in
       particular (e.g. "Trash pickup", "Halloween").
   - Category colors appear where there's room for text — the "what's expected today" chips
-    (surfaced separately from the grid) and the day modal — not on the month grid.
+    (surfaced separately from the grid) and the day modal — not on the month grid. **Not
+    built yet**: every category has a `color`, but nothing displays it.
   - **Month grid** (replaces the mockup's split-color chips, which were hard to read
     from a distance and broke down at 3+ events). The grid is a calm summary of the
     month's shape; details live in the Today chips and the day modal.
@@ -200,14 +249,17 @@ weather API. This plan describes turning that design into an actual running app.
       `getTodayISO()` (local time) like everything else.
     - **Tapping**: any in-month day with a chip, band, or holiday opens a **day modal**.
       The holiday's name shows as a subtitle under the date, then every event on that day
-      is listed. (The modal has no "N events" count line; the event cards show it.) Multi-day events always show
+      is listed. (The modal has no "N events" count line; the event cards show it.) The
+      event list scrolls inside a fixed max height (320px) while the header stays put,
+      so a very busy day can't push the modal past the widget and hide its close button. Multi-day events always show
       their **full date range** (e.g. "Vacation · Sep 21–25 · Mom, Dad"), even when the
       tapped day is in the middle of the event. (Later, maybe: tapping an empty day opens
       "+ Add event" with that date prefilled.)
     - **No color key**: bands share one tint, so there's nothing to decode, and the space
       goes to the grid. The day modal and Today chips answer "what is this?" (A
       non-color "This month" list of multi-day events could be added later if missed.)
-  - The "today" reminder banner also fires **the day before** an event, labeled
+  - **Not built yet** (neither the today chips nor the banner exist).
+    The "today" reminder banner also fires **the day before** an event, labeled
     "Tomorrow" instead of "Today" (currently only fires on the event's own day).
     Implies checking a date range (today or today+1) rather than an exact match, and a
     label that depends on which of the two matched. Decide later whether both a
@@ -283,7 +335,10 @@ weather API. This plan describes turning that design into an actual running app.
       Christmas tints muted and warm); purple as a *body* felt foreign to the palette,
       but as a *header* (Oct) or twilight (Jul) it works.
   - **Grid numbers use tabular digits** (`font-variant-numeric: tabular-nums` /
-    Tailwind `tabular-nums`) so "11" and "28" don't look like different sizes.
+    Tailwind `tabular-nums`) so "11" and "28" don't look like different sizes. Built:
+    the class is on the number chip. It has no visible effect with the current system
+    font on Windows (Segoe UI's digits are already equal-width, 9.2px each); it's there
+    as a safeguard for the tablet's font or a bundled font later.
 - **Home Care tracking**
   - Each tracked item = name + icon + a history log of dates, plus two **fixed, optional**
     text fields available on every item: `model` (e.g. a filter's part number) and `size`
@@ -506,9 +561,13 @@ family-dashboard/
 │   │   ├── calendar/
 │   │   │   ├── CalendarWidget.tsx
 │   │   │   ├── buildMonthGrid.ts     # 42-day Sun-first grid for a month (month is 1-based)
-│   │   │   ├── useCalendarData.ts    # mock categories, people, and events
-│   │   │   ├── EventForm.tsx
-│   │   │   └── seasonalThemes.ts
+│   │   │   ├── dayEvents.ts          # events covering a given day
+│   │   │   ├── useCalendarData.ts    # mock categories, people, events + add/edit/delete event
+│   │   │   ├── DayModal.tsx          # a day's holiday + events; edit/delete per event
+│   │   │   ├── EventForm.tsx         # add + edit event form
+│   │   │   ├── holidays.ts           # holiday lists, Easter, Chinese New Year, checkHoliday()
+│   │   │   ├── seasonalThemes.ts     # one theme per month
+│   │   │   └── customIcons.ts        # maple leaf, pumpkin, spider, spider web
 │   │   └── homeCare/
 │   │       ├── HomeCareWidget.tsx
 │   │       ├── HistoryModal.tsx      # per-item history: add/edit/delete dates
@@ -543,6 +602,8 @@ family-dashboard/
 
 ## Open / not yet decided
 
+- How a category declares its form defaults (e.g. a `defaultAllDay` field), needed
+  before "category choice sets form defaults" can be built.
 - Exact seasonal theme color values (the rendered mockup values are a starting point).
 - Full Supabase schema details (exact tables/columns beyond `household_id` + RLS).
 - Which kiosk browser APK to sideload on the Fire HD 10.
