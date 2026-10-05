@@ -27,7 +27,7 @@ export function useCalendarData() {
     const [categories, setCategories] = useState<Category[]>([
         { id: "c1", name: "Meeting", color: "#378ADD" },
         { id: "c2", name: "Appointment", color: "#FF5733" },
-        { id: "c3", name: "Vacation", color: "#33FF57" }
+        { id: "c3", name: "Vacation", color: "#335F57" }
     ])
 
     const [people] = useState<Person[]>([

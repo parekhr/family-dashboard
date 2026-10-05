@@ -7,8 +7,9 @@ Care item management (add/rename/delete/reorder) is deferred to Settings.
 The Calendar widget is mostly built on mock data: month grid (chips, bands, badge, today
 markers), monthly themes, holiday rings (fixed, floating, Easter, Chinese New Year), the
 day modal, and add/edit/delete events through `EventForm`. **Still to build for
-Calendar**: the today/tomorrow reminder chips, category colors (in those chips and the
-day modal), and category-based form defaults. After that: Weather.
+Calendar**: the today/tomorrow reminder strip (designed, see Calendar) and
+category-based form defaults. The day modal shows each event's category in the mock
+data's colors; picking colors is deferred to Settings. After that: Weather.
 
 ## Working agreement
 
@@ -54,7 +55,7 @@ weather API. This plan describes turning that design into an actual running app.
   - **One model: everything is an event.** A single "+ Add event" button; the event's
     category is picked inside the form (appointment, day off, vacation, etc. are all just
     categories, not separate kinds of record).
-  - **Categories control only the look** (name, color, maybe an icon). Households add,
+  - **Categories control only the look** (name, an optional color, maybe an icon). Households add,
     rename, and delete their own categories in Settings. Categories never define fields.
     Each event points to one category by `categoryId`; many events share a category.
     (Named "category", not "event type", to avoid clashing with TypeScript's `type`
@@ -140,9 +141,29 @@ weather API. This plan describes turning that design into an actual running app.
       only; it stores the same list.
     - **Zero people is allowed**, for household-wide events that aren't about anyone in
       particular (e.g. "Trash pickup", "Halloween").
-  - Category colors appear where there's room for text — the "what's expected today" chips
-    (surfaced separately from the grid) and the day modal — not on the month grid. **Not
-    built yet**: every category has a `color`, but nothing displays it.
+  - **Category color is optional; picking one is deferred to Settings.** A category will
+    start with **no color**, and a household can pick one later from a color picker in
+    Settings.
+    - **For now the day modal shows the mock data's colors.** The three mock categories
+      have hardcoded colors in `useCalendarData.ts` (Meeting `#378ADD`, Appointment
+      `#FF5733`, Vacation `#335F57`), standing in for what Settings will provide.
+    - **Day modal (built)**: an event card's second row shows the **category name in its
+      category's color**, then a `·`, then the people: e.g. `Meeting · 👤 Alice, Bob`.
+      The name is looked up with `getCategoryText` and the color with
+      `getCategoryColor`; the color is applied with `style` (it comes from data), and a
+      category with no color just shows in the row's muted gray.
+      - The category label shows **only when the event has a title**; an untitled event
+        already shows the category name as its title.
+      - The row appears if there's a label or people; the `·` only when both are there.
+    - **Reminder chips** (not built) show the title, or the category name when untitled,
+      all in the theme accent.
+    - A color is always shown **with** its category's name, never alone (there is no
+      color key), and **never on the month grid**.
+    - **Pick text-safe colors**: the color is used as small text on the cream card, so
+      it has to be dark enough to read (the mock Vacation green was darkened from
+      `#33FF57` for this). Something for the Settings picker to enforce.
+    - The `Category` type's `color` field becomes optional (`color?`) when Settings
+      arrives.
   - **Month grid** (replaces the mockup's split-color chips, which were hard to read
     from a distance and broke down at 3+ events). The grid is a calm summary of the
     month's shape; details live in the Today chips and the day modal.
@@ -258,12 +279,43 @@ weather API. This plan describes turning that design into an actual running app.
     - **No color key**: bands share one tint, so there's nothing to decode, and the space
       goes to the grid. The day modal and Today chips answer "what is this?" (A
       non-color "This month" list of multi-day events could be added later if missed.)
-  - **Not built yet** (neither the today chips nor the banner exist).
-    The "today" reminder banner also fires **the day before** an event, labeled
-    "Tomorrow" instead of "Today" (currently only fires on the event's own day).
-    Implies checking a date range (today or today+1) rather than an exact match, and a
-    label that depends on which of the two matched. Decide later whether both a
-    today-event and a tomorrow-event can show at once, or only the nearer one.
+  - **Reminder strip** (not built yet): the "what's expected today" chips.
+    - **Where**: inside the calendar widget, between the month/year header and the
+      grid, as in the mockup. A **fixed-height, single-row strip**: it never grows with
+      the number of events (same rule as a grid cell never growing).
+    - **What shows**: one chip per event whose **start date is today or tomorrow**,
+      labeled "Today" or "Tomorrow". That is the whole rule; no time comparison.
+      - A **multi-day event reminds only at its start**: a Sep 24 – Oct 8 vacation shows
+        "Tomorrow" on Sep 23 and "Today" on Sep 24, then nothing for the rest of it.
+      - A reminder **stays for the whole day**, even after a timed event's time has
+        passed, so one that was missed at the time can still be seen later. It clears
+        itself at midnight. (Timed events store only a start time, so there is no end
+        time to expire on anyway.)
+      - Today's and tomorrow's reminders can show together.
+      - A chip shows the event's title, or its category name when untitled (same
+        fallback as the day modal).
+    - **Order** decides which chips get the visible slots: today before tomorrow;
+      within a day, timed events in time order.
+    - **Overflow**: the strip shows a small fixed number of chips (about 2–3; settle by
+      testing), then a **"+N more"** chip counting everything that didn't fit, **today's
+      and tomorrow's together**.
+    - **Tapping "+N more"** opens the existing day modal on today, with **Today /
+      Tomorrow tabs** at the top to switch days. It reuses the day modal (scrolling,
+      edit, delete) rather than adding a new one. The modal lists every event on that
+      day, including multi-day events already in progress, so it can show more than
+      the chip counted.
+    - **Empty**: when nothing starts today or tomorrow, the strip stays in place with a
+      quiet message (e.g. "Nothing today") so the grid doesn't change size. Revisit if
+      it looks tacky on the real screen.
+    - **No dismissing** on the wall for the MVP. Reminders clear themselves at midnight
+      and the overflow handles a crowded strip; a per-chip ✕ would need remembered state
+      and a tap target that makes every chip wider. Add later if the strip feels
+      cluttered in real use.
+    - **Needs a "current time" tick**: React only redraws on a state change and the
+      tablet can sit untouched for hours, so the strip (and the red today markers, which
+      would otherwise stay on yesterday after midnight) need a timer. A small shared hook
+      (e.g. `useNow()`: a `useEffect` with a one-minute `setInterval`, cleared on
+      unmount) that the dashboard clock can use too.
   - **Every month has its own theme** (changed from six shared seasonal themes). Each
     month's calendar card gets a tinted **background**, a stronger tinted **header**,
     and a small **scene of faint watermark icons** tucked into the bottom corners of the
@@ -602,6 +654,11 @@ family-dashboard/
 
 ## Open / not yet decided
 
+- Phone companion: its "today's appointments (dismissible)" list predates the wall's
+  reminder-strip design (no dismissing on the wall); revisit the phone's version later.
+- The category color picker in Settings: which colors are offered (a fixed palette
+  avoids clashes with holiday rings and monthly themes; free choice doesn't, and every color must
+  be readable as small text), and whether reminder chips show the color too.
 - How a category declares its form defaults (e.g. a `defaultAllDay` field), needed
   before "category choice sets form defaults" can be built.
 - Exact seasonal theme color values (the rendered mockup values are a starting point).

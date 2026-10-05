@@ -35,6 +35,10 @@ function getCategoryText(categories: Category[], categoryId: string): string {
     return categories.find(category => category.id === categoryId)?.name ?? ''
 }
 
+function getCategoryColor(categories: Category[], categoryId: string): string | undefined {
+    return categories.find(category => category.id === categoryId)?.color
+}
+
 export function DayModal({ iso, onClose, events, people, categories, holiday, onEdit, onDelete }: DayModalProps) {
 
     const [confirmingId, setConfirmingId] = useState<string | null>(null)   // which event is asking "delete?" (null = none)
@@ -66,6 +70,8 @@ export function DayModal({ iso, onClose, events, people, categories, holiday, on
                 </div>
                 <div className="max-h-[320px] overflow-y-auto mt-4">
                     {events.map((event) => {
+                        const hasTitle = Boolean(event.title?.trim())
+                        const hasPeople = event.personIds.length > 0
                         return (
                             <div key={event.id} className="flex items-center gap-3 rounded-2xl bg-muted/10 p-4 mb-2 mt-4">
                                 <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -81,10 +87,16 @@ export function DayModal({ iso, onClose, events, people, categories, holiday, on
                                     </div>
 
                                     {/* row 2: people, only if there are any */}
-                                    {event.personIds.length > 0 && (
+                                    {(hasPeople || hasTitle) && (
                                         <div className="flex items-center gap-2 text-sm text-muted">
-                                            <User className="w-4 h-4" />
-                                            <span>{getPeopleText(people, event.personIds)}</span>
+                                            {hasTitle && <span style={{ color: getCategoryColor(categories, event.categoryId) }}>{getCategoryText(categories, event.categoryId)}</span>}
+                                            {hasTitle && hasPeople && <span>·</span>}
+                                            {hasPeople && (
+                                                <>
+                                                    <User className="w-4 h-4" />
+                                                    <span>{getPeopleText(people, event.personIds)}</span>
+                                                </>
+                                            )}
                                         </div>
                                     )}
                                 </div>
