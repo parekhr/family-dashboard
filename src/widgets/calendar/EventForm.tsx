@@ -84,7 +84,7 @@ export function EventForm({ onClose, onSave, categories, people, event }: EventF
                         <div className="grid grid-cols-2 gap-3">
                             <label className={labelClass}>
                                 Title (optional)
-                                <input type="text" className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} />
+                                <input type="text" className={inputClass} value={title} maxLength ={60} onChange={(e) => setTitle(e.target.value)} />
                             </label>
 
                             <label className={labelClass}>
@@ -105,7 +105,11 @@ export function EventForm({ onClose, onSave, categories, people, event }: EventF
                         <div className="grid grid-cols-2 gap-3">
                             <label className={labelClass}>
                                 {allDay ? 'Start' : 'Date'}
-                                <input type="date" className={inputClass} value={start} onChange={(e) => setStart(e.target.value)} />
+                                <input type="date" className={inputClass} value={start} 
+                                onChange={(e) => {
+                                    setStart(e.target.value)
+                                    if (end < e.target.value) setEnd(e.target.value)
+                                }} />
                             </label>
                             {allDay ? (
                                 <label className={labelClass}>
@@ -128,7 +132,7 @@ export function EventForm({ onClose, onSave, categories, people, event }: EventF
                                     className={`h-11 px-4 rounded-full font-semibold cursor-pointer transition-colors border-2 border-primary flex items-center gap-2 ${everyoneSelected ? 'bg-primary text-white' : 'text-primary hover:bg-primary/10'}`}
                                     onClick={toggleEveryone}
                                 >
-                                    <Users className="w-4 h-4" />   
+                                    <Users className="w-4 h-4" />
                                     Everyone
                                 </button>
                                 <span className="w-px h-6 self-center bg-muted/30"></span>

@@ -2,6 +2,11 @@ export function getTodayISO(): string {
   return toISO(new Date())
 }
 
+export function getTomorrowISO(): string {
+  const today = new Date()
+  return toISO(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1))
+}
+
 export function formatDate(iso: string): string {
   const [year, month, day] = iso.split('-').map(Number)
   const date = new Date(year, month - 1, day)

@@ -1,6 +1,7 @@
 import { formatDate, formatTime, formatShortDate } from '../../lib/dates'
 import type { CalendarEvent, Person, Category } from './useCalendarData'
 import type { Holiday } from './holidays'
+import { getCategoryText, getCategoryColor } from './categories'
 import { User, CalendarDays, Pencil, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
 
@@ -13,7 +14,11 @@ type DayModalProps = {
     holiday?: Holiday
     onEdit: (event: CalendarEvent) => void
     onDelete: (id: string) => void
+    showTabs?: boolean
+    activeTab?: 'today' | 'tomorrow'
+    onTabChange?: (tab: 'today' | 'tomorrow') => void
 }
+
 
 function getWhenText(event: CalendarEvent): string {
     if (event.start === event.end && event.allDay) {
@@ -31,15 +36,7 @@ function getPeopleText(people: Person[], personIds: string[]): string {
     return personIds.map(id => people.find(person => person.id === id)?.name ?? '').join(', ')
 }
 
-function getCategoryText(categories: Category[], categoryId: string): string {
-    return categories.find(category => category.id === categoryId)?.name ?? ''
-}
-
-function getCategoryColor(categories: Category[], categoryId: string): string | undefined {
-    return categories.find(category => category.id === categoryId)?.color
-}
-
-export function DayModal({ iso, onClose, events, people, categories, holiday, onEdit, onDelete }: DayModalProps) {
+export function DayModal({ iso, onClose, events, people, categories, holiday, onEdit, onDelete, showTabs, activeTab, onTabChange }: DayModalProps) {
 
     const [confirmingId, setConfirmingId] = useState<string | null>(null)   // which event is asking "delete?" (null = none)
 
@@ -68,7 +65,24 @@ export function DayModal({ iso, onClose, events, people, categories, holiday, on
                         ✕
                     </button>
                 </div>
-                <div className="max-h-[320px] overflow-y-auto mt-4">
+                {showTabs && (
+                    <div className="flex gap-2 mt-4">
+                        <button
+                            className={`flex-1 h-11 rounded-full font-semibold cursor-pointer transition-colors ${activeTab === 'today' ? 'bg-primary text-white' : 'bg-muted/15 text-ink hover:bg-muted/25'}`}
+                            onClick={() => onTabChange?.('today')}
+                        >
+                            Today
+                        </button>
+                        <button
+                            className={`flex-1 h-11 rounded-full font-semibold cursor-pointer transition-colors ${activeTab === 'tomorrow' ? 'bg-primary text-white' : 'bg-muted/15 text-ink hover:bg-muted/25'}`}
+                            onClick={() => onTabChange?.('tomorrow')}
+                        >
+                            Tomorrow
+                        </button>
+                    </div>
+                )}
+                <div className={`${showTabs ? 'h-[320px]' : 'max-h-[320px]'} overflow-y-auto mt-4`}>
+                    {events.length === 0 && <p className="py-3 text-sm text-muted">No events</p>}
                     {events.map((event) => {
                         const hasTitle = Boolean(event.title?.trim())
                         const hasPeople = event.personIds.length > 0
@@ -77,12 +91,12 @@ export function DayModal({ iso, onClose, events, people, categories, holiday, on
                                 <div className="flex flex-col gap-1 flex-1 min-w-0">
 
                                     {/* row 1: name left, time right */}
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-lg font-bold">{event.title?.trim() || getCategoryText(categories, event.categoryId)}</span>
+                                    <div className="flex items-center justify-between gap-3">
+                                        <span className="text-lg font-bold min-w-0 break-words">{event.title?.trim() || getCategoryText(categories, event.categoryId)}</span>
                                         {confirmingId === event.id ? (
-                                            <span className="font-semibold text-red-600">Delete?</span>
+                                            <span className="font-semibold text-red-600 whitespace-nowrap shrink-0">Delete?</span>
                                         ) : (
-                                            <span className="font-semibold text-primary">{getWhenText(event)}</span>
+                                            <span className="font-semibold text-primary whitespace-nowrap shrink-0">{getWhenText(event)}</span>
                                         )}
                                     </div>
 
