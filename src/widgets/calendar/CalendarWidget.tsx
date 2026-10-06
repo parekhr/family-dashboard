@@ -107,14 +107,14 @@ export function CalendarWidget() {
                 >+ Add Event
                 </button>
             </div>
-            <div className={`relative flex flex-col flex-1 min-h-0 p-4 ${seasonalTheme.background}`}>
+            <div className={`relative flex flex-col flex-1 min-h-0 px-4 pt-4 pb-2 ${seasonalTheme.background}`}>
                 {seasonalTheme.watermarks.map((watermark, index) => {
                     const Icon = watermark.icon
                     return (
                         <Icon key={index} className={`absolute pointer-events-none ${watermark.className}`} />
                     )
                 })}
-                <div className="flex items-center gap-2 h-11 shrink-0 justify-center">
+                <div className="flex items-center gap-2 h-9 shrink-0 justify-center">
                     {anyReminders ? (
                         <>
                             {visibleToday.map((event) => (
@@ -147,9 +147,9 @@ export function CalendarWidget() {
                         </>
                     ) : <span className="text-sm text-muted">Nothing today or tomorrow</span>}
                 </div>
-                <div className="grid grid-cols-7 gap-x-0 gap-y-2 flex-1 min-h-0">
+                <div className="grid grid-cols-7 gap-x-0 gap-y-0 flex-1 min-h-0">
                     {weekdays.map((weekday) => (
-                        <div key={weekday} className={`${isViewingTodaysMonth && weekday === weekdays[today.getDay()] ? 'text-today' : 'text-muted'} p-2 text-center font-bold text-sm`}>
+                        <div key={weekday} className={`${isViewingTodaysMonth && weekday === weekdays[today.getDay()] ? 'text-today' : 'text-muted'} px-2 py-1 text-center font-bold text-sm`}>
                             {weekday}
                         </div>
                     ))}

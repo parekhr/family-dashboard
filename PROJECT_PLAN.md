@@ -9,7 +9,15 @@ markers), monthly themes, holiday rings (fixed, floating, Easter, Chinese New Ye
 day modal, add/edit/delete events through `EventForm`, and the today/tomorrow reminder
 strip. Nothing is left to build for the widget itself; what remains for calendar data
 lives elsewhere (managing categories and people and picking category colors in Settings;
-real persistence with Supabase). **Next up: Weather.**
+real persistence with Supabase).
+
+The header is built except for the parts that depend on other work: date and time,
+household name, and a settings button with no action yet (see "Header and household
+settings").
+
+**In progress: Weather.** The row height is settled at 250px, the shell is in place, and
+real NWS responses are saved as mock data. Next is deciding the data shape (see the
+build stages under Weather).
 
 ## Working agreement
 
@@ -31,6 +39,43 @@ weather API. This plan describes turning that design into an actual running app.
 - **Date & time** — top-left of the wall dashboard.
 - **Location picker** — current location as the default/most prominent option.
 - **Weather**
+  - **Weather is the dominant widget**: it's the one looked at most, so it gets the top
+    band and more height than a first guess would give it.
+  - **Height: the weather row is 250px** (`h-[250px]` in `App.tsx`; the card inside is
+    1248×218). The mockup's band is about 310px, which left the calendar cut off after
+    its fourth week; 200px forced everything into one cramped row. 250px keeps the
+    mockup's two rows with shorter forecast cards. The three were compared on the live
+    layout before choosing.
+  - **Layout (from the mockup, to build)**: two rows. Top: the "Now" card (icon, large
+    temperature, condition, high/low) on the left, the alert banner in the middle, an
+    Hourly / Weekly switch on the right. Bottom: seven forecast cards that the switch
+    changes between days and hours. At 250px the cards are compact: day, icon,
+    temperature, then the low and the rain chance on one line (no condition text).
+  - **Built so far**: only the shell. `WeatherWidget.tsx` is registered as a
+    full-width widget, first in the layout, with placeholder sections.
+  - **What the NWS data looks like** (checked against real responses):
+    - Two steps: `/points/{lat},{lon}` returns links, not weather; follow its
+      `forecast` (7-day) and `forecastHourly` links. Grid numbers can't be guessed (a
+      wrong one can land on water and return "Marine Forecast Not Supported"). At most
+      four decimal places, and no space after the comma. Alerts are separate:
+      `/alerts/active?point={lat},{lon}`.
+    - The 7-day forecast is 14 periods, a day and a night each, and the first can be
+      either depending on the time of day. A daily high/low has to be paired from them.
+    - The hourly forecast is ~156 one-hour periods with the same fields plus dewpoint
+      and humidity. **"Now" comes from the first hourly period**; there is no separate
+      current-conditions entry in these responses.
+    - `windSpeed` is text ("5 to 10 mph"), not a number. There is no condition code:
+      the condition is words in `shortForecast` ("Mostly Sunny", "Chance Rain
+      Showers"), so icons and severe backgrounds are chosen by keyword.
+    - Errors come back as JSON with `status`, `title` and `detail`.
+  - **Mock data**: three saved real responses in `src/widgets/weather/mock/`
+    (`forecast.json`, `forecastHourly.json`, `alerts.json`). The saved alerts list is
+    empty (a calm day), so a severe sample still needs saving for the alert banner.
+    The files contain the location they were fetched for.
+  - **Build stages**: (1) look at real data and save it — done; (2) decide the tidy
+    data shape and types; (3) `useWeatherData()` returning that shape from the mock
+    files; (4) the layout; (5) alerts; (6) severe backgrounds; (7) real fetching with
+    loading and error states, using the household's location.
   - "Now" view plus weekly and hourly forecasts.
   - Alert banner sourced from a real weather API (primary/secondary alert ranking
     already exists in the mockup's logic: rain < wind < storm < tornado, etc.).
@@ -271,6 +316,14 @@ weather API. This plan describes turning that design into an actual running app.
       room, and darker green blended into adjacent chips.
     - **Layers never compete**: band (background), chip (fill), ring (outline), badge
       (corner). A cell never grows, however busy the day is.
+    - **Vertical budget.** With an 80px header and a 250px weather row, the calendar
+      widget is 438px tall, and the grid fits exactly. Day cells stay at **48px** (`p-2`
+      around the 32px number chip), because a holiday ring is 44px tall and rings in
+      the same column in consecutive weeks (Dec 24 and Dec 31) need the 4px between
+      them; 44px cells were tried and the rings touched. The space comes from around the
+      cells instead: no gap between week rows (`gap-y-0`), a 36px reminder strip
+      (`h-9`), a 28px weekday row (`py-1`), and 8px of padding under the grid (`pb-2`).
+      Any change to the header or weather height has to be re-checked against this.
     - **Today**: two light red (`#E5484D`) markers, nothing heavier. The red is its own
       theme color (`--color-today` in `@theme` → `text-today` / `bg-today`), separate
       from the holiday-ring reds, so it can be tuned without touching holidays:
@@ -301,7 +354,7 @@ weather API. This plan describes turning that design into an actual running app.
   - **Reminder strip** (built): the "what's expected today" chips.
     - **Where**: inside the calendar widget, between the month/year header and the
       grid, as in the mockup, on the month's tinted background. A **fixed-height,
-      single-row strip** (`h-11`): it never grows with the number of events (same rule
+      single-row strip** (`h-9`): it never grows with the number of events (same rule
       as a grid cell never growing). Its contents are **centered**.
     - **Look**: a "Today" chip is solid accent with white text; a "Tomorrow" chip is a
       lighter tint (`bg-primary/30`) with accent text, so the two days read differently
@@ -383,6 +436,11 @@ weather API. This plan describes turning that design into an actual running app.
       `watermarkIcon` / `secondaryIcon` fields, since most months now use 3–7 icons.
       Tailwind classes must be written out in full in the data (never built with
       `${…}`), or Tailwind won't generate them.
+    - **Anchor a watermark to the corner it belongs to.** Bottom-corner icons use
+      `bottom-[…]`; anything meant for a top corner uses `top-[…]`. October's small web
+      and spider were once placed with large `bottom-[…]` offsets, and drifted up over
+      the header each time the calendar got shorter; they now use `top-[-4px]` and
+      `top-[72px]`. When the calendar's height changes, flip through all twelve months.
     - **Paired icons** (icons that touch: May's bird on the birdhouse roof, December's
       star on the tree tip) only line up at their exact sizes/positions. Keep each pair
       next to each other in the list with a comment. Align to the icon's *visible* edge:
@@ -580,6 +638,21 @@ and in what order — a settings change, not a code change or a per-household fo
   not flex `justify-between`, so the name stays centered whatever the sides contain. With
   no household name the middle column is rendered empty (not removed) so the left and
   right zones don't shift. Long names truncate with an ellipsis.
+- **Built so far** (`src/components/Header.tsx`, fixed height `h-20`, `text-ink`):
+  - **Left**: the time, large (`text-5xl`, `tabular-nums` so it doesn't shift as the
+    minutes change), with a smaller AM/PM beside it on the same baseline; under it the
+    date with weekday and year in muted text, e.g. "Tuesday, October 6, 2026". The
+    time string is split at its space to style the digits and AM/PM separately. **No
+    time zone** is shown (the mockup had one; the tablet stays in one house).
+  - It reads the time from the shared `useNow()` hook, so the clock updates each minute.
+  - **Middle**: the household name, centered, one line, `truncate`. It comes from an
+    optional `name` on the mock household (`useHouseholdData.ts`), passed in by `App`.
+  - **Right**: a settings gear button, with no resting background (a soft circle shows
+    only on hover/press, like the calendar's month arrows) and an `aria-label`. It has
+    no action yet.
+- **Still to come**: the location picker (with the Weather widget, see below), the
+  settings button opening Settings, and the name's font choice and length limit (with
+  Settings).
 - **Household name**: optional `name` field on the household, edited in Settings. Display
   label only; `household_id` remains the identifier.
 - **Name length**: hard character limit in the Settings field (tentatively ~24; confirm
@@ -644,6 +717,7 @@ family-dashboard/
 │   │   ├── registry.ts           # widget id -> { component, shape, label } + buildRows()
 │   │   ├── weather/
 │   │   │   ├── WeatherWidget.tsx
+│   │   │   ├── mock/                 # saved NWS responses: forecast, forecastHourly, alerts
 │   │   │   ├── useWeatherData.ts     # NWS fetch/normalize
 │   │   │   └── severeBackgrounds.tsx
 │   │   ├── calendar/
@@ -670,6 +744,7 @@ family-dashboard/
 │   ├── phone/
 │   │   └── QuickActionsView.tsx
 │   ├── components/               # shared/generic UI (buttons, modals, date picker)
+│   │   └── Header.tsx            # date + time, household name, settings button
 │   └── styles/
 │       └── tokens.css            # design tokens ported from the mockup
 └── supabase/

@@ -126,8 +126,9 @@ const octoberTheme: SeasonalTheme = {
     header: 'bg-oct-header',
     watermarks: [
         { icon: SpiderWeb, className: 'left-[-75px] bottom-[-75px] w-[204px] h-[204px] text-oct-icon4/10' },
-        { icon: SpiderWeb, className: 'left-[-25px] bottom-[386px] w-[102px] h-[102px] text-oct-icon4/10' },
-        { icon: Spider, className: 'left-[0px] bottom-[347px] w-[65px] h-[65px] text-oct-icon4/20' },
+        // top corner: anchored to the top so it stays put when the calendar's height changes
+        { icon: SpiderWeb, className: 'left-[-25px] top-[-4px] w-[102px] h-[102px] text-oct-icon4/10' },
+        { icon: Spider, className: 'left-[0px] top-[72px] w-[65px] h-[65px] text-oct-icon4/20' },
         { icon: Ghost, className: 'right-[-24px] bottom-[-24px] w-[204px] h-[204px] text-oct-icon/50' },
         { icon: Pumpkin, className: 'right-[167px] bottom-[-14px] w-[112px] h-[112px] text-oct-icon3/30' },
         { icon: Skull, className: 'right-[41px] bottom-[184px] w-[71px] h-[71px] rotate-[-8deg] text-oct-icon4/15' },

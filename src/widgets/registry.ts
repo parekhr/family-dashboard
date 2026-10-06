@@ -1,6 +1,7 @@
 import type React from 'react'
 import { HomeCareWidget } from './homeCare/HomeCareWidget'
 import { CalendarWidget } from './calendar/CalendarWidget'
+import { WeatherWidget } from './weather/WeatherWidget'
 
 export type Shape = 'full' | 'half'
 export type WidgetId = 'weather' | 'calendar' | 'homeCare'
@@ -8,7 +9,7 @@ export type WidgetId = 'weather' | 'calendar' | 'homeCare'
 export type WidgetDef = { label: string; shape: Shape; component: React.ComponentType }
 
 export const registry: Record<WidgetId, WidgetDef> = {
-  weather: { label: 'Weather', shape: 'full', component: () => null },
+  weather: { label: 'Weather', shape: 'full', component: WeatherWidget },
   calendar: { label: 'Calendar', shape: 'half', component: CalendarWidget },
   homeCare: { label: 'Home Care', shape: 'half', component: HomeCareWidget },
 }
