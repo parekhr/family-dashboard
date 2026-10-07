@@ -15,9 +15,11 @@ The header is built except for the parts that depend on other work: date and tim
 household name, and a settings button with no action yet (see "Header and household
 settings").
 
-**In progress: Weather.** The row height is settled at 250px, the shell is in place, and
-real NWS responses are saved as mock data. Next is deciding the data shape (see the
-build stages under Weather).
+**In progress: Weather.** The row height is settled at 250px, the shell is in place,
+real NWS responses are saved as mock data, the data types are written, and the design
+is decided (one alert banner, an alerts modal over the whole dashboard, hourly cards
+tinted by time of day). Next is making `useWeatherData()` build its data from the saved
+responses (see the build stages under Weather).
 
 ## Working agreement
 
@@ -46,13 +48,114 @@ weather API. This plan describes turning that design into an actual running app.
     its fourth week; 200px forced everything into one cramped row. 250px keeps the
     mockup's two rows with shorter forecast cards. The three were compared on the live
     layout before choosing.
-  - **Layout (from the mockup, to build)**: two rows. Top: the "Now" card (icon, large
-    temperature, condition, high/low) on the left, the alert banner in the middle, an
-    Hourly / Weekly switch on the right. Bottom: seven forecast cards that the switch
-    changes between days and hours. At 250px the cards are compact: day, icon,
-    temperature, then the low and the rain chance on one line (no condition text).
-  - **Built so far**: only the shell. `WeatherWidget.tsx` is registered as a
-    full-width widget, first in the layout, with placeholder sections.
+  - **Layout (to build)**: the mockup's two rows, with the changes below. Each was
+    previewed on the live dashboard before being decided.
+    - **Top row** (64px): the Now card on the left, the alert banner in the middle, the
+      Hourly / Weekly switch on the right. The banner sits outside the row's flow, so
+      the Now card and the switch don't move when an alert appears or clears.
+    - **Bottom row** (about 120px): forecast cards, switched between hours and days.
+  - **Now card**: icon, large temperature, condition, and today's high and low. **Fixed
+    width**, sized for its longest line, so it never changes size.
+    - **Rain note lives here**, as a third line under the high/low (e.g. "Rain likely
+      next hour"), shown only when rain is likely in the next hour. It is worked out
+      from the first hour's rain chance; it needs no data of its own.
+  - **Alert banner: one banner, official alerts only.** The mockup stacked two things in
+    one box (an alert on top, a rain note with a tiny bar chart below); that was dropped
+    as janky: two kinds of information in one box, a shape that changed with what was
+    active, and text too small for a 64px row.
+    - It shows the **single most serious** active alert: the alert's `event` as the
+      title, and a timing line under it (see "The timing line" below). A **"+1"** chip
+      shows when more are active. On a calm day there is no banner.
+    - **Only real NWS fields are shown.** A short summary like "Gusts to 35 mph" is not
+      a field anywhere, so it isn't displayed; text is never made up.
+    - **Tapping the banner** (the whole banner, not just the chip) opens the alerts
+      modal, even when there is only one alert.
+  - **Alerts modal**: opens **over the whole dashboard**, centered (about 600px wide),
+    not inside the weather card, which is far too short. It is the first
+    dashboard-level modal. Read-only. It lists every active alert, most serious first;
+    each card has the title, the timing line, the description, and the instruction as
+    "What to do", in a scrolling list.
+    - **NWS alert fields** (checked on live alerts): `event`, `severity` (Extreme /
+      Severe / Moderate / Minor / Unknown), `onset`, `ends`, `expires`, `instruction`,
+      and `areaDesc` are separate fields. What / where / when / impacts are **not**:
+      they arrive together in `description` as one string, often with markers
+      (`* WHAT...`, `* WHERE...`, `* WHEN...`, `* IMPACTS...`). Not every alert uses
+      the markers: an Air Quality Alert was one plain block of text, with no
+      `instruction` and no `ends`.
+    - **The description is tidied, never parsed into fixed sections** (chosen over
+      showing it raw, hiding it behind a "Show details" button, and not showing it at
+      all; previewed with two real alerts, one of each kind). One renderer for every
+      alert: break the text into paragraphs; if a paragraph starts with a capitalized
+      label and `...` (e.g. `WHAT...`), show the label in bold ("What:") and the rest
+      as normal text; otherwise show it as a plain paragraph. Nothing is thrown away,
+      and it doesn't break when an alert is worded differently. A "details on tap"
+      version was rejected because an alert with no `instruction` collapsed to just a
+      title and a button.
+    - **Clean-ups, each one safe on its own** (it clearly applies or it's skipped; none
+      tries to understand the alert). When unsure, show the text as it came. Accepted
+      as not perfect.
+      - Treat a single line break as a space and a blank line as a new paragraph: NWS
+        hard-wraps its text at about 70 characters.
+      - Drop a first paragraph that is one short all-capitals word with no spaces (a
+        product code such as "AQAFWD"). Confirm against raw saved text.
+      - Leave trailing web addresses alone; there's no safe way to tell them from
+        useful text.
+      - If a description is very long, cut it off after a set number of lines with a
+        "Show more".
+    - **The timing line** (on the banner and on each modal card) has three cases:
+      not started yet → "Starts Thu 10:00 AM" (an alert can be issued days before its
+      `onset`, and still shows, since a heads-up is the point of a watch); under way
+      with an `ends` → "Until Fri 7:00 AM"; under way with no `ends` → "Since today
+      3:12 PM".
+    - **`expires` is not the end of the weather.** It's when the message goes stale; on
+      a real High Wind Watch it was a day *before* the wind started. Never display it
+      as an end time.
+    - **When an alert stops showing**: two mechanisms, both needed.
+      - **Refetching.** `/alerts/active` only returns alerts in effect now, so an ended
+        or cancelled alert is simply missing from the next response. This is the only
+        way to learn about an early cancellation.
+      - **A time check when drawing**, as a safety net between fetches and when a fetch
+        fails (e.g. wifi drops): skip an alert whose `ends` has passed, or whose
+        `expires` has passed when it has no `ends`. It compares against `useNow()`, so
+        it stays current on an idle tablet.
+      - Both belong to stage 7 (real fetching); mock files never change. Starting
+        intervals: alerts every 5–10 minutes, forecasts every 30–60.
+    - **Collect real alerts as test samples.** Save alerts of different kinds into
+      `mock/` as they come up (with markers, plain text, a flood warning, a winter
+      storm), and check the tidy-up code against all of them whenever it changes.
+  - **Hourly view**: **24 hours, six cards per page**, with an arrow button at each end
+    (the mockup's paging), and **page dots centered under the cards**, as in the
+    mockup. The dots sit inside the band's bottom padding (12px; the dots are about
+    6px), so they take no height from the cards.
+    - **Each card**: time, icon, temperature, condition, rain chance. No high/low (an
+      hour has one temperature).
+    - **Time of day is shown by the card's background tint**, not the mockup's
+      NIGHT / MORNING tag on every card, which cost a line of height on a 120px card.
+      Ranges: **Night 9 PM–4 AM, Morning 5–11 AM, Afternoon 12–4 PM, Evening 5–8 PM**.
+      Starting tints (strong enough to tell apart across a room, pale enough for dark
+      text): Morning `#FCE4A0`, Afternoon `#BEDFF4`, Evening `#F4C6B4`, Night `#BFC4EA`.
+      Evening is a warm peach so it doesn't blur into night's indigo.
+    - **A small label names the tint** (e.g. "EVENING", in a darker shade of the card's
+      color) on **the first card of each page, and on any card where the time of day
+      changes**. A page isn't guaranteed a change (night is 8 hours, a page is 6), and
+      a change can fall on any card, so "first and last card" doesn't work. The label
+      sits centered **above** the time; every card reserves the same space for it so
+      the times stay level. (Beside the time was tried: "AFTERNOON" ran into "12 PM".)
+    - A sun or moon icon beside the time was considered and rejected: it sits right
+      above the weather icon, which is often a sun or moon itself, and the two read as
+      one condition. The weather icon already switches to a night version after dark.
+  - **Weekly view**: seven day cards with the day name, icon, high, low and rain
+    chance. Compact at this height: the low and the rain chance share a line.
+  - **Icons are chosen from the condition text** at draw time (a function from
+    condition, and day or night, to a Lucide icon); they are not stored in the data.
+    NWS's own `icon` field is a link to a dated image and isn't used.
+  - **Built so far**: the shell and the types. `WeatherWidget.tsx` is registered as a
+    full-width widget, first in the layout, with two rows of placeholders.
+    `useWeatherData.ts` has the types: `CurrentWeather`, `DayForecast`, `HourForecast`,
+    `WeatherAlert` and `WeatherData` (`{ current, days, hours, alerts }`).
+    Temperatures and rain chance are numbers; the "°" and "%" are added when drawing.
+    `HourForecast` still needs a `timeOfDay` field, and the hook still returns
+    placeholder values.
   - **What the NWS data looks like** (checked against real responses):
     - Two steps: `/points/{lat},{lon}` returns links, not weather; follow its
       `forecast` (7-day) and `forecastHourly` links. Grid numbers can't be guessed (a
@@ -70,15 +173,17 @@ weather API. This plan describes turning that design into an actual running app.
     - Errors come back as JSON with `status`, `title` and `detail`.
   - **Mock data**: three saved real responses in `src/widgets/weather/mock/`
     (`forecast.json`, `forecastHourly.json`, `alerts.json`). The saved alerts list is
-    empty (a calm day), so a severe sample still needs saving for the alert banner.
+    empty (a calm day), so a severe sample still needs saving for the alert banner
+    and modal (e.g. `/alerts/active?event=Wind%20Advisory` while one is active
+    somewhere, saved as `alertsSevere.json`).
     The files contain the location they were fetched for.
   - **Build stages**: (1) look at real data and save it — done; (2) decide the tidy
-    data shape and types; (3) `useWeatherData()` returning that shape from the mock
-    files; (4) the layout; (5) alerts; (6) severe backgrounds; (7) real fetching with
-    loading and error states, using the household's location.
-  - "Now" view plus weekly and hourly forecasts.
-  - Alert banner sourced from a real weather API (primary/secondary alert ranking
-    already exists in the mockup's logic: rain < wind < storm < tornado, etc.).
+    data shape and types — done; (3) `useWeatherData()` returning that shape from the
+    mock files — in progress; (4) the layout; (5) alerts; (6) severe backgrounds;
+    (7) real fetching with loading and error states, using the household's location.
+  - Alerts are ranked so the banner shows the most serious one (the mockup's logic
+    ranks rain < wind < storm < tornado; NWS's own `severity` field is the starting
+    point).
   - Animated backgrounds for certain severe conditions (thunderstorm, tornado, wind,
     snow, blizzard) — pure CSS/DOM animation in the mockup, no external library.
   - **Chosen data source: National Weather Service API (`api.weather.gov`)** — free,
@@ -89,6 +194,8 @@ weather API. This plan describes turning that design into an actual running app.
     small precipitation bar chart ("Now · 15m · 30m…") plus a one-line summary, and
     it's hidden on dry hours. That moves the routine rain heads-up out of the middle
     banner, leaving the banner for real alerts only (wind, storm, tornado…).
+    - **Decided for the MVP:** no bar chart. The rain heads-up is the one-line note in
+      the Now card (see above), and the hourly cards show each hour's rain chance.
     - **Data catch:** NWS's finest resolution is hourly, so it can't drive a
       minute-level chart. MVP keeps the simple "Rain likely next hour" line from NWS.
     - **Likely upgrade path:** Open-Meteo (free, no key) `minutely_15` precipitation →
@@ -767,6 +874,9 @@ family-dashboard/
 
 ## Open / not yet decided
 
+- Weather: the final tint colors for the four times of day, and the alert banner's
+  colors per severity. Starting values only so far; **to be decided on the live app
+  once the widget is built**, not in advance.
 - Phone companion: its "today's appointments (dismissible)" list predates the wall's
   reminder-strip design (no dismissing on the wall); revisit the phone's version later.
 - The category color picker in Settings: which colors are offered (a fixed palette
