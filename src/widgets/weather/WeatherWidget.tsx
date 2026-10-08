@@ -55,9 +55,10 @@ export function WeatherWidget() {
                     const icon = getWeatherIcon(day.condition, true)
                     const isSnow = day.condition.toLowerCase().includes('snow')
                     return (
-                        <div key={day.label} className="flex flex-1 flex-col items-center justify-center gap-1 rounded-2xl bg-card p-2 shadow-sm">
+                        <div key={day.label} className="flex flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl bg-card p-1.5 shadow-sm pt-2">
                             <span className="text-sm font-bold leading-none">{day.label}</span>
                             <img src={icon.still} className="h-8 w-8 shrink-0" alt="" />
+                            <span className="text-sm font-semibold text-muted">{day.condition}</span>
                             <span className="text-lg font-bold leading-none tabular-nums">
                                 {day.high}° <span className="text-sm font-semibold text-muted">/ {day.low}°</span>
                             </span>
