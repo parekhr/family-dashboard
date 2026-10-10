@@ -17,9 +17,9 @@ settings").
 
 **In progress: Weather.** `useWeatherData()` builds its data from the saved NWS
 responses, and the layout is mostly built on it: the Now card, the Hourly / Weekly
-switch, the weekly day cards, and the hourly cards with paging arrows and page dots.
-Still to build in the layout: the hourly cards' time-of-day tint and label, and the rain
-note in the Now card. After that come the alert banner and alerts modal (the banner is
+switch, the weekly day cards, and the hourly cards with paging arrows, page dots and
+the time-of-day tint. Still to build in the layout: the rain note in the Now card.
+After that come the alert banner and alerts modal (the banner is
 still a placeholder), severe backgrounds, and real fetching (see the build stages under
 Weather).
 
@@ -133,7 +133,7 @@ weather API. This plan describes turning that design into an actual running app.
       storm), and check the tidy-up code against all of them whenever it changes.
   - **Hourly view**: **24 hours, six cards per page**, with an arrow button at each end
     (the mockup's paging), and **page dots centered under the cards**, as in the
-    mockup. Built, except for the tint and label below.
+    mockup. Built.
     - **Arrows** are small round buttons, vertically centered beside the cards. Each
       is disabled and faded at its end of the range. Wrapping around like a carousel
       was considered and rejected.
@@ -142,18 +142,24 @@ weather API. This plan describes turning that design into an actual running app.
     - **Each card**: time, icon, condition, temperature, rain chance. No high/low (an
       hour has one temperature). The icon uses the hour's `isDaytime`, so night hours
       get night icons.
-    - **Time of day is shown by the card's background tint** (not built yet), not the mockup's
-      NIGHT / MORNING tag on every card, which cost a line of height on a 120px card.
+    - **Time of day is shown by the card's color**, not the mockup's NIGHT / MORNING
+      tag on every card, which cost a line of height on a 120px card.
       Ranges: **Night 9 PM–4 AM, Morning 5–11 AM, Afternoon 12–4 PM, Evening 5–8 PM**.
-      Starting tints (strong enough to tell apart across a room, pale enough for dark
-      text): Morning `#FCE4A0`, Afternoon `#BEDFF4`, Evening `#F4C6B4`, Night `#BFC4EA`.
-      Evening is a warm peach so it doesn't blur into night's indigo.
-    - **A small label names the tint** (e.g. "EVENING", in a darker shade of the card's
-      color) on **the first card of each page, and on any card where the time of day
-      changes**. A page isn't guaranteed a change (night is 8 hours, a page is 6), and
-      a change can fall on any card, so "first and last card" doesn't work. The label
-      sits centered **above** the time; every card reserves the same space for it so
-      the times stay level. (Beside the time was tried: "AFTERNOON" ran into "12 PM".)
+      Tints: Morning `#FCE4A0`, Afternoon `#BEDFF4`, Evening `#F4C6B4`, Night
+      `#BFC4EA` (`timeOfDayTints` in `WeatherWidget.tsx`, looked up by the hour's
+      `timeOfDay`). Evening is a warm peach so it doesn't blur into night's indigo.
+      The colors live with the drawing code, not in `useWeatherData.ts`.
+    - **Two strengths of the same tint**: the time sits in a full-strength band across
+      the top of the card, and the body below is a 30% mix of the tint with white
+      (`color-mix`). Arrived at in three tries:
+      - The whole card at full strength: the yellow sun icon was hard to see on it.
+      - A white disc behind the icon: looked like a patch.
+      - The band over a plain card-colored body: read as a header stuck on a white
+        card.
+    - **No label naming the tint** ("EVENING" on the first card of a page and wherever
+      the time of day changes) — planned, then dropped. The time is printed in the
+      band, the color change already marks where one part of the day ends, and the
+      label needed a sixth line on a card that is full at five.
     - A sun or moon icon beside the time was considered and rejected: it sits right
       above the weather icon, which is often a sun or moon itself, and the two read as
       one condition. The weather icon already switches to a night version after dark.
@@ -210,8 +216,8 @@ weather API. This plan describes turning that design into an actual running app.
     The files contain the location they were fetched for.
   - **Build stages**: (1) look at real data and save it — done; (2) decide the tidy
     data shape and types — done; (3) `useWeatherData()` returning that shape from the
-    mock files — done; (4) the layout — in progress (left: hourly tint and label, the
-    Now card's rain note); (5) alerts; (6) severe backgrounds;
+    mock files — done; (4) the layout — in progress (left: the Now card's rain
+    note); (5) alerts; (6) severe backgrounds;
     (7) real fetching with loading and error states, using the household's location.
     - **To check at stage 7: the "Today" label.** `useWeatherData()` labels the first
       daytime period "Today". If a forecast is fetched in the evening its first period

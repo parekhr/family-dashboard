@@ -93,9 +93,12 @@ export function WeatherWidget() {
                         {weather.hours.slice(start, start + 6).map(hour => {
                             const icon = getWeatherIcon(hour.condition, hour.isDaytime)
                             const isSnow = hour.condition.toLowerCase().includes('snow')
+                            const tint = timeOfDayTints[hour.timeOfDay]
                             return (
-                                <div key={hour.label} className="flex flex-1 flex-col items-center justify-center gap-1 rounded-2xl bg-card p-1.5 shadow-sm pt-2">
-                                    <span className="text-sm font-bold leading-none">{hour.label}</span>
+                                <div key={hour.label} style={{ backgroundColor: `color-mix(in srgb, ${tint} 30%, white)` }} className="flex flex-1 flex-col items-center justify-between gap-1 overflow-hidden rounded-2xl pb-1.5 shadow-sm">
+                                    <span style={{ backgroundColor: tint }} className="w-full py-1 text-center text-sm font-bold leading-none">
+                                        {hour.label}
+                                    </span>
                                     <img src={icon.still} className="h-8 w-8 shrink-0" alt="" />
                                     <span className="text-sm font-semibold leading-none text-muted">{hour.condition}</span>
                                     <span className="text-lg font-bold leading-none tabular-nums">
