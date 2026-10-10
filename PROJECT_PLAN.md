@@ -15,11 +15,13 @@ The header is built except for the parts that depend on other work: date and tim
 household name, and a settings button with no action yet (see "Header and household
 settings").
 
-**In progress: Weather.** The row height is settled at 250px, the shell is in place,
-real NWS responses are saved as mock data, the data types are written, and the design
-is decided (one alert banner, an alerts modal over the whole dashboard, hourly cards
-tinted by time of day). Next is making `useWeatherData()` build its data from the saved
-responses (see the build stages under Weather).
+**In progress: Weather.** `useWeatherData()` builds its data from the saved NWS
+responses, and the layout is mostly built on it: the Now card, the Hourly / Weekly
+switch, the weekly day cards, and the hourly cards with paging arrows and page dots.
+Still to build in the layout: the hourly cards' time-of-day tint and label, and the rain
+note in the Now card. After that come the alert banner and alerts modal (the banner is
+still a placeholder), severe backgrounds, and real fetching (see the build stages under
+Weather).
 
 ## Working agreement
 
@@ -48,21 +50,27 @@ weather API. This plan describes turning that design into an actual running app.
     its fourth week; 200px forced everything into one cramped row. 250px keeps the
     mockup's two rows with shorter forecast cards. The three were compared on the live
     layout before choosing.
-  - **Layout (to build)**: the mockup's two rows, with the changes below. Each was
-    previewed on the live dashboard before being decided.
-    - **Top row** (64px): the Now card on the left, the alert banner in the middle, the
-      Hourly / Weekly switch on the right. The banner sits outside the row's flow, so
-      the Now card and the switch don't move when an alert appears or clears.
+  - **Layout**: the mockup's two rows, with the changes below. Each was previewed on
+    the live dashboard before being decided.
+    - **Top row** (56px, `h-14`): the Now card on the left, the alert banner in the
+      middle, the Hourly / Weekly switch on the right. The banner sits outside the
+      row's flow, so the Now card and the switch don't move when an alert appears or
+      clears. It was 64px at first; 8px went to the forecast cards, which were cramped
+      with five lines each. The alert banner has not been built at this height yet.
     - **Bottom row** (about 120px): forecast cards, switched between hours and days.
-  - **Now card**: icon, large temperature, condition, and today's high and low. **Fixed
-    width**, sized for its longest line, so it never changes size.
-    - **Rain note lives here**, as a third line under the high/low (e.g. "Rain likely
-      next hour"), shown only when rain is likely in the next hour. It is worked out
-      from the first hour's rain chance; it needs no data of its own.
+    - **Padding**: 12px, except 20px at the bottom (`p-3 pb-5`), which is where the
+      page dots sit.
+  - **Now card**: icon (animated), large temperature, condition, and today's high and
+    low. **Fixed width** (320px), sized for its longest line, so it never changes size.
+    - **Rain note lives here** (not built yet), as a third line under the high/low
+      (e.g. "Rain likely next hour"), shown only when rain is likely in the next hour.
+      It is worked out from the first hour's rain chance; it needs no data of its own.
+  - **Hourly / Weekly switch**: a pill with both words always visible and a highlight
+    that slides behind the selected one. The widget opens on Hourly.
   - **Alert banner: one banner, official alerts only.** The mockup stacked two things in
     one box (an alert on top, a rain note with a tiny bar chart below); that was dropped
     as janky: two kinds of information in one box, a shape that changed with what was
-    active, and text too small for a 64px row.
+    active, and text too small for a row that short.
     - It shows the **single most serious** active alert: the alert's `event` as the
       title, and a timing line under it (see "The timing line" below). A **"+1"** chip
       shows when more are active. On a calm day there is no banner.
@@ -125,11 +133,16 @@ weather API. This plan describes turning that design into an actual running app.
       storm), and check the tidy-up code against all of them whenever it changes.
   - **Hourly view**: **24 hours, six cards per page**, with an arrow button at each end
     (the mockup's paging), and **page dots centered under the cards**, as in the
-    mockup. The dots sit inside the band's bottom padding (12px; the dots are about
-    6px), so they take no height from the cards.
-    - **Each card**: time, icon, temperature, condition, rain chance. No high/low (an
-      hour has one temperature).
-    - **Time of day is shown by the card's background tint**, not the mockup's
+    mockup. Built, except for the tint and label below.
+    - **Arrows** are small round buttons, vertically centered beside the cards. Each
+      is disabled and faded at its end of the range. Wrapping around like a carousel
+      was considered and rejected.
+    - **Dots** sit inside the band's bottom padding, which was deepened from 12px to
+      20px for them: 6px dots in a 12px strip looked squished.
+    - **Each card**: time, icon, condition, temperature, rain chance. No high/low (an
+      hour has one temperature). The icon uses the hour's `isDaytime`, so night hours
+      get night icons.
+    - **Time of day is shown by the card's background tint** (not built yet), not the mockup's
       NIGHT / MORNING tag on every card, which cost a line of height on a 120px card.
       Ranges: **Night 9 PM–4 AM, Morning 5–11 AM, Afternoon 12–4 PM, Evening 5–8 PM**.
       Starting tints (strong enough to tell apart across a room, pale enough for dark
@@ -144,19 +157,37 @@ weather API. This plan describes turning that design into an actual running app.
     - A sun or moon icon beside the time was considered and rejected: it sits right
       above the weather icon, which is often a sun or moon itself, and the two read as
       one condition. The weather icon already switches to a night version after dark.
-  - **Weekly view**: seven day cards with the day name, icon, high, low and rain
-    chance. Compact at this height: the low and the rain chance share a line.
-  - **Icons are chosen from the condition text** at draw time (a function from
-    condition, and day or night, to a Lucide icon); they are not stored in the data.
-    NWS's own `icon` field is a link to a dated image and isn't used.
-  - **Built so far**: the shell and the types. `WeatherWidget.tsx` is registered as a
-    full-width widget, first in the layout, with two rows of placeholders.
-    `useWeatherData.ts` has the types: `CurrentWeather`, `DayForecast`, `HourForecast`,
-    `WeatherAlert` and `WeatherData` (`{ current, days, hours, alerts }`).
-    Temperatures and rain chance are numbers; the "°" and "%" are added when drawing.
-    `HourForecast` still needs a `timeOfDay` field, and the hook still returns
-    placeholder values.
-  - **What the NWS data looks like** (checked against real responses):
+  - **Weekly view** (built): seven day cards, each with the day name, icon, condition,
+    high and low, and rain chance, on five lines.
+    - **High and low share a line** as "61° / 42°": the high large and dark, the slash
+      and the low smaller and muted. Low and rain chance on one line was tried and
+      looked wrong (two unrelated numbers joined together).
+    - **No single "day temperature".** The mockup's large number is the average of the
+      high and low, which isn't a forecast value and would disagree with the Now card
+      on today's card. The high is the large number instead.
+    - **The condition text is kept from the mockup**, under the icon.
+  - **Rain chance** (both views) is its own line, in blue, with a droplet icon. The
+    value is NWS's `probabilityOfPrecipitation`, the chance of any precipitation, so
+    the droplet becomes a snowflake when the condition mentions snow. The field is
+    still named `rainChance`.
+  - **Icons are chosen from the condition text** at draw time; they are not stored in
+    the data. `getWeatherIcon(condition, isDaytime)` in `weatherIcons.ts` matches
+    keywords (thunder, snow, rain or shower, fog, partly / mostly sunny / mostly clear,
+    cloud; otherwise clear) and returns an animated and a still version of a
+    **Meteocons** icon (`@meteocons/svg` and `@meteocons/svg-static`), not Lucide. The
+    Now card uses the animated one and the forecast cards the still one; day cards
+    always use the daytime icon. NWS's own `icon` field is a link to a dated image
+    and isn't used. Lucide is still used for the droplet, snowflake and arrows.
+  - **Built so far**: `WeatherWidget.tsx` is registered as a full-width widget, first
+    in the layout, with everything above marked built; the alert banner is a
+    placeholder box. `useWeatherData.ts` has the types (`CurrentWeather`,
+    `DayForecast`, `HourForecast`, `WeatherAlert` and `WeatherData`, which is
+    `{ current, days, hours, alerts }`) and builds `current`, `days` and `hours` from
+    the mock files; `alerts` is one hard-coded sample. `HourForecast` has `timeOfDay`
+    and `isDaytime`. Temperatures and rain chance are numbers; the "°" and "%" are
+    added when drawing.
+    - **Because the mock is a snapshot**, "now" and the first hourly card are the hour
+      the files were saved (12 PM on October 6, 2026), whatever the real time is.  - **What the NWS data looks like** (checked against real responses):
     - Two steps: `/points/{lat},{lon}` returns links, not weather; follow its
       `forecast` (7-day) and `forecastHourly` links. Grid numbers can't be guessed (a
       wrong one can land on water and return "Marine Forecast Not Supported"). At most
@@ -179,8 +210,13 @@ weather API. This plan describes turning that design into an actual running app.
     The files contain the location they were fetched for.
   - **Build stages**: (1) look at real data and save it — done; (2) decide the tidy
     data shape and types — done; (3) `useWeatherData()` returning that shape from the
-    mock files — in progress; (4) the layout; (5) alerts; (6) severe backgrounds;
+    mock files — done; (4) the layout — in progress (left: hourly tint and label, the
+    Now card's rain note); (5) alerts; (6) severe backgrounds;
     (7) real fetching with loading and error states, using the household's location.
+    - **To check at stage 7: the "Today" label.** `useWeatherData()` labels the first
+      daytime period "Today". If a forecast is fetched in the evening its first period
+      is tonight, so the card labeled "Today" would really be tomorrow. The mock can't
+      show this (it was saved at midday); check it against a real evening response.
   - Alerts are ranked so the banner shows the most serious one (the mockup's logic
     ranks rain < wind < storm < tornado; NWS's own `severity` field is the starting
     point).
@@ -826,6 +862,7 @@ family-dashboard/
 │   │   │   ├── WeatherWidget.tsx
 │   │   │   ├── mock/                 # saved NWS responses: forecast, forecastHourly, alerts
 │   │   │   ├── useWeatherData.ts     # NWS fetch/normalize
+│   │   │   ├── weatherIcons.ts       # condition text -> Meteocons icon (animated + still)
 │   │   │   └── severeBackgrounds.tsx
 │   │   ├── calendar/
 │   │   │   ├── CalendarWidget.tsx

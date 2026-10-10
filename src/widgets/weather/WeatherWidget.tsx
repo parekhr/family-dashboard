@@ -3,6 +3,13 @@ import { useWeatherData } from './useWeatherData'
 import { getWeatherIcon } from './weatherIcons'
 import { useState } from 'react'
 
+const timeOfDayTints = {
+    Morning: '#FCE4A0',
+    Afternoon: '#BEDFF4',
+    Evening: '#F4C6B4',
+    Night: '#BFC4EA',
+}
+
 export function WeatherWidget() {
     const [view, setView] = useState<'hourly' | 'weekly'>('hourly')
     const [pageNumber, setPageNumber] = useState(0)
