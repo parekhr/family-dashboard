@@ -18,10 +18,10 @@ settings").
 **In progress: Weather.** `useWeatherData()` builds its data from the saved NWS
 responses, and the layout is mostly built on it: the Now card, the Hourly / Weekly
 switch, the weekly day cards, and the hourly cards with paging arrows, page dots and
-the time-of-day tint. Still to build in the layout: the rain note in the Now card.
-After that come the alert banner and alerts modal (the banner is
-still a placeholder), severe backgrounds, and real fetching (see the build stages under
-Weather).
+the time-of-day tint, and the Now card's note for rain, snow or storms coming soon.
+The layout stage is done. Next are the alert banner and alerts modal (the banner is
+still a placeholder), then severe backgrounds and real fetching (see the build stages
+under Weather).
 
 ## Working agreement
 
@@ -62,9 +62,19 @@ weather API. This plan describes turning that design into an actual running app.
       page dots sit.
   - **Now card**: icon (animated), large temperature, condition, and today's high and
     low. **Fixed width** (320px), sized for its longest line, so it never changes size.
-    - **Rain note lives here** (not built yet), as a third line under the high/low
-      (e.g. "Rain likely next hour"), shown only when rain is likely in the next hour.
-      It is worked out from the first hour's rain chance; it needs no data of its own.
+    - **The "soon" note lives here** (built), as a third line under the high/low,
+      shown only when precipitation may be on the way. It needs no data of its own.
+      - **When it shows**: the rain chance of the current hour or the next one
+        (`hours[0]` or `hours[1]`) is 30% or more. 30% and not 50%, because knowing
+        there is a chance at all is the useful part.
+      - **What it says** depends on those two hours' condition text, checked in this
+        order: thunder → "Chance of storms soon", snow → "Chance of snow soon",
+        otherwise "Chance of rain soon". "Chance of" and "soon" (not "Rain likely
+        next hour") because 30% isn't likely and two hours are covered.
+      - **Icon**: the matching animated Meteocons icon, small, beside the words. It is
+        drawn larger than its line with negative margins (the icons have a wide empty
+        border) and has a thin drop shadow as an edge, since the pale cloud faded
+        into the card.
   - **Hourly / Weekly switch**: a pill with both words always visible and a highlight
     that slides behind the selected one. The widget opens on Hourly.
   - **Alert banner: one banner, official alerts only.** The mockup stacked two things in
@@ -184,6 +194,8 @@ weather API. This plan describes turning that design into an actual running app.
     Now card uses the animated one and the forecast cards the still one; day cards
     always use the daytime icon. NWS's own `icon` field is a link to a dated image
     and isn't used. Lucide is still used for the droplet, snowflake and arrows.
+    The icons are Meteocons' `fill` style. The `line` style was tried for clearer
+    clouds and rejected: it is outline-only, and the suns became thin rings.
   - **Built so far**: `WeatherWidget.tsx` is registered as a full-width widget, first
     in the layout, with everything above marked built; the alert banner is a
     placeholder box. `useWeatherData.ts` has the types (`CurrentWeather`,
@@ -193,7 +205,8 @@ weather API. This plan describes turning that design into an actual running app.
     and `isDaytime`. Temperatures and rain chance are numbers; the "°" and "%" are
     added when drawing.
     - **Because the mock is a snapshot**, "now" and the first hourly card are the hour
-      the files were saved (12 PM on October 6, 2026), whatever the real time is.  - **What the NWS data looks like** (checked against real responses):
+      the files were saved (12 PM on October 6, 2026), whatever the real time is.
+  - **What the NWS data looks like** (checked against real responses):
     - Two steps: `/points/{lat},{lon}` returns links, not weather; follow its
       `forecast` (7-day) and `forecastHourly` links. Grid numbers can't be guessed (a
       wrong one can land on water and return "Marine Forecast Not Supported"). At most
@@ -216,8 +229,7 @@ weather API. This plan describes turning that design into an actual running app.
     The files contain the location they were fetched for.
   - **Build stages**: (1) look at real data and save it — done; (2) decide the tidy
     data shape and types — done; (3) `useWeatherData()` returning that shape from the
-    mock files — done; (4) the layout — in progress (left: the Now card's rain
-    note); (5) alerts; (6) severe backgrounds;
+    mock files — done; (4) the layout — done; (5) alerts — next; (6) severe backgrounds;
     (7) real fetching with loading and error states, using the household's location.
     - **To check at stage 7: the "Today" label.** `useWeatherData()` labels the first
       daytime period "Today". If a forecast is fetched in the evening its first period
@@ -239,7 +251,7 @@ weather API. This plan describes turning that design into an actual running app.
     - **Decided for the MVP:** no bar chart. The rain heads-up is the one-line note in
       the Now card (see above), and the hourly cards show each hour's rain chance.
     - **Data catch:** NWS's finest resolution is hourly, so it can't drive a
-      minute-level chart. MVP keeps the simple "Rain likely next hour" line from NWS.
+      minute-level chart. MVP keeps the simple "Chance of rain soon" line from NWS.
     - **Likely upgrade path:** Open-Meteo (free, no key) `minutely_15` precipitation →
       4 bars/hour; e.g. next 2 hours as 8 bars, which also reads better from across a
       room than iOS's 60 thin bars. True per-minute sources (OpenWeather, Pirate

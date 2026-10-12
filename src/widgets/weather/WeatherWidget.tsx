@@ -10,6 +10,12 @@ const timeOfDayTints = {
     Night: '#BFC4EA',
 }
 
+const soonMessages = {
+    thunder: 'Chance of storms soon',
+    snow: 'Chance of snow soon',
+    rain: 'Chance of rain soon',
+}
+
 export function WeatherWidget() {
     const [view, setView] = useState<'hourly' | 'weekly'>('hourly')
     const [pageNumber, setPageNumber] = useState(0)
@@ -18,10 +24,13 @@ export function WeatherWidget() {
     const weather = useWeatherData()
     const nowIcon = getWeatherIcon(weather.current.condition, weather.current.isDaytime)
     const pageCount = Math.ceil(weather.hours.length / 6)
+    const soonText = `${weather.hours[0].condition} ${weather.hours[1].condition}`.toLowerCase()
+    const soonKind = soonText.includes('thunder') ? 'thunder' : soonText.includes('snow') ? 'snow' : 'rain'
+    const soonIcon = getWeatherIcon(soonKind, true)
+    const precipSoon = weather.hours[0].rainChance >= 30 || weather.hours[1].rainChance >= 30
 
     return (
-        <div className="relative flex flex-col flex-1 min-h-0 gap-2.5 rounded-3xl overflow-hidden bg-card p-3 pb-5 text-ink bg-muted/15">
-
+        <div className="relative flex flex-col flex-1 min-h-0 gap-2.5 rounded-3xl overflow-hidden p-3 pb-5 text-ink bg-muted/15">
             {/* top row: now (left), alert (middle), hourly/weekly switch (right) */}
             <div className="flex h-14 shrink-0 items-center justify-between">
                 {/* Now card */}
@@ -35,6 +44,12 @@ export function WeatherWidget() {
                         <span className="text-xs font-semibold text-muted">
                             H {weather.current.high}°  L {weather.current.low}°
                         </span>
+                        {precipSoon && (
+                            <span className="flex items-center gap-1 text-xs font-bold text-sky-600">
+                                <img src={soonIcon.animated} className="-my-2 -ml-1 h-7 w-7 shrink-0 drop-shadow-[0_0_1px_rgba(0,0,0,0.45)]" alt="" />
+                                {soonMessages[soonKind]}
+                            </span>
+                        )}
                     </div>
                 </div>
                 <div className="flex h-full w-[220px] items-center justify-center rounded-2xl bg-yellow-100">Alert</div>
@@ -64,10 +79,10 @@ export function WeatherWidget() {
                     const icon = getWeatherIcon(day.condition, true)
                     const isSnow = day.condition.toLowerCase().includes('snow')
                     return (
-                        <div key={day.label} className="flex flex-1 flex-col items-center justify-center gap-1 rounded-2xl bg-card p-1.5 shadow-sm pt-2">
+                        <div key={day.label} className="flex flex-1 flex-col items-center justify-center gap-1 rounded-2xl bg-card shadow-sm p-1.5 pt-2">
                             <span className="text-sm font-bold leading-none">{day.label}</span>
                             <img src={icon.still} className="h-8 w-8 shrink-0" alt="" />
-                            <span className="text-sm font-semibold text-muted">{day.condition}</span>
+                            <span className="text-sm font-semibold leading-none text-muted">{day.condition}</span>
                             <span className="text-lg font-bold leading-none tabular-nums">
                                 {day.high}° <span className="text-sm font-semibold text-muted">/ {day.low}°</span>
                             </span>
@@ -83,11 +98,12 @@ export function WeatherWidget() {
                     <>
                         {/* previous page */}
                         <button
-                            className="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-full rounded-2xl bg-card shadow-sm cursor-pointer disabled:cursor-default disabled:opacity-30 hover:bg-card/50"
+                            className="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-full bg-card shadow-sm cursor-pointer disabled:cursor-default disabled:opacity-30 hover:bg-card/50"
                             onClick={() => setPageNumber(pageNumber - 1)}
                             disabled={pageNumber === 0}
+                            aria-label="Earlier hours"
                         >
-                            <ChevronLeft className="h-5 w-5 hover" />
+                            <ChevronLeft className="h-5 w-5" />
                         </button>
 
                         {weather.hours.slice(start, start + 6).map(hour => {
@@ -114,9 +130,10 @@ export function WeatherWidget() {
 
                         {/* next page */}
                         <button
-                            className="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-full rounded-2xl bg-card shadow-sm cursor-pointer disabled:cursor-default disabled:opacity-30 hover:bg-card/50"
+                            className="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-full bg-card shadow-sm cursor-pointer disabled:cursor-default disabled:opacity-30 hover:bg-card/50"
                             onClick={() => setPageNumber(pageNumber + 1)}
                             disabled={pageNumber === pageCount - 1}
+                            aria-label="Later hours" 
                         >
                             <ChevronRight className="h-5 w-5" />
                         </button>
