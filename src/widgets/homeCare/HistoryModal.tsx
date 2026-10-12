@@ -2,6 +2,7 @@ import type { HomeCareItem } from "./useHomeCareData"
 import { Trash2, Pencil } from "lucide-react"
 import { formatDate, getTodayISO } from "../../lib/dates"
 import { useState } from "react"
+import { Modal } from "../../components/Modal"
 
 type HistoryModalProps = {
     item: HomeCareItem
@@ -78,103 +79,101 @@ export function HistoryModal({ item, onClose, onDelete, onAdd, onEdit }: History
     }
 
     return (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-50" onClick={onClose}>
-            <div className="w-[480px] rounded-3xl bg-card p-6 text-ink" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-extrabold">{item.name} History</h3>
-                    <button
-                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors"
-                        onClick={onClose}
-                    >
-                        ✕
-                    </button>
-                </div>
-
-                <div className="mt-4 max-h-[320px] overflow-y-auto">
-                    {item.history.length === 0 && <p className="py-3 text-sm text-muted">No entries yet</p>}
-                    {[...item.history].sort().reverse().map((date) => (
-                        <div key={date} className="flex items-center justify-between py-2 border-b border-muted/20">
-                            {editingDate === date ? (
-                                <div className="flex w-full flex-col gap-1">
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            type="date"
-                                            max={getTodayISO()}
-                                            className="h-11 flex-1 rounded-xl border border-muted/40 px-3"
-                                            value={editValue}
-                                            onChange={(e) => {
-                                                setEditValue(e.target.value)
-                                                setEditError('')
-                                            }}
-                                        />
-                                        <button
-                                            className="h-11 cursor-pointer rounded-xl bg-primary px-4 font-bold text-white"
-                                            onClick={() => handleEditSave(date)}
-                                        >
-                                            Save
-                                        </button>
-                                        <button
-                                            className="h-11 cursor-pointer px-3 text-muted"
-                                            onClick={cancelEditing}
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                    {editError && <p className="text-sm text-red-600">{editError}</p>}
-                                </div>
-                            ) : (
-                                <>
-                                    <span className="text-base font-semibold">{formatDate(date)}</span>
-
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-muted hover:bg-muted/10"
-                                            onClick={() => startEditing(date)}
-                                        >
-                                            <Pencil size={18} />
-                                        </button>
-                                        <button
-                                            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-red-600 hover:bg-red-100"
-                                            onClick={() => onDelete(date)}
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    ))}
-                </div>
-                {adding ? (
-                    <div className="mt-4 flex min-h-[52px] flex-col justify-center gap-2">
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="date"
-                                max={getTodayISO()}
-                                className="h-11 flex-1 rounded-xl border border-muted/40 px-3"
-                                value={newDate}
-                                onChange={(e) => {
-                                    setNewDate(e.target.value)
-                                    setError('')
-                                }}
-                            />
-                            <button className="h-11 cursor-pointer rounded-xl bg-primary px-4 font-bold text-white" onClick={handleSave}>Save</button>
-                            <button className="h-11 cursor-pointer px-3 text-muted" onClick={() => { setAdding(false); setNewDate(''); setError(''); }}>Cancel</button>
-                        </div>
-                        {error && <p className="text-sm text-red-600">{error}</p>}
-                    </div>
-                ) : (
-                    <button
-                        className="mt-4 h-[52px] w-full cursor-pointer rounded-full border-2 border-dashed border-muted/40 font-bold"
-                        onClick={() => {
-                            cancelEditing()   // only one form open at a time: close any row edit
-                            setAdding(true)
-                        }}
-                    >
-                        + Add Entry
-                    </button>
-                )}
+        <Modal onClose={onClose} className="w-[480px]">
+            <div className="flex items-center justify-between">
+                <h3 className="text-xl font-extrabold">{item.name} History</h3>
+                <button
+                    className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors"
+                    onClick={onClose}
+                >
+                    ✕
+                </button>
             </div>
-        </div>
+
+            <div className="mt-4 max-h-[320px] overflow-y-auto">
+                {item.history.length === 0 && <p className="py-3 text-sm text-muted">No entries yet</p>}
+                {[...item.history].sort().reverse().map((date) => (
+                    <div key={date} className="flex items-center justify-between py-2 border-b border-muted/20">
+                        {editingDate === date ? (
+                            <div className="flex w-full flex-col gap-1">
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="date"
+                                        max={getTodayISO()}
+                                        className="h-11 flex-1 rounded-xl border border-muted/40 px-3"
+                                        value={editValue}
+                                        onChange={(e) => {
+                                            setEditValue(e.target.value)
+                                            setEditError('')
+                                        }}
+                                    />
+                                    <button
+                                        className="h-11 cursor-pointer rounded-xl bg-primary px-4 font-bold text-white"
+                                        onClick={() => handleEditSave(date)}
+                                    >
+                                        Save
+                                    </button>
+                                    <button
+                                        className="h-11 cursor-pointer px-3 text-muted"
+                                        onClick={cancelEditing}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                                {editError && <p className="text-sm text-red-600">{editError}</p>}
+                            </div>
+                        ) : (
+                            <>
+                                <span className="text-base font-semibold">{formatDate(date)}</span>
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-muted hover:bg-muted/10"
+                                        onClick={() => startEditing(date)}
+                                    >
+                                        <Pencil size={18} />
+                                    </button>
+                                    <button
+                                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-red-600 hover:bg-red-100"
+                                        onClick={() => onDelete(date)}
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                ))}
+            </div>
+            {adding ? (
+                <div className="mt-4 flex min-h-[52px] flex-col justify-center gap-2">
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="date"
+                            max={getTodayISO()}
+                            className="h-11 flex-1 rounded-xl border border-muted/40 px-3"
+                            value={newDate}
+                            onChange={(e) => {
+                                setNewDate(e.target.value)
+                                setError('')
+                            }}
+                        />
+                        <button className="h-11 cursor-pointer rounded-xl bg-primary px-4 font-bold text-white" onClick={handleSave}>Save</button>
+                        <button className="h-11 cursor-pointer px-3 text-muted" onClick={() => { setAdding(false); setNewDate(''); setError(''); }}>Cancel</button>
+                    </div>
+                    {error && <p className="text-sm text-red-600">{error}</p>}
+                </div>
+            ) : (
+                <button
+                    className="mt-4 h-[52px] w-full cursor-pointer rounded-full border-2 border-dashed border-muted/40 font-bold"
+                    onClick={() => {
+                        cancelEditing()   // only one form open at a time: close any row edit
+                        setAdding(true)
+                    }}
+                >
+                    + Add Entry
+                </button>
+            )}
+        </Modal>
     )
 }

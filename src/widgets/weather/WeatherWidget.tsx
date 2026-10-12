@@ -1,7 +1,10 @@
 import { ChevronLeft, ChevronRight, Droplet, Snowflake } from 'lucide-react'
-import { useWeatherData } from './useWeatherData'
+import { useWeatherData, type WeatherAlert } from './useWeatherData'
 import { getWeatherIcon } from './weatherIcons'
 import { useState } from 'react'
+import { formatWeekdayTime } from '../../lib/dates'
+import { useNow } from '../../hooks/useNow'
+import { AlertsModal } from './AlertsModal'
 
 const timeOfDayTints = {
     Morning: '#FCE4A0',
@@ -19,20 +22,30 @@ const soonMessages = {
 export function WeatherWidget() {
     const [view, setView] = useState<'hourly' | 'weekly'>('hourly')
     const [pageNumber, setPageNumber] = useState(0)
+    const [showAlertsModal, setShowAlertsModal] = useState(false)
     const start = pageNumber * 6
 
     const weather = useWeatherData()
+    const now = useNow()
     const nowIcon = getWeatherIcon(weather.current.condition, weather.current.isDaytime)
     const pageCount = Math.ceil(weather.hours.length / 6)
     const soonText = `${weather.hours[0].condition} ${weather.hours[1].condition}`.toLowerCase()
     const soonKind = soonText.includes('thunder') ? 'thunder' : soonText.includes('snow') ? 'snow' : 'rain'
     const soonIcon = getWeatherIcon(soonKind, true)
     const precipSoon = weather.hours[0].rainChance >= 30 || weather.hours[1].rainChance >= 30
+    const topAlert = weather.alerts[0]
+    const extraAlerts = weather.alerts.length - 1
+
+    function getAlertTiming(alert: WeatherAlert, now: Date) {
+        if (now < new Date(alert.start)) return `Starts ${formatWeekdayTime(alert.start)}`
+        if (alert.end) return `Until ${formatWeekdayTime(alert.end)}`
+        return `Since ${formatWeekdayTime(alert.start)}`
+    }
 
     return (
         <div className="relative flex flex-col flex-1 min-h-0 gap-2.5 rounded-3xl overflow-hidden p-3 pb-5 text-ink bg-muted/15">
             {/* top row: now (left), alert (middle), hourly/weekly switch (right) */}
-            <div className="flex h-14 shrink-0 items-center justify-between">
+            <div className="relative flex h-14 shrink-0 items-center justify-between">
                 {/* Now card */}
                 <div className="flex h-full w-[320px] shrink-0 items-center gap-3 rounded-2xl bg-card px-4 shadow-sm">
                     <img src={nowIcon.animated} className="h-12 w-12 shrink-0" alt="" />
@@ -52,7 +65,25 @@ export function WeatherWidget() {
                         )}
                     </div>
                 </div>
-                <div className="flex h-full w-[220px] items-center justify-center rounded-2xl bg-yellow-100">Alert</div>
+                {/* alert */}
+                {topAlert && (
+                    <button
+                        className="absolute left-1/2 flex h-full w-[260px] -translate-x-1/2 cursor-pointer items-center justify-center rounded-2xl bg-yellow-100 px-3 hover:bg-yellow-200 gap-2"
+                        onClick={() => setShowAlertsModal(true)}
+                    >
+                        <div className="flex flex-col">
+                            <span className="text-sm font-bold leading-tight truncate">{topAlert.title}</span>
+                            <span className="text-xs font-semibold leading-tight text-muted">{getAlertTiming(topAlert, now)}</span>
+                        </div>
+                        {extraAlerts > 0 && (
+                            <span className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/10 px-3 py-0.5 text-xs font-bold tabular-nums">
+                                +{extraAlerts}
+                            </span>
+                        )}
+                    </button>
+                )}
+                {/* alerts modal */}
+                {showAlertsModal && <AlertsModal onClose={() => setShowAlertsModal(false)} alerts={weather.alerts} />}
                 <div className="relative grid h-9 w-[190px] shrink-0 grid-cols-2 rounded-full bg-muted/15 p-1">
                     {/* sliding highlight */}
                     <div
@@ -133,7 +164,7 @@ export function WeatherWidget() {
                             className="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-full bg-card shadow-sm cursor-pointer disabled:cursor-default disabled:opacity-30 hover:bg-card/50"
                             onClick={() => setPageNumber(pageNumber + 1)}
                             disabled={pageNumber === pageCount - 1}
-                            aria-label="Later hours" 
+                            aria-label="Later hours"
                         >
                             <ChevronRight className="h-5 w-5" />
                         </button>

@@ -7,7 +7,7 @@ function App() {
   const rows = buildRows(household.widgetLayout, registry)
 
   return (
-    <div className="flex flex-col w-[1280px] h-[800px] bg-page relative">
+    <div id="dashboard" className="flex flex-col w-[1280px] h-[800px] bg-page relative">
       <Header name={household.name} />
 
       <div className="flex-1 flex flex-col min-h-0">

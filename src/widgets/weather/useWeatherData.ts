@@ -1,5 +1,6 @@
 import forecastHourly from './mock/forecastHourly.json'
 import forecast from './mock/forecast.json'
+import alertsSevere from './mock/alertsSevere.json'
 
 export type TimeOfDay = 'Morning' | 'Afternoon' | 'Evening' | 'Night'
 
@@ -34,6 +35,7 @@ export type WeatherAlert = {
     description: string
     start: string
     end?: string
+    expires: string
     instruction?: string
 }
 
@@ -49,6 +51,14 @@ function getTimeOfDay(hour: number): TimeOfDay {
     if (hour >= 12 && hour < 17) return 'Afternoon'
     if (hour >= 17 && hour < 21) return 'Evening'
     return 'Night'
+}
+
+const severityRank = {
+    Extreme: 4,
+    Severe: 3,
+    Moderate: 2,
+    Minor: 1,
+    Unknown: 0,
 }
 
 export function useWeatherData(): WeatherData {
@@ -87,15 +97,16 @@ export function useWeatherData(): WeatherData {
                 isDaytime: period.isDaytime,
             }
         }),
-        alerts: [
-            {
-                title: 'Heat Advisory',
-                severity: 'Moderate',
-                description: 'High temperatures expected throughout the day.',
-                start: '2024-06-01T10:00:00Z',
-                end: '2024-06-01T18:00:00Z',
-                instruction: 'Stay hydrated and avoid prolonged sun exposure.',
-            },
-        ],
+        alerts: alertsSevere.features.map(feature => {
+            return {
+                title: feature.properties.event,
+                severity: feature.properties.severity as WeatherAlert['severity'],
+                description: feature.properties.description,
+                start: feature.properties.onset,
+                end: feature.properties.ends ?? undefined,
+                expires: feature.properties.expires,
+                instruction: feature.properties.instruction ?? undefined,
+            }
+        }).sort((a, b) => severityRank[b.severity] - severityRank[a.severity])
     }
 }

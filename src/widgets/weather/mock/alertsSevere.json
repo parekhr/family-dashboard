@@ -1,0 +1,2069 @@
+{
+    "@context": [
+        "https://geojson.org/geojson-ld/geojson-context.jsonld",
+        {
+            "@version": "1.1",
+            "wx": "https://api.weather.gov/ontology#",
+            "@vocab": "https://api.weather.gov/ontology#"
+        }
+    ],
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.f44a223ab9f1b5befa6d7d7ba23d0282c7aaded3.001.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.f44a223ab9f1b5befa6d7d7ba23d0282c7aaded3.001.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.f44a223ab9f1b5befa6d7d7ba23d0282c7aaded3.001.1",
+                "areaDesc": "Southeastern Elko County; White Pine County; Northwestern Nye County; Northeastern Nye County",
+                "geocode": {
+                    "SAME": [
+                        "032007",
+                        "032033",
+                        "032023"
+                    ],
+                    "UGC": [
+                        "NVZ033",
+                        "NVZ035",
+                        "NVZ040",
+                        "NVZ041"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/NVZ033",
+                    "https://api.weather.gov/zones/forecast/NVZ035",
+                    "https://api.weather.gov/zones/forecast/NVZ040",
+                    "https://api.weather.gov/zones/forecast/NVZ041"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.1f7ac2b3597cb5422ab2bbf16b110686a818926f.001.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.1f7ac2b3597cb5422ab2bbf16b110686a818926f.001.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T01:00:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T16:34:00-07:00",
+                "effective": "2026-10-11T16:34:00-07:00",
+                "onset": "2026-10-11T16:34:00-07:00",
+                "expires": "2026-10-12T05:00:00-07:00",
+                "ends": "2026-10-12T05:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Elko NV",
+                "headline": "Wind Advisory issued October 11 at 4:34PM PDT until October 12 at 5:00AM PDT by NWS Elko NV",
+                "description": "* WHAT...Southerly winds are expected to increase once again later\nthis evening into early Monday morning, with sustained winds up to\n30 mph and gusts up to 50 mph.\n\n* WHERE...White Pine, Southeastern Elko, Northeastern Nye, and\nNorthwestern Nye Counties.\n\n* WHEN...Until 5 AM PDT Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.\n\nSecure outdoor objects.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWLKN"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS75 KLKN 112334"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 5 AM PDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KLKN.WI.Y.0020.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T05:00:00-07:00"
+                    ],
+                    "expiredReferences": [
+                        "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.435cb9bef9c3532eb91ea87faa2a6cadb057ebd6.002.1,2026-10-10T18:38:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.a635bce5de1359f86510f7b31b24cbdf78f36bcf.002.1,2026-10-10T14:48:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.06ca88f7964812c5df67a5b5ea8b25779895ba7f.001.1,2026-10-10T03:11:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.6ea0ad0bcd401e2a22d5020e36a1de02d18d4cd2.001.1,2026-10-09T11:21:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.3ff5ba3cb244394ad8a5380f3b9cc71bfbb6e228.002.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.3ff5ba3cb244394ad8a5380f3b9cc71bfbb6e228.002.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.3ff5ba3cb244394ad8a5380f3b9cc71bfbb6e228.002.1",
+                "areaDesc": "Esmeralda and Central Nye County",
+                "geocode": {
+                    "SAME": [
+                        "032009",
+                        "032023"
+                    ],
+                    "UGC": [
+                        "NVZ014"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/NVZ014"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.d1292f43445e2759903af05d9bd799257cdcfcfe.003.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.d1292f43445e2759903af05d9bd799257cdcfcfe.003.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T00:18:00-07:00"
+                    },
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.798ed67727b73f90fb9acf7eb97ead670716f2d4.003.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.798ed67727b73f90fb9acf7eb97ead670716f2d4.003.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T04:15:00-07:00"
+                    },
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.1716a7bacde51e6d47f9e81b7bd4e18719fca8d0.003.2",
+                        "identifier": "urn:oid:2.49.0.1.840.0.1716a7bacde51e6d47f9e81b7bd4e18719fca8d0.003.2",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T12:18:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T14:08:00-07:00",
+                "effective": "2026-10-11T14:08:00-07:00",
+                "onset": "2026-10-11T14:08:00-07:00",
+                "expires": "2026-10-12T05:00:00-07:00",
+                "ends": "2026-10-12T05:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Las Vegas NV",
+                "headline": "Wind Advisory issued October 11 at 2:08PM PDT until October 12 at 5:00AM PDT by NWS Las Vegas NV",
+                "description": "* WHAT...For the Wind Advisory, south winds 15 to 25 mph with gusts\nup to 45 mph. For the Freeze Watch, sub-freezing temperatures as\nlow as 30 possible.\n\n* WHERE...Esmeralda and Central Nye County.\n\n* WHEN...For the Wind Advisory, until 5 AM PDT Monday. For the Freeze\nWatch, from late Monday night through Tuesday morning.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result. Frost\nand freeze conditions could kill crops, other sensitive vegetation\nand possibly damage unprotected outdoor plumbing.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.\n\nSecure outdoor objects.\n\nTake steps now to protect tender plants from the cold.\n\nTo prevent water pipes from freezing; wrap or drain or allow them to\ndrip slowly.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWVEF"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS75 KVEF 112108"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 5 AM PDT MONDAY... ...FREEZE WATCH REMAINS IN EFFECT FROM LATE MONDAY NIGHT THROUGH TUESDAY MORNING"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KVEF.WI.Y.0018.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T05:00:00-07:00"
+                    ],
+                    "expiredReferences": [
+                        "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.b291e89ab189009a74e5d7a7cbda4a669c220bef.004.1,2026-10-10T12:58:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.f5bcbdb4b8cdcda291c9be6f2a2875556c00f510.004.1,2026-10-10T12:36:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.87b705cfa51e479eea0afa2797919cdeef80bbe5.002.1,2026-10-09T20:13:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.c31fba86273bfb2ece45c0950c95352dc025bac9.002.1,2026-10-09T23:52:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.99600b74275b41c624206fc3736b11063a1162c2.003.1,2026-10-09T12:35:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.e0b34d0a539a5c13c822b3b272fa1d048d42d239.002.1,2026-10-08T23:59:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.3ff5ba3cb244394ad8a5380f3b9cc71bfbb6e228.001.2",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.3ff5ba3cb244394ad8a5380f3b9cc71bfbb6e228.001.2",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.3ff5ba3cb244394ad8a5380f3b9cc71bfbb6e228.001.2",
+                "areaDesc": "Northwest Plateau; Lake Havasu and Fort Mohave; Lake Mead - AZ side; Lake Mohave - AZ side; Hualapai Mountains; Northwest Deserts; San Bernardino County-Upper Colorado River Valley; Lincoln County; Northeast Clark County; Sheep Range; Spring Mountains-Red Rock Canyon; Southern Clark County; Lake Mead - NV side; Lake Mohave - NV side",
+                "geocode": {
+                    "SAME": [
+                        "004015",
+                        "006071",
+                        "032017",
+                        "032003",
+                        "032023"
+                    ],
+                    "UGC": [
+                        "AZZ001",
+                        "AZZ002",
+                        "AZZ570",
+                        "AZZ571",
+                        "AZZ575",
+                        "AZZ576",
+                        "CAZ527",
+                        "NVZ015",
+                        "NVZ016",
+                        "NVZ018",
+                        "NVZ019",
+                        "NVZ022",
+                        "NVZ025",
+                        "NVZ026"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/AZZ001",
+                    "https://api.weather.gov/zones/forecast/AZZ002",
+                    "https://api.weather.gov/zones/forecast/AZZ570",
+                    "https://api.weather.gov/zones/forecast/AZZ571",
+                    "https://api.weather.gov/zones/forecast/AZZ575",
+                    "https://api.weather.gov/zones/forecast/AZZ576",
+                    "https://api.weather.gov/zones/forecast/CAZ527",
+                    "https://api.weather.gov/zones/forecast/NVZ015",
+                    "https://api.weather.gov/zones/forecast/NVZ016",
+                    "https://api.weather.gov/zones/forecast/NVZ018",
+                    "https://api.weather.gov/zones/forecast/NVZ019",
+                    "https://api.weather.gov/zones/forecast/NVZ022",
+                    "https://api.weather.gov/zones/forecast/NVZ025",
+                    "https://api.weather.gov/zones/forecast/NVZ026"
+                ],
+                "references": [],
+                "sent": "2026-10-11T14:08:00-07:00",
+                "effective": "2026-10-11T14:08:00-07:00",
+                "onset": "2026-10-11T20:00:00-07:00",
+                "expires": "2026-10-12T05:00:00-07:00",
+                "ends": "2026-10-12T05:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Alert",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Las Vegas NV",
+                "headline": "Wind Advisory issued October 11 at 2:08PM PDT until October 12 at 5:00AM PDT by NWS Las Vegas NV",
+                "description": "* WHAT...South winds 15 to 25 mph with gusts up to 40 mph expected.\n\n* WHERE...Portions of northwest Arizona, southeast California, and\nsouth central and southern Nevada.\n\n* WHEN...From 8 PM PDT / MST this evening to 5 AM PDT / MST Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWVEF"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS75 KVEF 112108"
+                    ],
+                    "NWSheadline": [
+                        "HIGH WIND WARNING IS CANCELLED... ...WIND ADVISORY IN EFFECT FROM 8 PM PDT / MST THIS EVENING TO 5 AM PDT / MST MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.EXB.KVEF.WI.Y.0018.261012T0300Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T05:00:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.3ff5ba3cb244394ad8a5380f3b9cc71bfbb6e228.004.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.3ff5ba3cb244394ad8a5380f3b9cc71bfbb6e228.004.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.3ff5ba3cb244394ad8a5380f3b9cc71bfbb6e228.004.1",
+                "areaDesc": "Western Mojave Desert; Eastern Mojave Desert, Including the Mojave National Preserve; Morongo Basin; Cadiz Basin; Las Vegas Valley",
+                "geocode": {
+                    "SAME": [
+                        "006071",
+                        "032003"
+                    ],
+                    "UGC": [
+                        "CAZ523",
+                        "CAZ524",
+                        "CAZ525",
+                        "CAZ526",
+                        "NVZ020"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/CAZ523",
+                    "https://api.weather.gov/zones/forecast/CAZ524",
+                    "https://api.weather.gov/zones/forecast/CAZ525",
+                    "https://api.weather.gov/zones/forecast/CAZ526",
+                    "https://api.weather.gov/zones/forecast/NVZ020"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.d1292f43445e2759903af05d9bd799257cdcfcfe.004.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.d1292f43445e2759903af05d9bd799257cdcfcfe.004.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T00:18:00-07:00"
+                    },
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.798ed67727b73f90fb9acf7eb97ead670716f2d4.004.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.798ed67727b73f90fb9acf7eb97ead670716f2d4.004.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T04:15:00-07:00"
+                    },
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.1716a7bacde51e6d47f9e81b7bd4e18719fca8d0.005.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.1716a7bacde51e6d47f9e81b7bd4e18719fca8d0.005.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T12:18:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T14:08:00-07:00",
+                "effective": "2026-10-11T14:08:00-07:00",
+                "onset": "2026-10-11T14:08:00-07:00",
+                "expires": "2026-10-12T05:00:00-07:00",
+                "ends": "2026-10-12T05:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Las Vegas NV",
+                "headline": "Wind Advisory issued October 11 at 2:08PM PDT until October 12 at 5:00AM PDT by NWS Las Vegas NV",
+                "description": "* WHAT...Southwest winds 15 to 25 mph with gusts up to 50 mph.\n\n* WHERE...In California, Cadiz Basin, Eastern Mojave Desert, Morongo\nBasin, and Western Mojave Desert. In Nevada, Las Vegas Valley.\n\n* WHEN...Until 5 AM PDT Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWVEF"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS75 KVEF 112108"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 5 AM PDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KVEF.WI.Y.0018.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T05:00:00-07:00"
+                    ],
+                    "expiredReferences": [
+                        "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.b291e89ab189009a74e5d7a7cbda4a669c220bef.001.2,2026-10-10T12:58:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.87b705cfa51e479eea0afa2797919cdeef80bbe5.003.1,2026-10-09T20:13:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.f5bcbdb4b8cdcda291c9be6f2a2875556c00f510.001.1,2026-10-10T12:36:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.c31fba86273bfb2ece45c0950c95352dc025bac9.001.1,2026-10-09T23:52:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.99600b74275b41c624206fc3736b11063a1162c2.002.1,2026-10-09T12:35:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.3ff5ba3cb244394ad8a5380f3b9cc71bfbb6e228.003.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.3ff5ba3cb244394ad8a5380f3b9cc71bfbb6e228.003.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.3ff5ba3cb244394ad8a5380f3b9cc71bfbb6e228.003.1",
+                "areaDesc": "Death Valley National Park; Western Clark and Southern Nye County",
+                "geocode": {
+                    "SAME": [
+                        "006027",
+                        "032003",
+                        "032023"
+                    ],
+                    "UGC": [
+                        "CAZ522",
+                        "NVZ017"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/CAZ522",
+                    "https://api.weather.gov/zones/forecast/NVZ017"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.d1292f43445e2759903af05d9bd799257cdcfcfe.003.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.d1292f43445e2759903af05d9bd799257cdcfcfe.003.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T00:18:00-07:00"
+                    },
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.798ed67727b73f90fb9acf7eb97ead670716f2d4.003.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.798ed67727b73f90fb9acf7eb97ead670716f2d4.003.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T04:15:00-07:00"
+                    },
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.1716a7bacde51e6d47f9e81b7bd4e18719fca8d0.004.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.1716a7bacde51e6d47f9e81b7bd4e18719fca8d0.004.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T12:18:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T14:08:00-07:00",
+                "effective": "2026-10-11T14:08:00-07:00",
+                "onset": "2026-10-11T14:08:00-07:00",
+                "expires": "2026-10-12T05:00:00-07:00",
+                "ends": "2026-10-12T05:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Las Vegas NV",
+                "headline": "Wind Advisory issued October 11 at 2:08PM PDT until October 12 at 5:00AM PDT by NWS Las Vegas NV",
+                "description": "* WHAT...South winds 20 to 30 mph with gusts of 45 to 55 mph\nexpected.\n\n* WHERE...In California, Death Valley National Park. In Nevada,\nWestern Clark and Southern Nye County.\n\n* WHEN...Until 5 AM PDT Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.\n\nSecure outdoor objects.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWVEF"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS75 KVEF 112108"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 5 AM PDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KVEF.WI.Y.0018.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T05:00:00-07:00"
+                    ],
+                    "expiredReferences": [
+                        "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.b291e89ab189009a74e5d7a7cbda4a669c220bef.004.1,2026-10-10T12:58:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.f5bcbdb4b8cdcda291c9be6f2a2875556c00f510.004.1,2026-10-10T12:36:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.87b705cfa51e479eea0afa2797919cdeef80bbe5.002.1,2026-10-09T20:13:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.87b705cfa51e479eea0afa2797919cdeef80bbe5.001.2,2026-10-09T20:13:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.c31fba86273bfb2ece45c0950c95352dc025bac9.002.1,2026-10-09T23:52:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.99600b74275b41c624206fc3736b11063a1162c2.003.1,2026-10-09T12:35:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.99600b74275b41c624206fc3736b11063a1162c2.001.2,2026-10-09T12:35:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.e0b34d0a539a5c13c822b3b272fa1d048d42d239.002.1,2026-10-08T23:59:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.e0b34d0a539a5c13c822b3b272fa1d048d42d239.001.1,2026-10-08T23:59:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.005.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.005.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.005.1",
+                "areaDesc": "Coachella Valley",
+                "geocode": {
+                    "SAME": [
+                        "006065"
+                    ],
+                    "UGC": [
+                        "CAZ061"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/CAZ061"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.004.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.004.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T01:46:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T13:22:00-07:00",
+                "effective": "2026-10-11T13:22:00-07:00",
+                "onset": "2026-10-11T13:22:00-07:00",
+                "expires": "2026-10-11T22:15:00-07:00",
+                "ends": "2026-10-12T05:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS San Diego CA",
+                "headline": "Wind Advisory issued October 11 at 1:22PM PDT until October 12 at 5:00AM PDT by NWS San Diego CA",
+                "description": "* WHAT...West winds 20 to 30 mph with gusts up to 45 mph expected.\n\n* WHERE...Coachella Valley.\n\n* WHEN...Until 5 AM PDT Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWSGX"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS76 KSGX 112022"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 5 AM PDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KSGX.WI.Y.0023.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T05:00:00-07:00"
+                    ],
+                    "expiredReferences": [
+                        "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.6318f98ef1166b341807e056c2fd5d2141ca3d0d.002.1,2026-10-10T21:19:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.3f33847ed5b5cbccd37ad802a4e9c3e8c51e2ed3.002.1,2026-10-10T11:31:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.003.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.003.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.003.1",
+                "areaDesc": "San Diego County Mountains",
+                "geocode": {
+                    "SAME": [
+                        "006073"
+                    ],
+                    "UGC": [
+                        "CAZ058"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/CAZ058"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.001.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.001.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T01:46:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T13:22:00-07:00",
+                "effective": "2026-10-11T13:22:00-07:00",
+                "onset": "2026-10-11T13:22:00-07:00",
+                "expires": "2026-10-11T22:15:00-07:00",
+                "ends": "2026-10-12T05:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS San Diego CA",
+                "headline": "Wind Advisory issued October 11 at 1:22PM PDT until October 12 at 5:00AM PDT by NWS San Diego CA",
+                "description": "* WHAT...West winds 25 to 35 mph with gusts up to 50 mph expected.\n\n* WHERE...San Diego County Mountains.\n\n* WHEN...Until 5 AM PDT Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWSGX"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS76 KSGX 112022"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 5 AM PDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KSGX.WI.Y.0023.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T05:00:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.002.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.002.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.002.1",
+                "areaDesc": "Riverside County Mountains",
+                "geocode": {
+                    "SAME": [
+                        "006065"
+                    ],
+                    "UGC": [
+                        "CAZ056"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/CAZ056"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.003.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.003.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T01:46:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T13:22:00-07:00",
+                "effective": "2026-10-11T13:22:00-07:00",
+                "onset": "2026-10-11T13:22:00-07:00",
+                "expires": "2026-10-11T22:15:00-07:00",
+                "ends": "2026-10-12T05:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS San Diego CA",
+                "headline": "Wind Advisory issued October 11 at 1:22PM PDT until October 12 at 5:00AM PDT by NWS San Diego CA",
+                "description": "* WHAT...West winds 25 to 35 mph with gusts up to 50 mph expected.\n\n* WHERE...Riverside County Mountains.\n\n* WHEN...Until 5 AM PDT Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWSGX"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS76 KSGX 112022"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 5 AM PDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KSGX.WI.Y.0023.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T05:00:00-07:00"
+                    ],
+                    "expiredReferences": [
+                        "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.6318f98ef1166b341807e056c2fd5d2141ca3d0d.001.1,2026-10-10T21:19:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.3f33847ed5b5cbccd37ad802a4e9c3e8c51e2ed3.001.1,2026-10-10T11:31:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.001.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.001.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.001.1",
+                "areaDesc": "San Bernardino County Mountains",
+                "geocode": {
+                    "SAME": [
+                        "006071"
+                    ],
+                    "UGC": [
+                        "CAZ055"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/CAZ055"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.006.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.006.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T01:46:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T13:22:00-07:00",
+                "effective": "2026-10-11T13:22:00-07:00",
+                "onset": "2026-10-11T13:22:00-07:00",
+                "expires": "2026-10-11T22:15:00-07:00",
+                "ends": "2026-10-12T05:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS San Diego CA",
+                "headline": "Wind Advisory issued October 11 at 1:22PM PDT until October 12 at 5:00AM PDT by NWS San Diego CA",
+                "description": "* WHAT...South winds 20 to 30 mph with gusts 50 to 60 mph expected;\nstrongest winds on the desert mountain slopes.\n\n* WHERE...San Bernardino County Mountains.\n\n* WHEN...Until 5 AM PDT Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWSGX"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS76 KSGX 112022"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 5 AM PDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KSGX.WI.Y.0023.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T05:00:00-07:00"
+                    ],
+                    "expiredReferences": [
+                        "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.6318f98ef1166b341807e056c2fd5d2141ca3d0d.004.1,2026-10-10T21:19:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.3f33847ed5b5cbccd37ad802a4e9c3e8c51e2ed3.004.1,2026-10-10T11:31:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.006.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.006.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.006.1",
+                "areaDesc": "San Diego County Deserts",
+                "geocode": {
+                    "SAME": [
+                        "006073"
+                    ],
+                    "UGC": [
+                        "CAZ062"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/CAZ062"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.002.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.002.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T01:46:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T13:22:00-07:00",
+                "effective": "2026-10-11T13:22:00-07:00",
+                "onset": "2026-10-11T13:22:00-07:00",
+                "expires": "2026-10-11T22:15:00-07:00",
+                "ends": "2026-10-12T05:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS San Diego CA",
+                "headline": "Wind Advisory issued October 11 at 1:22PM PDT until October 12 at 5:00AM PDT by NWS San Diego CA",
+                "description": "* WHAT...West winds 20 to 30 mph with gusts up to 45 mph.\n\n* WHERE...San Diego County Deserts.\n\n* WHEN...Until 5 AM PDT Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWSGX"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS76 KSGX 112022"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 5 AM PDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KSGX.WI.Y.0023.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T05:00:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.007.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.007.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.007.1",
+                "areaDesc": "San Gorgonio Pass Near Banning",
+                "geocode": {
+                    "SAME": [
+                        "006065"
+                    ],
+                    "UGC": [
+                        "CAZ065"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/CAZ065"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.005.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.005.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T01:46:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T13:22:00-07:00",
+                "effective": "2026-10-11T13:22:00-07:00",
+                "onset": "2026-10-11T13:22:00-07:00",
+                "expires": "2026-10-11T22:15:00-07:00",
+                "ends": "2026-10-12T05:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS San Diego CA",
+                "headline": "Wind Advisory issued October 11 at 1:22PM PDT until October 12 at 5:00AM PDT by NWS San Diego CA",
+                "description": "* WHAT...West winds 20 to 30 mph with gusts 50 to 60 mph expected.\n\n* WHERE...San Gorgonio Pass near Banning.\n\n* WHEN...Until 5 AM PDT Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWSGX"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS76 KSGX 112022"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 5 AM PDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KSGX.WI.Y.0023.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T05:00:00-07:00"
+                    ],
+                    "expiredReferences": [
+                        "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.6318f98ef1166b341807e056c2fd5d2141ca3d0d.003.1,2026-10-10T21:19:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.3f33847ed5b5cbccd37ad802a4e9c3e8c51e2ed3.003.1,2026-10-10T11:31:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.004.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.004.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.e4fb3e47c847641f48ff1ec521fdd7fa83b677d6.004.1",
+                "areaDesc": "Apple and Lucerne Valleys",
+                "geocode": {
+                    "SAME": [
+                        "006071"
+                    ],
+                    "UGC": [
+                        "CAZ060"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/CAZ060"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.007.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.75ae4143d671a44a202570ac58011f0084e97739.007.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T01:46:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T13:22:00-07:00",
+                "effective": "2026-10-11T13:22:00-07:00",
+                "onset": "2026-10-11T13:22:00-07:00",
+                "expires": "2026-10-11T22:15:00-07:00",
+                "ends": "2026-10-12T05:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS San Diego CA",
+                "headline": "Wind Advisory issued October 11 at 1:22PM PDT until October 12 at 5:00AM PDT by NWS San Diego CA",
+                "description": "* WHAT...Southwest winds 20 to 30 mph with gusts 40 to 50 mph\nexpected.\n\n* WHERE...Apple and Lucerne Valleys.\n\n* WHEN...Until 5 AM PDT Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWSGX"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS76 KSGX 112022"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 5 AM PDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KSGX.WI.Y.0023.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T05:00:00-07:00"
+                    ],
+                    "expiredReferences": [
+                        "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.6318f98ef1166b341807e056c2fd5d2141ca3d0d.005.1,2026-10-10T21:19:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.3f33847ed5b5cbccd37ad802a4e9c3e8c51e2ed3.005.1,2026-10-10T11:31:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.15b42723362e443fa751a51f99307eb3a7ad676b.001.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.15b42723362e443fa751a51f99307eb3a7ad676b.001.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.15b42723362e443fa751a51f99307eb3a7ad676b.001.1",
+                "areaDesc": "Kaibab Plateau; Marble and Glen Canyons; Grand Canyon Country; Coconino Plateau; Yavapai County Mountains; Northeast Plateaus and Mesas Hwy 264 Northward; Chinle Valley; Chuska Mountains and Defiance Plateau; Little Colorado River Valley in Coconino County; Little Colorado River Valley in Navajo County; Little Colorado River Valley in Apache County; Western Mogollon Rim; Eastern Mogollon Rim; White Mountains; Northern Gila County; Yavapai County Valleys and Basins; Oak Creek and Sycamore Canyons; Black Mesa Area; Northeast Plateaus and Mesas South of Hwy 264",
+                "geocode": {
+                    "SAME": [
+                        "004005",
+                        "004025",
+                        "004001",
+                        "004017",
+                        "004007"
+                    ],
+                    "UGC": [
+                        "AZZ004",
+                        "AZZ005",
+                        "AZZ006",
+                        "AZZ007",
+                        "AZZ008",
+                        "AZZ009",
+                        "AZZ010",
+                        "AZZ011",
+                        "AZZ012",
+                        "AZZ013",
+                        "AZZ014",
+                        "AZZ015",
+                        "AZZ016",
+                        "AZZ017",
+                        "AZZ018",
+                        "AZZ037",
+                        "AZZ038",
+                        "AZZ039",
+                        "AZZ040"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/AZZ004",
+                    "https://api.weather.gov/zones/forecast/AZZ005",
+                    "https://api.weather.gov/zones/forecast/AZZ006",
+                    "https://api.weather.gov/zones/forecast/AZZ007",
+                    "https://api.weather.gov/zones/forecast/AZZ008",
+                    "https://api.weather.gov/zones/forecast/AZZ009",
+                    "https://api.weather.gov/zones/forecast/AZZ010",
+                    "https://api.weather.gov/zones/forecast/AZZ011",
+                    "https://api.weather.gov/zones/forecast/AZZ012",
+                    "https://api.weather.gov/zones/forecast/AZZ013",
+                    "https://api.weather.gov/zones/forecast/AZZ014",
+                    "https://api.weather.gov/zones/forecast/AZZ015",
+                    "https://api.weather.gov/zones/forecast/AZZ016",
+                    "https://api.weather.gov/zones/forecast/AZZ017",
+                    "https://api.weather.gov/zones/forecast/AZZ018",
+                    "https://api.weather.gov/zones/forecast/AZZ037",
+                    "https://api.weather.gov/zones/forecast/AZZ038",
+                    "https://api.weather.gov/zones/forecast/AZZ039",
+                    "https://api.weather.gov/zones/forecast/AZZ040"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.95cf2d23d1c61f508dba514dc20086817aeb4ae3.001.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.95cf2d23d1c61f508dba514dc20086817aeb4ae3.001.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T06:56:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T11:08:00-07:00",
+                "effective": "2026-10-11T11:08:00-07:00",
+                "onset": "2026-10-11T11:08:00-07:00",
+                "expires": "2026-10-11T20:00:00-07:00",
+                "ends": "2026-10-11T20:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Flagstaff AZ",
+                "headline": "Wind Advisory issued October 11 at 11:08AM MST until October 11 at 8:00PM MST by NWS Flagstaff AZ",
+                "description": "* WHAT...South winds 25 to 35 mph with gusts 45 to 55 mph expected,\nwith some locally higher gusts in excess of 60 mph possible.\n\n* WHERE...All of central and northern Arizona.\n\n* WHEN...Until 8 PM MST /9 PM MDT/ this evening.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could snap resulting in a few power outages. Travel will be\ndifficult, especially for high profile vehicles.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles, such as RVs, campers, and tractor trailers. Use\nextra caution.\n\nSecure loose outdoor objects that could be blown around or damaged by\nthe wind.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWFGZ"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS75 KFGZ 111808"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 8 PM MST /9 PM MDT/ THIS EVENING"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KFGZ.WI.Y.0017.000000T0000Z-261012T0300Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-11T20:00:00-07:00"
+                    ],
+                    "expiredReferences": [
+                        "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.45be2d19063198f217eadc525933fb25d7805e12.001.1,2026-10-10T11:08:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.b0359c5987046a53a3370cd0da5cf9e455ad6a2e.001.1,2026-10-09T12:58:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.061f9a76187d2a6fa4f2fb694c077c3bd5182e53.001.1,2026-10-09T11:53:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.27edac7da0bdc8b810f4848b485c3120377af4a7.001.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.27edac7da0bdc8b810f4848b485c3120377af4a7.001.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.27edac7da0bdc8b810f4848b485c3120377af4a7.001.1",
+                "areaDesc": "Interstate 5 Corridor; Western San Gabriel Mountains and Highway 14 Corridor; Eastern San Gabriel Mountains; Western Antelope Valley Foothills; Eastern Antelope Valley Foothills; Antelope Valley",
+                "geocode": {
+                    "SAME": [
+                        "006037"
+                    ],
+                    "UGC": [
+                        "CAZ378",
+                        "CAZ379",
+                        "CAZ380",
+                        "CAZ381",
+                        "CAZ382",
+                        "CAZ383"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/CAZ378",
+                    "https://api.weather.gov/zones/forecast/CAZ379",
+                    "https://api.weather.gov/zones/forecast/CAZ380",
+                    "https://api.weather.gov/zones/forecast/CAZ381",
+                    "https://api.weather.gov/zones/forecast/CAZ382",
+                    "https://api.weather.gov/zones/forecast/CAZ383"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.5456a548a4d64d4dd721aac46cbb55169921c3c4.001.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.5456a548a4d64d4dd721aac46cbb55169921c3c4.001.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-10T10:40:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T11:07:00-07:00",
+                "effective": "2026-10-11T11:07:00-07:00",
+                "onset": "2026-10-11T11:07:00-07:00",
+                "expires": "2026-10-12T05:00:00-07:00",
+                "ends": "2026-10-12T05:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Los Angeles/Oxnard CA",
+                "headline": "Wind Advisory issued October 11 at 11:07AM PDT until October 12 at 5:00AM PDT by NWS Los Angeles/Oxnard CA",
+                "description": "* WHAT...Southwest winds 20 to 35 mph with gusts up to 50 mph\nexpected. Local gusts to 60 mph are possible over mountains and\nfoothills.\n\n* WHERE...Antelope Valley, Eastern Antelope Valley Foothills, Eastern\nSan Gabriel Mountains, Interstate 5 Corridor, Western Antelope\nValley Foothills, and Western San Gabriel Mountains and Highway 14\nCorridor.\n\n* WHEN...Until 5 AM PDT Monday.\n\n* IMPACTS...Tree limbs could be blown down and a few power outages\nmay result. Higher chances of downed trees in areas that receive\nmoderate rainfall. Gusty winds will blow around unsecured objects.",
+                "instruction": "Secure outdoor objects.\n\nAvoid parking vehicles under trees.\n\nWinds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWLOX"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS76 KLOX 111807"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 5 AM PDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KLOX.WI.Y.0067.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T05:00:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e286bb81c12d232157670298d78c5e44bb115c34.002.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e286bb81c12d232157670298d78c5e44bb115c34.002.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.e286bb81c12d232157670298d78c5e44bb115c34.002.1",
+                "areaDesc": "Indian Wells Valley; Mojave Desert Slopes; Mojave Desert",
+                "geocode": {
+                    "SAME": [
+                        "006029"
+                    ],
+                    "UGC": [
+                        "CAZ337",
+                        "CAZ338",
+                        "CAZ339"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/CAZ337",
+                    "https://api.weather.gov/zones/forecast/CAZ338",
+                    "https://api.weather.gov/zones/forecast/CAZ339"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.3d8a64441f9689c5bf03421ff889276c084166ab.002.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.3d8a64441f9689c5bf03421ff889276c084166ab.002.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T02:45:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T10:32:00-07:00",
+                "effective": "2026-10-11T10:32:00-07:00",
+                "onset": "2026-10-11T14:00:00-07:00",
+                "expires": "2026-10-11T20:00:00-07:00",
+                "ends": "2026-10-12T08:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Hanford CA",
+                "headline": "Wind Advisory issued October 11 at 10:32AM PDT until October 12 at 8:00AM PDT by NWS Hanford CA",
+                "description": "* WHAT...Southwest winds 20 to 30 mph with gusts up to 50 mph\nexpected.\n\n* WHERE...Indian Wells Valley, Mojave Desert, and Mojave Desert\nSlopes.\n\n* WHEN...From 2 PM this afternoon to 8 AM PDT Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.\n\n* ADDITIONAL DETAILS...Highways impacted include US Highway 395, and\nState Routes 14, 58, and 178.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWHNX"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS76 KHNX 111732"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT FROM 2 PM THIS AFTERNOON TO 8 AM PDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KHNX.WI.Y.0031.261011T2100Z-261012T1500Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T08:00:00-07:00"
+                    ],
+                    "expiredReferences": [
+                        "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.c90b01f9d873dd7394417003a494ecb8804d42c7.001.1,2026-10-10T18:49:00-07:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.dee21a1e20863e583a409560987769046d0a01de.001.1,2026-10-10T10:46:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e286bb81c12d232157670298d78c5e44bb115c34.001.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.e286bb81c12d232157670298d78c5e44bb115c34.001.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.e286bb81c12d232157670298d78c5e44bb115c34.001.1",
+                "areaDesc": "Coalinga - Avenal; West Side Mountains South of 198; Buena Vista",
+                "geocode": {
+                    "SAME": [
+                        "006019",
+                        "006031",
+                        "006029"
+                    ],
+                    "UGC": [
+                        "CAZ304",
+                        "CAZ308",
+                        "CAZ313"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/CAZ304",
+                    "https://api.weather.gov/zones/forecast/CAZ308",
+                    "https://api.weather.gov/zones/forecast/CAZ313"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.3d8a64441f9689c5bf03421ff889276c084166ab.001.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.3d8a64441f9689c5bf03421ff889276c084166ab.001.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T02:45:00-07:00"
+                    }
+                ],
+                "sent": "2026-10-11T10:32:00-07:00",
+                "effective": "2026-10-11T10:32:00-07:00",
+                "onset": "2026-10-11T13:00:00-07:00",
+                "expires": "2026-10-11T20:00:00-07:00",
+                "ends": "2026-10-11T23:00:00-07:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Hanford CA",
+                "headline": "Wind Advisory issued October 11 at 10:32AM PDT until October 11 at 11:00PM PDT by NWS Hanford CA",
+                "description": "* WHAT...Southwest winds 15 to 25 mph with gusts up to 45 mph\nexpected.\n\n* WHERE...Buena Vista, Coalinga - Avenal, and West Side Mountains\nSouth of 198.\n\n* WHEN...Until 11 PM PDT this evening.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.\n\n* ADDITIONAL DETAILS...Includes areas mainly west of Interstate 5.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWHNX"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS76 KHNX 111732"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY REMAINS IN EFFECT UNTIL 11 PM PDT THIS EVENING"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.CON.KHNX.WI.Y.0031.261011T2000Z-261012T0600Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-11T23:00:00-07:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.92b536704cbd5fed3f025b74d4ff8869d9d615a1.007.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.92b536704cbd5fed3f025b74d4ff8869d9d615a1.007.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.92b536704cbd5fed3f025b74d4ff8869d9d615a1.007.1",
+                "areaDesc": "Wasatch Mountains I-80 North; Wasatch Mountains South of I-80; Western Uinta Mountains",
+                "geocode": {
+                    "SAME": [
+                        "049003",
+                        "049005",
+                        "049011",
+                        "049029",
+                        "049033",
+                        "049035",
+                        "049043",
+                        "049057",
+                        "049023",
+                        "049049",
+                        "049051",
+                        "049013"
+                    ],
+                    "UGC": [
+                        "UTZ110",
+                        "UTZ111",
+                        "UTZ112"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/UTZ110",
+                    "https://api.weather.gov/zones/forecast/UTZ111",
+                    "https://api.weather.gov/zones/forecast/UTZ112"
+                ],
+                "references": [],
+                "sent": "2026-10-11T10:31:00-06:00",
+                "effective": "2026-10-11T10:31:00-06:00",
+                "onset": "2026-10-11T12:00:00-06:00",
+                "expires": "2026-10-12T00:00:00-06:00",
+                "ends": "2026-10-12T00:00:00-06:00",
+                "status": "Actual",
+                "messageType": "Alert",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Salt Lake City UT",
+                "headline": "Wind Advisory issued October 11 at 10:31AM MDT until October 12 at 12:00AM MDT by NWS Salt Lake City UT",
+                "description": "* WHAT...South winds 25 to 35 mph with gusts up to 70 mph expected.\n\n* WHERE...The Wasatch Mountains, and Western Uinta Mountains.\n\n* WHEN...Until midnight MDT tonight.\n\n* IMPACTS...Gusty winds will blow around unsecured objects and a few\npower outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles and vehicles with trailers. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWSLC"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS75 KSLC 111631"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY IN EFFECT UNTIL MIDNIGHT MDT TONIGHT"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.EXB.KSLC.WI.Y.0017.261011T1800Z-261012T0600Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T00:00:00-06:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.92b536704cbd5fed3f025b74d4ff8869d9d615a1.008.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.92b536704cbd5fed3f025b74d4ff8869d9d615a1.008.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.92b536704cbd5fed3f025b74d4ff8869d9d615a1.008.1",
+                "areaDesc": "Eastern Juab/Millard Counties; Central Mountains; Sevier Valley; Upper Sevier River Valleys; Bryce Canyon Country",
+                "geocode": {
+                    "SAME": [
+                        "049023",
+                        "049027",
+                        "049015",
+                        "049039",
+                        "049041",
+                        "049017",
+                        "049031",
+                        "049025"
+                    ],
+                    "UGC": [
+                        "UTZ116",
+                        "UTZ117",
+                        "UTZ119",
+                        "UTZ126",
+                        "UTZ127"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/UTZ116",
+                    "https://api.weather.gov/zones/forecast/UTZ117",
+                    "https://api.weather.gov/zones/forecast/UTZ119",
+                    "https://api.weather.gov/zones/forecast/UTZ126",
+                    "https://api.weather.gov/zones/forecast/UTZ127"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a3eff31ba817820eb9d6e514b7c15dc9b145b64b.003.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.a3eff31ba817820eb9d6e514b7c15dc9b145b64b.003.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-10T21:47:00-06:00"
+                    },
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.a3eff31ba817820eb9d6e514b7c15dc9b145b64b.004.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.a3eff31ba817820eb9d6e514b7c15dc9b145b64b.004.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-10T21:47:00-06:00"
+                    },
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.37801f4e9cbc62ea68c8104a584c7860886f661b.003.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.37801f4e9cbc62ea68c8104a584c7860886f661b.003.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-11T07:57:00-06:00"
+                    }
+                ],
+                "sent": "2026-10-11T10:31:00-06:00",
+                "effective": "2026-10-11T10:31:00-06:00",
+                "onset": "2026-10-11T10:31:00-06:00",
+                "expires": "2026-10-12T00:00:00-06:00",
+                "ends": "2026-10-12T00:00:00-06:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Salt Lake City UT",
+                "headline": "Wind Advisory issued October 11 at 10:31AM MDT until October 12 at 12:00AM MDT by NWS Salt Lake City UT",
+                "description": "* WHAT...South winds 20 to 30 mph with gusts up to 50 mph, except\ngusts up to 70 mph over the Central Mountains.\n\n* WHERE...Central Mountains, Eastern Juab/Millard Counties, Sevier\nValley, Bryce Canyon Country, and Upper Sevier River Valleys.\n\n* WHEN...Until midnight MDT tonight.\n\n* IMPACTS...Gusty winds will blow around unsecured objects and a few\npower outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles and vehicles with trailers. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWSLC"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS75 KSLC 111631"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY NOW IN EFFECT UNTIL MIDNIGHT MDT TONIGHT"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.EXT.KSLC.WI.Y.0017.000000T0000Z-261012T0600Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T00:00:00-06:00"
+                    ],
+                    "expiredReferences": [
+                        "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.67779d1c0f4fd02990cad9c12c7f6edccab799d0.002.2,2026-10-10T15:35:00-06:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.67779d1c0f4fd02990cad9c12c7f6edccab799d0.001.2,2026-10-10T15:35:00-06:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.748977cd8ca50e8ca7c8da24c45d2e4f17ab695b.001.1,2026-10-10T04:01:00-06:00 w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.17dea4b23cd40239aff98ce4daab4f461161ade1.001.1,2026-10-09T13:12:00-06:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.92b536704cbd5fed3f025b74d4ff8869d9d615a1.005.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.92b536704cbd5fed3f025b74d4ff8869d9d615a1.005.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.92b536704cbd5fed3f025b74d4ff8869d9d615a1.005.1",
+                "areaDesc": "Great Salt Lake Desert and Mountains",
+                "geocode": {
+                    "SAME": [
+                        "049003",
+                        "049035",
+                        "049045",
+                        "049049"
+                    ],
+                    "UGC": [
+                        "UTZ101"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/UTZ101"
+                ],
+                "references": [],
+                "sent": "2026-10-11T10:31:00-06:00",
+                "effective": "2026-10-11T10:31:00-06:00",
+                "onset": "2026-10-11T12:00:00-06:00",
+                "expires": "2026-10-11T21:00:00-06:00",
+                "ends": "2026-10-11T21:00:00-06:00",
+                "status": "Actual",
+                "messageType": "Alert",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Salt Lake City UT",
+                "headline": "Wind Advisory issued October 11 at 10:31AM MDT until October 11 at 9:00PM MDT by NWS Salt Lake City UT",
+                "description": "* WHAT...Southeast winds 20 to 30 mph with gusts up to 55 mph\nexpected.\n\n* WHERE...Great Salt Lake Desert and Mountains.\n\n* WHEN...Until 9 PM MDT this evening.\n\n* IMPACTS...Gusty winds will blow around unsecured objects and a few\npower outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles and vehicles with trailers. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWSLC"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS75 KSLC 111631"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY IN EFFECT UNTIL 9 PM MDT THIS EVENING"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.NEW.KSLC.WI.Y.0018.261011T1800Z-261012T0300Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-11T21:00:00-06:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.92b536704cbd5fed3f025b74d4ff8869d9d615a1.006.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.92b536704cbd5fed3f025b74d4ff8869d9d615a1.006.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.92b536704cbd5fed3f025b74d4ff8869d9d615a1.006.1",
+                "areaDesc": "Northern Wasatch Front; Salt Lake Valley; Utah Valley; Wasatch Back",
+                "geocode": {
+                    "SAME": [
+                        "049011",
+                        "049057",
+                        "049035",
+                        "049049",
+                        "049029",
+                        "049043",
+                        "049051"
+                    ],
+                    "UGC": [
+                        "UTZ104",
+                        "UTZ105",
+                        "UTZ106",
+                        "UTZ108"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/UTZ104",
+                    "https://api.weather.gov/zones/forecast/UTZ105",
+                    "https://api.weather.gov/zones/forecast/UTZ106",
+                    "https://api.weather.gov/zones/forecast/UTZ108"
+                ],
+                "references": [],
+                "sent": "2026-10-11T10:31:00-06:00",
+                "effective": "2026-10-11T10:31:00-06:00",
+                "onset": "2026-10-11T12:00:00-06:00",
+                "expires": "2026-10-11T21:00:00-06:00",
+                "ends": "2026-10-11T21:00:00-06:00",
+                "status": "Actual",
+                "messageType": "Alert",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Salt Lake City UT",
+                "headline": "Wind Advisory issued October 11 at 10:31AM MDT until October 11 at 9:00PM MDT by NWS Salt Lake City UT",
+                "description": "* WHAT...South winds 20 to 30 mph with gusts up to 55 mph expected.\n\n* WHERE...Northern Wasatch Front, Salt Lake Valley, Utah Valley, and\nWasatch Back.\n\n* WHEN...Until 9 PM MDT this evening.\n\n* IMPACTS...Gusty winds will blow around unsecured objects and a few\npower outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles and vehicles with trailers. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWSLC"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS75 KSLC 111631"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY IN EFFECT UNTIL 9 PM MDT THIS EVENING"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.EXB.KSLC.WI.Y.0017.261011T1800Z-261012T0300Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-11T21:00:00-06:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.b2f10efed41750dde19f66ec0b1d0c24e802afcf.001.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.b2f10efed41750dde19f66ec0b1d0c24e802afcf.001.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.b2f10efed41750dde19f66ec0b1d0c24e802afcf.001.1",
+                "areaDesc": "Lower Yampa River Basin; Central Yampa River Basin",
+                "geocode": {
+                    "SAME": [
+                        "008045",
+                        "008081",
+                        "008103",
+                        "008107"
+                    ],
+                    "UGC": [
+                        "COZ001",
+                        "COZ002"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/COZ001",
+                    "https://api.weather.gov/zones/forecast/COZ002"
+                ],
+                "references": [],
+                "sent": "2026-10-11T09:58:00-06:00",
+                "effective": "2026-10-11T09:58:00-06:00",
+                "onset": "2026-10-11T09:58:00-06:00",
+                "expires": "2026-10-12T06:00:00-06:00",
+                "ends": "2026-10-12T06:00:00-06:00",
+                "status": "Actual",
+                "messageType": "Alert",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Grand Junction CO",
+                "headline": "Wind Advisory issued October 11 at 9:58AM MDT until October 12 at 6:00AM MDT by NWS Grand Junction CO",
+                "description": "* WHAT...South winds 20 to 30 mph with gusts up to 45 mph.\n\n* WHERE...Central Yampa River Basin and Lower Yampa River Basin.\n\n* WHEN...Until 6 AM MDT Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWGJT"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS75 KGJT 111558"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY IN EFFECT UNTIL 6 AM MDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.EXB.KGJT.WI.Y.0013.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T06:00:00-06:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.b2f10efed41750dde19f66ec0b1d0c24e802afcf.002.1",
+            "type": "Feature",
+            "geometry": null,
+            "properties": {
+                "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.b2f10efed41750dde19f66ec0b1d0c24e802afcf.002.1",
+                "@type": "wx:Alert",
+                "id": "urn:oid:2.49.0.1.840.0.b2f10efed41750dde19f66ec0b1d0c24e802afcf.002.1",
+                "areaDesc": "Paradox Valley/Lower Dolores River; Four Corners/Upper Dolores River; Southeast Utah; Arches/Grand Flat; Canyonlands/Natural Bridges",
+                "geocode": {
+                    "SAME": [
+                        "008033",
+                        "008077",
+                        "008085",
+                        "008113",
+                        "008083",
+                        "049037",
+                        "049019"
+                    ],
+                    "UGC": [
+                        "COZ020",
+                        "COZ021",
+                        "UTZ022",
+                        "UTZ027",
+                        "UTZ029"
+                    ]
+                },
+                "affectedZones": [
+                    "https://api.weather.gov/zones/forecast/COZ020",
+                    "https://api.weather.gov/zones/forecast/COZ021",
+                    "https://api.weather.gov/zones/forecast/UTZ022",
+                    "https://api.weather.gov/zones/forecast/UTZ027",
+                    "https://api.weather.gov/zones/forecast/UTZ029"
+                ],
+                "references": [
+                    {
+                        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.46826db6d1e97a725b85504d8a9426472b687ccb.001.1",
+                        "identifier": "urn:oid:2.49.0.1.840.0.46826db6d1e97a725b85504d8a9426472b687ccb.001.1",
+                        "sender": "w-nws.webmaster@noaa.gov",
+                        "sent": "2026-10-10T21:57:00-06:00"
+                    }
+                ],
+                "sent": "2026-10-11T09:58:00-06:00",
+                "effective": "2026-10-11T09:58:00-06:00",
+                "onset": "2026-10-11T09:58:00-06:00",
+                "expires": "2026-10-12T06:00:00-06:00",
+                "ends": "2026-10-12T06:00:00-06:00",
+                "status": "Actual",
+                "messageType": "Update",
+                "category": "Met",
+                "severity": "Moderate",
+                "certainty": "Likely",
+                "urgency": "Expected",
+                "event": "Wind Advisory",
+                "sender": "w-nws.webmaster@noaa.gov",
+                "senderName": "NWS Grand Junction CO",
+                "headline": "Wind Advisory issued October 11 at 9:58AM MDT until October 12 at 6:00AM MDT by NWS Grand Junction CO",
+                "description": "* WHAT...South winds 20 to 30 mph with gusts up to 50 mph.\n\n* WHERE...In Colorado, Four Corners/Upper Dolores River and Paradox\nValley/Lower Dolores River. In Utah, Arches/Grand Flat,\nCanyonlands/Natural Bridges, and Southeast Utah.\n\n* WHEN...Until 6 AM MDT Monday.\n\n* IMPACTS...Gusty winds will blow around unsecured objects. Tree\nlimbs could be blown down and a few power outages may result.",
+                "instruction": "Winds this strong can make driving difficult, especially for high\nprofile vehicles. Use extra caution.",
+                "response": "Execute",
+                "note": null,
+                "parameters": {
+                    "AWIPSidentifier": [
+                        "NPWGJT"
+                    ],
+                    "WMOidentifier": [
+                        "WWUS75 KGJT 111558"
+                    ],
+                    "NWSheadline": [
+                        "WIND ADVISORY NOW IN EFFECT UNTIL 6 AM MDT MONDAY"
+                    ],
+                    "BLOCKCHANNEL": [
+                        "EAS",
+                        "NWEM",
+                        "CMAS"
+                    ],
+                    "VTEC": [
+                        "/O.EXT.KGJT.WI.Y.0013.000000T0000Z-261012T1200Z/"
+                    ],
+                    "eventEndingTime": [
+                        "2026-10-12T06:00:00-06:00"
+                    ],
+                    "expiredReferences": [
+                        "w-nws.webmaster@noaa.gov,urn:oid:2.49.0.1.840.0.ff10900cc46e41ab81af8f49e488159758748f34.001.1,2026-10-10T10:38:00-06:00"
+                    ]
+                },
+                "scope": "Public",
+                "code": "IPAWSv1.0",
+                "language": "en-US",
+                "web": "http://www.weather.gov",
+                "eventCode": {
+                    "SAME": [
+                        "NWS"
+                    ],
+                    "NationalWeatherService": [
+                        "WIY"
+                    ]
+                }
+            }
+        }
+    ],
+    "title": "Current Wind Advisory events",
+    "updated": "2026-10-12T01:04:00+00:00"
+}

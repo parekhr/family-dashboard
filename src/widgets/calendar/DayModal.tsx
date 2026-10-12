@@ -4,6 +4,7 @@ import type { Holiday } from './holidays'
 import { getCategoryText, getCategoryColor } from './categories'
 import { User, CalendarDays, Pencil, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
+import { Modal } from '../../components/Modal'
 
 type DayModalProps = {
     iso: string
@@ -41,120 +42,118 @@ export function DayModal({ iso, onClose, events, people, categories, holiday, on
     const [confirmingId, setConfirmingId] = useState<string | null>(null)   // which event is asking "delete?" (null = none)
 
     return (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-50" onClick={onClose}>
-            <div className="w-[480px] rounded-3xl bg-card p-6 text-ink" onClick={(e) => e.stopPropagation()}>
+        <Modal onClose={onClose} className="w-[480px]">
+            <div className="flex items-center justify-between">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center justify-between">
-                        <div className="flex flex-col">
-                            <h3 className="flex items-center gap-2 text-xl font-extrabold">
-                                <CalendarDays className="w-5 h-5 text-muted" />
-                                {formatDate(iso)}
-                            </h3>
-                            {holiday && (
-                                <span className="ml-7 text-sm text-muted">
-                                    {holiday.name}
-                                </span>
-                            )}
-                        </div>
-
+                    <div className="flex flex-col">
+                        <h3 className="flex items-center gap-2 text-xl font-extrabold">
+                            <CalendarDays className="w-5 h-5 text-muted" />
+                            {formatDate(iso)}
+                        </h3>
+                        {holiday && (
+                            <span className="ml-7 text-sm text-muted">
+                                {holiday.name}
+                            </span>
+                        )}
                     </div>
+
+                </div>
+                <button
+                    className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors"
+                    onClick={onClose}
+                >
+                    ✕
+                </button>
+            </div>
+            {showTabs && (
+                <div className="flex gap-2 mt-4">
                     <button
-                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors"
-                        onClick={onClose}
+                        className={`flex-1 h-11 rounded-full font-semibold cursor-pointer transition-colors ${activeTab === 'today' ? 'bg-primary text-white' : 'bg-muted/15 text-ink hover:bg-muted/25'}`}
+                        onClick={() => onTabChange?.('today')}
                     >
-                        ✕
+                        Today
+                    </button>
+                    <button
+                        className={`flex-1 h-11 rounded-full font-semibold cursor-pointer transition-colors ${activeTab === 'tomorrow' ? 'bg-primary text-white' : 'bg-muted/15 text-ink hover:bg-muted/25'}`}
+                        onClick={() => onTabChange?.('tomorrow')}
+                    >
+                        Tomorrow
                     </button>
                 </div>
-                {showTabs && (
-                    <div className="flex gap-2 mt-4">
-                        <button
-                            className={`flex-1 h-11 rounded-full font-semibold cursor-pointer transition-colors ${activeTab === 'today' ? 'bg-primary text-white' : 'bg-muted/15 text-ink hover:bg-muted/25'}`}
-                            onClick={() => onTabChange?.('today')}
-                        >
-                            Today
-                        </button>
-                        <button
-                            className={`flex-1 h-11 rounded-full font-semibold cursor-pointer transition-colors ${activeTab === 'tomorrow' ? 'bg-primary text-white' : 'bg-muted/15 text-ink hover:bg-muted/25'}`}
-                            onClick={() => onTabChange?.('tomorrow')}
-                        >
-                            Tomorrow
-                        </button>
-                    </div>
-                )}
-                <div className={`${showTabs ? 'h-[320px]' : 'max-h-[320px]'} overflow-y-auto mt-4`}>
-                    {events.length === 0 && <p className="py-3 text-sm text-muted">No events</p>}
-                    {events.map((event) => {
-                        const hasTitle = Boolean(event.title?.trim())
-                        const hasPeople = event.personIds.length > 0
-                        return (
-                            <div key={event.id} className="flex items-center gap-3 rounded-2xl bg-muted/10 p-4 mb-2 mt-4">
-                                <div className="flex flex-col gap-1 flex-1 min-w-0">
+            )}
+            <div className={`${showTabs ? 'h-[320px]' : 'max-h-[320px]'} overflow-y-auto mt-4`}>
+                {events.length === 0 && <p className="py-3 text-sm text-muted">No events</p>}
+                {events.map((event) => {
+                    const hasTitle = Boolean(event.title?.trim())
+                    const hasPeople = event.personIds.length > 0
+                    return (
+                        <div key={event.id} className="flex items-center gap-3 rounded-2xl bg-muted/10 p-4 mb-2 mt-4">
+                            <div className="flex flex-col gap-1 flex-1 min-w-0">
 
-                                    {/* row 1: name left, time right */}
-                                    <div className="flex items-center justify-between gap-3">
-                                        <span className="text-lg font-bold min-w-0 break-words">{event.title?.trim() || getCategoryText(categories, event.categoryId)}</span>
-                                        {confirmingId === event.id ? (
-                                            <span className="font-semibold text-red-600 whitespace-nowrap shrink-0">Delete?</span>
-                                        ) : (
-                                            <span className="font-semibold text-primary whitespace-nowrap shrink-0">{getWhenText(event)}</span>
-                                        )}
-                                    </div>
-
-                                    {/* row 2: people, only if there are any */}
-                                    {(hasPeople || hasTitle) && (
-                                        <div className="flex items-center gap-2 text-sm text-muted">
-                                            {hasTitle && <span style={{ color: getCategoryColor(categories, event.categoryId) }}>{getCategoryText(categories, event.categoryId)}</span>}
-                                            {hasTitle && hasPeople && <span>·</span>}
-                                            {hasPeople && (
-                                                <>
-                                                    <User className="w-4 h-4" />
-                                                    <span>{getPeopleText(people, event.personIds)}</span>
-                                                </>
-                                            )}
-                                        </div>
+                                {/* row 1: name left, time right */}
+                                <div className="flex items-center justify-between gap-3">
+                                    <span className="text-lg font-bold min-w-0 break-words">{event.title?.trim() || getCategoryText(categories, event.categoryId)}</span>
+                                    {confirmingId === event.id ? (
+                                        <span className="font-semibold text-red-600 whitespace-nowrap shrink-0">Delete?</span>
+                                    ) : (
+                                        <span className="font-semibold text-primary whitespace-nowrap shrink-0">{getWhenText(event)}</span>
                                     )}
                                 </div>
 
-                                {/* edit + delete, same buttons as Home Care's History modal.
-                                    The trash asks first: "Delete?" replaces the time, and the buttons swap to
-                                    confirm / cancel at the same size, so the card never changes shape.
-                                    Cancel sits where the trash was, so a double tap can't delete. */}
-                                {confirmingId === event.id ? (
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-red-600 text-white"
-                                            onClick={() => { setConfirmingId(null); onDelete(event.id) }}
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                        <button
-                                            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-muted"
-                                            onClick={() => setConfirmingId(null)}
-                                        >
-                                            <X size={18} />
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-muted"
-                                            onClick={() => onEdit(event)}
-                                        >
-                                            <Pencil size={18} />
-                                        </button>
-                                        <button
-                                            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-red-600"
-                                            onClick={() => setConfirmingId(event.id)}
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
+                                {/* row 2: people, only if there are any */}
+                                {(hasPeople || hasTitle) && (
+                                    <div className="flex items-center gap-2 text-sm text-muted">
+                                        {hasTitle && <span style={{ color: getCategoryColor(categories, event.categoryId) }}>{getCategoryText(categories, event.categoryId)}</span>}
+                                        {hasTitle && hasPeople && <span>·</span>}
+                                        {hasPeople && (
+                                            <>
+                                                <User className="w-4 h-4" />
+                                                <span>{getPeopleText(people, event.personIds)}</span>
+                                            </>
+                                        )}
                                     </div>
                                 )}
                             </div>
-                        )
-                    })}
-                </div>
+
+                            {/* edit + delete, same buttons as Home Care's History modal.
+                                The trash asks first: "Delete?" replaces the time, and the buttons swap to
+                                confirm / cancel at the same size, so the card never changes shape.
+                                Cancel sits where the trash was, so a double tap can't delete. */}
+                            {confirmingId === event.id ? (
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-red-600 text-white"
+                                        onClick={() => { setConfirmingId(null); onDelete(event.id) }}
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                    <button
+                                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-muted"
+                                        onClick={() => setConfirmingId(null)}
+                                    >
+                                        <X size={18} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-muted"
+                                        onClick={() => onEdit(event)}
+                                    >
+                                        <Pencil size={18} />
+                                    </button>
+                                    <button
+                                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-red-600"
+                                        onClick={() => setConfirmingId(event.id)}
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )
+                })}
             </div>
-        </div>
+        </Modal>
     )
 }

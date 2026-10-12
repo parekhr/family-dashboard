@@ -41,3 +41,12 @@ export function formatShortDate(iso: string): string {
     day: 'numeric',
   })
 }
+
+export function formatWeekdayTime(timestamp: string): string {
+  const date = new Date(timestamp)
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    hour: 'numeric',
+    minute: 'numeric',
+  })
+}
