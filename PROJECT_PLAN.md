@@ -20,9 +20,8 @@ responses, and the layout is mostly built on it: the Now card, the Hourly / Week
 switch, the weekly day cards, and the hourly cards with paging arrows, page dots and
 the time-of-day tint, and the Now card's note for rain, snow or storms coming soon.
 The layout and alerts stages are done: the alert banner and the alerts modal are built
-on a saved sample of real alerts. Still open for alerts: the banner's colors by
-severity. Next are severe backgrounds and real fetching (see the build stages under
-Weather).
+on a saved sample of real alerts, with colors by severity. Next are severe backgrounds
+and real fetching (see the build stages under Weather).
 
 **Modals** all go through one shared `Modal` component (`src/components/Modal.tsx`) and
 open centered over the whole dashboard. It draws its overlay into the dashboard's root
@@ -82,8 +81,7 @@ weather API. This plan describes turning that design into an actual running app.
         next hour") because 30% isn't likely and two hours are covered.
       - **Icon**: the matching animated Meteocons icon, small, beside the words. It is
         drawn larger than its line with negative margins (the icons have a wide empty
-        border) and has a thin drop shadow as an edge, since the pale cloud faded
-        into the card.
+        border) and has the cloud outline described under "Icons" below.
   - **Hourly / Weekly switch**: a pill with both words always visible and a highlight
     that slides behind the selected one. The widget opens on Hourly.
   - **Alert banner: one banner, official alerts only.** The mockup stacked two things in
@@ -99,8 +97,15 @@ weather API. This plan describes turning that design into an actual running app.
       below; the gaps to its two neighbors are uneven, which was accepted. The count
       chip is pinned to the banner's right edge, outside the text's flow, so the title
       stays centered whether or not the chip shows.
-    - **Color is one yellow for every alert for now**; colors by severity are still to
-      be decided. Hover darkens whatever color it has (`hover:brightness-95`).
+    - **Color by severity** (built): Extreme `#F4B0A8` (red), Severe `#F8CC9C`
+      (orange), Moderate `#FBEBA5` (yellow), Minor `#CFE2F3` (blue), Unknown `#E4E1DB`
+      (grey). They live in `severityColors` in `alertColors.ts`, shared by the banner
+      and the modal, not in `useWeatherData.ts`.
+      - **Both show the color at 75%**, mixed with white (`color-mix`): the banner as
+        its background, and each modal card as a 6px strip down its left edge. The
+        full-strength red was too heavy as a banner background.
+      - These are the first set tried and were accepted "for now"; still adjustable.
+      - Hover darkens whatever color the banner has (`hover:brightness-95`).
     - **Only real NWS fields are shown.** A short summary like "Gusts to 35 mph" is not
       a field anywhere, so it isn't displayed; text is never made up.
     - **Tapping the banner** (the whole banner, not just the chip) opens the alerts
@@ -111,7 +116,8 @@ weather API. This plan describes turning that design into an actual running app.
     each card has the title, the timing line, the description, and the instruction as
     "What to do", in a scrolling list.
     - **Built** (`AlertsModal.tsx`): 600px wide, a 480px scrolling list, one card per
-      alert. `severity` and `expires` are not shown on the card.
+      alert. `severity` shows only as the color of the card's left strip; `expires` is
+      not shown.
     - **NWS alert fields** (checked on live alerts): `event`, `severity` (Extreme /
       Severe / Moderate / Minor / Unknown), `onset`, `ends`, `expires`, `instruction`,
       and `areaDesc` are separate fields. What / where / when / impacts are **not**:
@@ -222,6 +228,14 @@ weather API. This plan describes turning that design into an actual running app.
     and isn't used. Lucide is still used for the droplet, snowflake and arrows.
     The icons are Meteocons' `fill` style. The `line` style was tried for clearer
     clouds and rejected: it is outline-only, and the suns became thin rings.
+    - **Cloud icons get a dark outline; suns don't.** The pale clouds faded into the
+      near-white cards. Each icon `getWeatherIcon` returns carries an `outline` flag:
+      true for everything with a cloud in it (thunder, snow, rain, fog, partly cloudy,
+      cloudy), false for clear day and clear night. The widget applies one class,
+      `iconOutline` in `WeatherWidget.tsx` (a 1px drop shadow at 0.9 black, which
+      follows the drawing's shape), wherever the flag is true: the Now icon, the day
+      and hour cards, and the "soon" note. An outline on every icon was tried first;
+      it made the suns look tacky.
   - **Built so far**: `WeatherWidget.tsx` is registered as a full-width widget, first
     in the layout, with everything above marked built. `useWeatherData.ts` has the
     types (`CurrentWeather`, `DayForecast`, `HourForecast`, `WeatherAlert` and
@@ -263,7 +277,10 @@ weather API. This plan describes turning that design into an actual running app.
     (`forecast.json`, `forecastHourly.json`, `alerts.json`, `alertsSevere.json`).
     `alerts.json` is a calm day with an empty list. `alertsSevere.json` is every Wind
     Advisory active nationwide on October 11, 2026
-    (`/alerts/active?event=Wind%20Advisory`): 22 alerts, all Moderate. The hook reads
+    (`/alerts/active?event=Wind%20Advisory`): 22 alerts, all Moderate as fetched. **The saved
+    file has been hand-edited for testing**: one alert's severity is set to Extreme
+    and one to Minor, so the sort and the colors have something to show. It is no
+    longer an exact NWS response. The hook reads
     `alertsSevere.json`; pointing its import at `alerts.json` tests the calm day.
     - **Limits of this sample**: one alert type and one severity, so it can't test
       ranking; and 22 alerts is far more than one location would get, so the chip
@@ -272,8 +289,8 @@ weather API. This plan describes turning that design into an actual running app.
     The files contain the location they were fetched for.
   - **Build stages**: (1) look at real data and save it — done; (2) decide the tidy
     data shape and types — done; (3) `useWeatherData()` returning that shape from the
-    mock files — done; (4) the layout — done; (5) alerts — done, except colors by
-    severity; (6) severe backgrounds — next;
+    mock files — done; (4) the layout — done; (5) alerts — done; (6) severe
+    backgrounds — next;
     (7) real fetching with loading and error states, using the household's location.
     - **To check at stage 7: the "Today" label.** `useWeatherData()` labels the first
       daytime period "Today". If a forecast is fetched in the evening its first period
@@ -929,6 +946,7 @@ family-dashboard/
 │   │   │   ├── weatherIcons.ts       # condition text -> Meteocons icon (animated + still)
 │   │   │   ├── AlertsModal.tsx       # every active alert; tidies the description text
 │   │   │   ├── alertTiming.ts        # "Starts / Until / Since ..." sentence for an alert
+│   │   │   ├── alertColors.ts        # severity -> color, for the banner and the modal
 │   │   │   └── severeBackgrounds.tsx
 │   │   ├── calendar/
 │   │   │   ├── CalendarWidget.tsx
@@ -978,9 +996,9 @@ family-dashboard/
 
 ## Open / not yet decided
 
-- Weather: the final tint colors for the four times of day, and the alert banner's
-  colors per severity. Starting values only so far; **to be decided on the live app
-  once the widget is built**, not in advance.
+- Weather: the tint colors for the four times of day and the alert colors per
+  severity are both in use on the live app and looked acceptable, but neither set has
+  been called final.
 - Phone companion: its "today's appointments (dismissible)" list predates the wall's
   reminder-strip design (no dismissing on the wall); revisit the phone's version later.
 - The category color picker in Settings: which colors are offered (a fixed palette

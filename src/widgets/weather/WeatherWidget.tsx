@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useNow } from '../../hooks/useNow'
 import { AlertsModal } from './AlertsModal'
 import { getAlertTiming } from './alertTiming'
+import { severityColors } from './alertColors'
 
 const timeOfDayTints = {
     Morning: '#FCE4A0',
@@ -64,7 +65,8 @@ export function WeatherWidget() {
                 {/* alert */}
                 {topAlert && (
                     <button
-                        className="absolute left-1/2 flex h-full w-[260px] -translate-x-1/2 cursor-pointer items-center justify-center rounded-2xl bg-yellow-100 transition px-3 hover:brightness-95 gap-2"
+                        className="absolute left-1/2 flex h-full w-[260px] -translate-x-1/2 cursor-pointer items-center justify-center rounded-2xl transition px-3 hover:brightness-95 gap-2"
+                        style={{ backgroundColor: `color-mix(in srgb, ${severityColors[topAlert.severity]} 75%, white)` }}
                         onClick={() => setShowAlertsModal(true)}
                     >
                         <div className="flex flex-col">
