@@ -28,22 +28,23 @@ import partlyCloudyNightStill from '@meteocons/svg-static/fill/partly-cloudy-nig
 export type WeatherIcon = {
     animated: string
     still: string
+    outline: boolean
 }
 
 export function getWeatherIcon(condition: string, isDaytime: boolean): WeatherIcon {
     const text = condition.toLowerCase()
 
-    if (text.includes('thunder')) return { animated: thunderAnimated, still: thunderStill }
-    if (text.includes('snow')) return { animated: snowAnimated, still: snowStill }
-    if (text.includes('rain') || text.includes('shower')) return { animated: rainAnimated, still: rainStill }
-    if (text.includes('fog')) return { animated: fogAnimated, still: fogStill }
+    if (text.includes('thunder')) return { animated: thunderAnimated, still: thunderStill, outline: true }
+    if (text.includes('snow')) return { animated: snowAnimated, still: snowStill, outline: true }
+    if (text.includes('rain') || text.includes('shower')) return { animated: rainAnimated, still: rainStill, outline: true }
+    if (text.includes('fog')) return { animated: fogAnimated, still: fogStill, outline: true }
     if (text.includes('partly') || text.includes('mostly sunny') || text.includes('mostly clear')) {
         return isDaytime
-            ? { animated: partlyCloudyDayAnimated, still: partlyCloudyDayStill }
-            : { animated: partlyCloudyNightAnimated, still: partlyCloudyNightStill }
+            ? { animated: partlyCloudyDayAnimated, still: partlyCloudyDayStill, outline: true }
+            : { animated: partlyCloudyNightAnimated, still: partlyCloudyNightStill, outline: true }
     }
-    if (text.includes('cloud')) return { animated: cloudyAnimated, still: cloudyStill }
+    if (text.includes('cloud')) return { animated: cloudyAnimated, still: cloudyStill, outline: true }
     return isDaytime
-        ? { animated: clearDayAnimated, still: clearDayStill }
-        : { animated: clearNightAnimated, still: clearNightStill }
+        ? { animated: clearDayAnimated, still: clearDayStill, outline: false }
+        : { animated: clearNightAnimated, still: clearNightStill, outline: false }
 }

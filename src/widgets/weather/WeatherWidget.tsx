@@ -2,9 +2,9 @@ import { ChevronLeft, ChevronRight, Droplet, Snowflake } from 'lucide-react'
 import { useWeatherData, type WeatherAlert } from './useWeatherData'
 import { getWeatherIcon } from './weatherIcons'
 import { useState } from 'react'
-import { formatWeekdayTime } from '../../lib/dates'
 import { useNow } from '../../hooks/useNow'
 import { AlertsModal } from './AlertsModal'
+import { getAlertTiming } from './alertTiming'
 
 const timeOfDayTints = {
     Morning: '#FCE4A0',
@@ -12,6 +12,8 @@ const timeOfDayTints = {
     Evening: '#F4C6B4',
     Night: '#BFC4EA',
 }
+
+const iconOutline = 'drop-shadow-[0_0_1px_rgba(0,0,0,0.9)]'
 
 const soonMessages = {
     thunder: 'Chance of storms soon',
@@ -36,19 +38,13 @@ export function WeatherWidget() {
     const topAlert = weather.alerts[0]
     const extraAlerts = weather.alerts.length - 1
 
-    function getAlertTiming(alert: WeatherAlert, now: Date) {
-        if (now < new Date(alert.start)) return `Starts ${formatWeekdayTime(alert.start)}`
-        if (alert.end) return `Until ${formatWeekdayTime(alert.end)}`
-        return `Since ${formatWeekdayTime(alert.start)}`
-    }
-
     return (
         <div className="relative flex flex-col flex-1 min-h-0 gap-2.5 rounded-3xl overflow-hidden p-3 pb-5 text-ink bg-muted/15">
             {/* top row: now (left), alert (middle), hourly/weekly switch (right) */}
             <div className="relative flex h-14 shrink-0 items-center justify-between">
                 {/* Now card */}
                 <div className="flex h-full w-[320px] shrink-0 items-center gap-3 rounded-2xl bg-card px-4 shadow-sm">
-                    <img src={nowIcon.animated} className="h-12 w-12 shrink-0" alt="" />
+                    <img src={nowIcon.animated} className={`h-12 w-12 shrink-0 ${nowIcon.outline ? iconOutline : ''}`} alt="" />
                     <span className="text-5xl font-bold leading-none tabular-nums">
                         {weather.current.temperature}°
                     </span>
@@ -59,7 +55,7 @@ export function WeatherWidget() {
                         </span>
                         {precipSoon && (
                             <span className="flex items-center gap-1 text-xs font-bold text-sky-600">
-                                <img src={soonIcon.animated} className="-my-2 -ml-1 h-7 w-7 shrink-0 drop-shadow-[0_0_1px_rgba(0,0,0,0.45)]" alt="" />
+                                <img src={soonIcon.animated} className={`-my-2 -ml-1 h-7 w-7 shrink-0 ${iconOutline}`} alt="" />
                                 {soonMessages[soonKind]}
                             </span>
                         )}
@@ -68,7 +64,7 @@ export function WeatherWidget() {
                 {/* alert */}
                 {topAlert && (
                     <button
-                        className="absolute left-1/2 flex h-full w-[260px] -translate-x-1/2 cursor-pointer items-center justify-center rounded-2xl bg-yellow-100 px-3 hover:bg-yellow-200 gap-2"
+                        className="absolute left-1/2 flex h-full w-[260px] -translate-x-1/2 cursor-pointer items-center justify-center rounded-2xl bg-yellow-100 transition px-3 hover:brightness-95 gap-2"
                         onClick={() => setShowAlertsModal(true)}
                     >
                         <div className="flex flex-col">
@@ -83,7 +79,7 @@ export function WeatherWidget() {
                     </button>
                 )}
                 {/* alerts modal */}
-                {showAlertsModal && <AlertsModal onClose={() => setShowAlertsModal(false)} alerts={weather.alerts} />}
+                {showAlertsModal && <AlertsModal onClose={() => setShowAlertsModal(false)} alerts={weather.alerts} now={now} />}
                 <div className="relative grid h-9 w-[190px] shrink-0 grid-cols-2 rounded-full bg-muted/15 p-1">
                     {/* sliding highlight */}
                     <div
@@ -112,7 +108,7 @@ export function WeatherWidget() {
                     return (
                         <div key={day.label} className="flex flex-1 flex-col items-center justify-center gap-1 rounded-2xl bg-card shadow-sm p-1.5 pt-2">
                             <span className="text-sm font-bold leading-none">{day.label}</span>
-                            <img src={icon.still} className="h-8 w-8 shrink-0" alt="" />
+                            <img src={icon.still} className={`h-8 w-8 shrink-0 ${icon.outline ? iconOutline : ''}`} alt="" />
                             <span className="text-sm font-semibold leading-none text-muted">{day.condition}</span>
                             <span className="text-lg font-bold leading-none tabular-nums">
                                 {day.high}° <span className="text-sm font-semibold text-muted">/ {day.low}°</span>
@@ -146,7 +142,7 @@ export function WeatherWidget() {
                                     <span style={{ backgroundColor: tint }} className="w-full py-1 text-center text-sm font-bold leading-none">
                                         {hour.label}
                                     </span>
-                                    <img src={icon.still} className="h-8 w-8 shrink-0" alt="" />
+                                    <img src={icon.still} className={`h-8 w-8 shrink-0 ${icon.outline ? iconOutline : ''}`} alt="" />
                                     <span className="text-sm font-semibold leading-none text-muted">{hour.condition}</span>
                                     <span className="text-lg font-bold leading-none tabular-nums">
                                         {hour.temperature}°

@@ -19,9 +19,18 @@ settings").
 responses, and the layout is mostly built on it: the Now card, the Hourly / Weekly
 switch, the weekly day cards, and the hourly cards with paging arrows, page dots and
 the time-of-day tint, and the Now card's note for rain, snow or storms coming soon.
-The layout stage is done. Next are the alert banner and alerts modal (the banner is
-still a placeholder), then severe backgrounds and real fetching (see the build stages
-under Weather).
+The layout and alerts stages are done: the alert banner and the alerts modal are built
+on a saved sample of real alerts. Still open for alerts: the banner's colors by
+severity. Next are severe backgrounds and real fetching (see the build stages under
+Weather).
+
+**Modals** all go through one shared `Modal` component (`src/components/Modal.tsx`) and
+open centered over the whole dashboard. It draws its overlay into the dashboard's root
+element (`id="dashboard"` in `App.tsx`) with a portal, so it doesn't matter which widget
+opened it. Before this, each modal filled its nearest positioned ancestor: the day modal
+and event form only covered the calendar card, which left the rest of the dashboard
+tappable and let a second modal open at the same time; and the alerts modal was trapped
+in the 250px weather band.
 
 ## Working agreement
 
@@ -84,6 +93,14 @@ weather API. This plan describes turning that design into an actual running app.
     - It shows the **single most serious** active alert: the alert's `event` as the
       title, and a timing line under it (see "The timing line" below). A **"+1"** chip
       shows when more are active. On a calm day there is no banner.
+    - **Built.** It is a button, 260px wide, **centered on the widget** (absolutely
+      positioned in the top row, not spaced between the Now card and the switch). That
+      puts it on the same center line as the household name above and the page dots
+      below; the gaps to its two neighbors are uneven, which was accepted. The count
+      chip is pinned to the banner's right edge, outside the text's flow, so the title
+      stays centered whether or not the chip shows.
+    - **Color is one yellow for every alert for now**; colors by severity are still to
+      be decided. Hover darkens whatever color it has (`hover:brightness-95`).
     - **Only real NWS fields are shown.** A short summary like "Gusts to 35 mph" is not
       a field anywhere, so it isn't displayed; text is never made up.
     - **Tapping the banner** (the whole banner, not just the chip) opens the alerts
@@ -93,6 +110,8 @@ weather API. This plan describes turning that design into an actual running app.
     dashboard-level modal. Read-only. It lists every active alert, most serious first;
     each card has the title, the timing line, the description, and the instruction as
     "What to do", in a scrolling list.
+    - **Built** (`AlertsModal.tsx`): 600px wide, a 480px scrolling list, one card per
+      alert. `severity` and `expires` are not shown on the card.
     - **NWS alert fields** (checked on live alerts): `event`, `severity` (Extreme /
       Severe / Moderate / Minor / Unknown), `onset`, `ends`, `expires`, `instruction`,
       and `areaDesc` are separate fields. What / where / when / impacts are **not**:
@@ -113,13 +132,20 @@ weather API. This plan describes turning that design into an actual running app.
       tries to understand the alert). When unsure, show the text as it came. Accepted
       as not perfect.
       - Treat a single line break as a space and a blank line as a new paragraph: NWS
-        hard-wraps its text at about 70 characters.
+        hard-wraps its text at about 70 characters. **Built** (`getParagraphs`), and
+        used for the instruction text too.
+      - A leading label is recognized when the text before the first `...` is all
+        capitals and under 30 characters, after an optional `* `. It is shown bold as
+        "What:". **Built** (`splitLabel`). Anything else stays a plain paragraph.
       - Drop a first paragraph that is one short all-capitals word with no spaces (a
-        product code such as "AQAFWD"). Confirm against raw saved text.
+        product code such as "AQAFWD"). Confirm against raw saved text. **Not built.**
       - Leave trailing web addresses alone; there's no safe way to tell them from
         useful text.
       - If a description is very long, cut it off after a set number of lines with a
-        "Show more".
+        "Show more". **Not built.**
+      - **Tested only on marker-style text.** All 22 saved Wind Advisories use the
+        `* WHAT...` markers (What, Where, When, Impacts, and Additional details on
+        two). The plain-paragraph path has not met a real unmarked alert yet.
     - **The timing line** (on the banner and on each modal card) has three cases:
       not started yet → "Starts Thu 10:00 AM" (an alert can be issued days before its
       `onset`, and still shows, since a heads-up is the point of a watch); under way
@@ -197,15 +223,27 @@ weather API. This plan describes turning that design into an actual running app.
     The icons are Meteocons' `fill` style. The `line` style was tried for clearer
     clouds and rejected: it is outline-only, and the suns became thin rings.
   - **Built so far**: `WeatherWidget.tsx` is registered as a full-width widget, first
-    in the layout, with everything above marked built; the alert banner is a
-    placeholder box. `useWeatherData.ts` has the types (`CurrentWeather`,
-    `DayForecast`, `HourForecast`, `WeatherAlert` and `WeatherData`, which is
-    `{ current, days, hours, alerts }`) and builds `current`, `days` and `hours` from
-    the mock files; `alerts` is one hard-coded sample. `HourForecast` has `timeOfDay`
+    in the layout, with everything above marked built. `useWeatherData.ts` has the
+    types (`CurrentWeather`, `DayForecast`, `HourForecast`, `WeatherAlert` and
+    `WeatherData`, which is `{ current, days, hours, alerts }`) and builds all four
+    from the mock files. `HourForecast` has `timeOfDay`
     and `isDaytime`. Temperatures and rain chance are numbers; the "°" and "%" are
     added when drawing.
     - **Because the mock is a snapshot**, "now" and the first hourly card are the hour
       the files were saved (12 PM on October 6, 2026), whatever the real time is.
+    - **Alerts in the hook**: each NWS feature becomes a `WeatherAlert`: `title` from
+      `event` (not `headline`, which is a full sentence), `start` from `onset` (not
+      `effective`, which is when the message was issued), `end` from `ends`, plus
+      `expires`, `severity`, `description` and `instruction`. `end` and `instruction`
+      can be missing. The list is sorted most serious first (`severityRank`: Extreme,
+      Severe, Moderate, Minor, Unknown), so the banner takes the first one and the
+      modal shows them in order.
+    - **The timing sentence** is `getAlertTiming(alert, now)` in `alertTiming.ts`, shared
+      by the banner and the modal. Times are formatted by `formatWeekdayTime` in
+      `src/lib/dates.ts` and shown in the device's time zone.
+    - **The mock shows ended alerts.** The sample's advisories ended on October 12,
+      2026, so the banner says "Until Monday 8:00 AM" about a time in the past.
+      Hiding ended alerts is the time check at stage 7.
   - **What the NWS data looks like** (checked against real responses):
     - Two steps: `/points/{lat},{lon}` returns links, not weather; follow its
       `forecast` (7-day) and `forecastHourly` links. Grid numbers can't be guessed (a
@@ -221,15 +259,21 @@ weather API. This plan describes turning that design into an actual running app.
       the condition is words in `shortForecast` ("Mostly Sunny", "Chance Rain
       Showers"), so icons and severe backgrounds are chosen by keyword.
     - Errors come back as JSON with `status`, `title` and `detail`.
-  - **Mock data**: three saved real responses in `src/widgets/weather/mock/`
-    (`forecast.json`, `forecastHourly.json`, `alerts.json`). The saved alerts list is
-    empty (a calm day), so a severe sample still needs saving for the alert banner
-    and modal (e.g. `/alerts/active?event=Wind%20Advisory` while one is active
-    somewhere, saved as `alertsSevere.json`).
+  - **Mock data**: four saved real responses in `src/widgets/weather/mock/`
+    (`forecast.json`, `forecastHourly.json`, `alerts.json`, `alertsSevere.json`).
+    `alerts.json` is a calm day with an empty list. `alertsSevere.json` is every Wind
+    Advisory active nationwide on October 11, 2026
+    (`/alerts/active?event=Wind%20Advisory`): 22 alerts, all Moderate. The hook reads
+    `alertsSevere.json`; pointing its import at `alerts.json` tests the calm day.
+    - **Limits of this sample**: one alert type and one severity, so it can't test
+      ranking; and 22 alerts is far more than one location would get, so the chip
+      reads "+21". A mixed sample (e.g. `/alerts/active?area=` plus a state code) and
+      an unmarked plain-text alert are still worth saving.
     The files contain the location they were fetched for.
   - **Build stages**: (1) look at real data and save it — done; (2) decide the tidy
     data shape and types — done; (3) `useWeatherData()` returning that shape from the
-    mock files — done; (4) the layout — done; (5) alerts — next; (6) severe backgrounds;
+    mock files — done; (4) the layout — done; (5) alerts — done, except colors by
+    severity; (6) severe backgrounds — next;
     (7) real fetching with loading and error states, using the household's location.
     - **To check at stage 7: the "Today" label.** `useWeatherData()` labels the first
       daytime period "Today". If a forecast is fetched in the evening its first period
@@ -237,7 +281,7 @@ weather API. This plan describes turning that design into an actual running app.
       show this (it was saved at midday); check it against a real evening response.
   - Alerts are ranked so the banner shows the most serious one (the mockup's logic
     ranks rain < wind < storm < tornado; NWS's own `severity` field is the starting
-    point).
+    point). Built on `severity` alone; alerts of equal severity keep NWS's order.
   - Animated backgrounds for certain severe conditions (thunderstorm, tornado, wind,
     snow, blizzard) — pure CSS/DOM animation in the mockup, no external library.
   - **Chosen data source: National Weather Service API (`api.weather.gov`)** — free,
@@ -292,8 +336,9 @@ weather API. This plan describes turning that design into an actual running app.
       two-column row that depends on All Day: **timed** = Date + Time, **all-day** =
       Start + End. That is how "timed events are single-day" is enforced: a timed event
       has no End field and saves `end = start`; an all-day event saves no `time`. Then
-      the People chips and Save. Sharing rows keeps the form short enough to fit inside
-      the calendar widget without scrolling (the modal is confined to the widget).
+      the People chips and Save. Sharing rows keeps the form short enough to fit
+      without scrolling. (It was sized to fit inside the calendar widget, which the
+      modal was confined to; it now opens over the whole dashboard like every modal.)
     - **Defaults**: today for both dates, the first category, not all-day, no people.
       **The defaults are the same for every category** (see "No category-based
       defaults" below).
@@ -503,7 +548,8 @@ weather API. This plan describes turning that design into an actual running app.
       The holiday's name shows as a subtitle under the date, then every event on that day
       is listed. (The modal has no "N events" count line; the event cards show it.) The
       event list scrolls inside a fixed max height (320px) while the header stays put,
-      so a very busy day can't push the modal past the widget and hide its close button.
+      so a very busy day can't push the modal off the dashboard and hide its close
+      button.
       A long title wraps inside its card (and a single unbroken word breaks) while the
       "when" text and the buttons stay on one line. Multi-day events always show
       their **full date range** (e.g. "Vacation · Sep 21–25 · Mom, Dad"), even when the
@@ -878,9 +924,11 @@ family-dashboard/
 │   │   ├── registry.ts           # widget id -> { component, shape, label } + buildRows()
 │   │   ├── weather/
 │   │   │   ├── WeatherWidget.tsx
-│   │   │   ├── mock/                 # saved NWS responses: forecast, forecastHourly, alerts
+│   │   │   ├── mock/                 # saved NWS responses: forecast, forecastHourly, alerts, alertsSevere
 │   │   │   ├── useWeatherData.ts     # NWS fetch/normalize
 │   │   │   ├── weatherIcons.ts       # condition text -> Meteocons icon (animated + still)
+│   │   │   ├── AlertsModal.tsx       # every active alert; tidies the description text
+│   │   │   ├── alertTiming.ts        # "Starts / Until / Since ..." sentence for an alert
 │   │   │   └── severeBackgrounds.tsx
 │   │   ├── calendar/
 │   │   │   ├── CalendarWidget.tsx
@@ -906,7 +954,8 @@ family-dashboard/
 │   ├── phone/
 │   │   └── QuickActionsView.tsx
 │   ├── components/               # shared/generic UI (buttons, modals, date picker)
-│   │   └── Header.tsx            # date + time, household name, settings button
+│   │   ├── Header.tsx            # date + time, household name, settings button
+│   │   └── Modal.tsx             # shared overlay + card, drawn into the dashboard root
 │   └── styles/
 │       └── tokens.css            # design tokens ported from the mockup
 └── supabase/
