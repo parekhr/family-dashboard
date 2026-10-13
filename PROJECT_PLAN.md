@@ -20,8 +20,9 @@ responses, and the layout is mostly built on it: the Now card, the Hourly / Week
 switch, the weekly day cards, and the hourly cards with paging arrows, page dots and
 the time-of-day tint, and the Now card's note for rain, snow or storms coming soon.
 The layout and alerts stages are done: the alert banner and the alerts modal are built
-on a saved sample of real alerts, with colors by severity. Next are severe backgrounds
-and real fetching (see the build stages under Weather).
+on a saved sample of real alerts, with colors by severity. The animated weather
+backgrounds are built too. The only stage left is real fetching (see the build stages
+under Weather).
 
 **Modals** all go through one shared `Modal` component (`src/components/Modal.tsx`) and
 open centered over the whole dashboard. It draws its overlay into the dashboard's root
@@ -271,7 +272,7 @@ weather API. This plan describes turning that design into an actual running app.
       current-conditions entry in these responses.
     - `windSpeed` is text ("5 to 10 mph"), not a number. There is no condition code:
       the condition is words in `shortForecast` ("Mostly Sunny", "Chance Rain
-      Showers"), so icons and severe backgrounds are chosen by keyword.
+      Showers"), so icons and weather backgrounds are chosen by keyword.
     - Errors come back as JSON with `status`, `title` and `detail`.
   - **Mock data**: four saved real responses in `src/widgets/weather/mock/`
     (`forecast.json`, `forecastHourly.json`, `alerts.json`, `alertsSevere.json`).
@@ -289,8 +290,8 @@ weather API. This plan describes turning that design into an actual running app.
     The files contain the location they were fetched for.
   - **Build stages**: (1) look at real data and save it — done; (2) decide the tidy
     data shape and types — done; (3) `useWeatherData()` returning that shape from the
-    mock files — done; (4) the layout — done; (5) alerts — done; (6) severe
-    backgrounds — next;
+    mock files — done; (4) the layout — done; (5) alerts — done; (6) weather
+    backgrounds — done;
     (7) real fetching with loading and error states, using the household's location.
     - **To check at stage 7: the "Today" label.** `useWeatherData()` labels the first
       daytime period "Today". If a forecast is fetched in the evening its first period
@@ -299,8 +300,65 @@ weather API. This plan describes turning that design into an actual running app.
   - Alerts are ranked so the banner shows the most serious one (the mockup's logic
     ranks rain < wind < storm < tornado; NWS's own `severity` field is the starting
     point). Built on `severity` alone; alerts of equal severity keep NWS's order.
-  - Animated backgrounds for certain severe conditions (thunderstorm, tornado, wind,
-    snow, blizzard) — pure CSS/DOM animation in the mockup, no external library.
+  - **Animated weather backgrounds** (built, `WeatherBackground.tsx`): rain, snow,
+    thunderstorm, wind and blizzard, in plain CSS with no library. Tornado, from the
+    original list, was not built. On an ordinary day nothing is drawn and the widget
+    keeps its plain grey. Called "weather" and not "severe" backgrounds because
+    "severe" already means an alert's severity, which has nothing to do with this.
+    - **Animated or nothing.** Static versions (a color and a pattern per condition)
+      were mocked up and rejected: the patterns only show in the gaps between cards
+      and added little.
+    - **How one is chosen**: `getBackgroundKind(condition, rainChance)` reads the
+      current condition text, the same text `getWeatherIcon` reads, and returns one
+      kind. Checked in this order, first match wins: blizzard, thunder, snow, rain
+      (or "shower"), wind, otherwise none.
+      - **Blizzard, snow and rain need a rain chance of 50% or more** for the current
+        hour (`weather.hours[0].rainChance`), so "Chance Rain Showers" at 30% doesn't
+        rain on screen. Thunder shows whenever the condition mentions it, at any
+        chance. Wind ignores the rain chance.
+      - **One background at a time.** A design that combined separate ingredients
+        (rain, snow, lightning, wind, heavy) was worked out and set aside as too many
+        rules for the first version. Known costs: a thunderstorm always shows rain,
+        even a dry one, and rain during a wind advisory falls straight.
+      - **Wind is triggered by the condition text only**, which rarely says "wind".
+        Triggering it from an active wind alert was discussed and not built; the
+        saved sample's 22 wind advisories show no wind.
+      - An unrecognized word turns nothing on, so the fallback is the plain
+        background, never a wrong one. It is a forecast, not a sensor: the screen can
+        show rain while the window is dry.
+    - **Where it sits**: one layer, first inside the widget's outer div, filling it
+      (`absolute inset-0`) and ignoring taps (`pointer-events-none`). The cards are
+      solid, so it shows only in the gaps and around the edges. The bottom row needed
+      `relative` added so its cards draw in front of the layer.
+    - **How it's drawn**: each kind has one line in `backgroundSettings`: `count`,
+      `shape` (size and color classes), `speed` (seconds for one pass, so smaller is
+      faster), `across` (false = falls, true = blows left to right), `drift` and
+      `sway`. One loop draws `count` pieces from those settings.
+      - Each piece's position, speed, drift and rhythm are worked out from its index,
+        not `Math.random()`, because the widget re-renders every minute and random
+        values would make every piece jump.
+      - **Drift and sway** were added because pieces moving in dead straight parallel
+        lines looked mechanical. Drift: each piece ends a different distance off its
+        axis. Sway: a second, slower back-and-forth runs alongside the main movement
+        (rain and thunder have none).
+      - **Wind** pieces are lucide's `Wind` icon, not straight bars, which didn't read
+        as wind. **Blizzard** is 100 white dots blown sideways, tuned to be harsh.
+      - **Thunderstorm** adds a white sheet that flickers and a jagged yellow bolt (an
+        SVG `polyline`) in the gap beside the banner, both on a 7-second cycle. The
+        bolt has its own animation (`weather-bolt`) that holds at full strength
+        across the sheet's flicker.
+    - **The animations** are six `@keyframes` rules at the end of `src/index.css`:
+      `weather-fall`, `weather-blow`, `weather-sway`, `weather-bob`, `weather-flash`
+      and `weather-bolt`.
+    - **Two things that cost time while building**:
+      - An element that names an animation which doesn't exist gives no error; it
+        just doesn't move.
+      - Editing one element's animation while the page is open restarts only that
+        element's clock, so the bolt and the flash drifted apart until the page was
+        reloaded. Reload before judging timing.
+    - **Not yet done**: tried on the real tablet (smoothness on a Fire HD 10 is
+      untested), and seen against real weather. All tuning so far was done with a
+      kind forced on over the sunny mock.
   - **Chosen data source: National Weather Service API (`api.weather.gov`)** — free,
     no API key, and the mockup's own code comments already model its hourly data on
     NWS's gridpoint forecast fields, so this is a close match rather than a rework.
@@ -947,7 +1005,7 @@ family-dashboard/
 │   │   │   ├── AlertsModal.tsx       # every active alert; tidies the description text
 │   │   │   ├── alertTiming.ts        # "Starts / Until / Since ..." sentence for an alert
 │   │   │   ├── alertColors.ts        # severity -> color, for the banner and the modal
-│   │   │   └── SevereBackground.tsx   # animated layer behind the cards + its picker (stage 6)
+│   │   │   └── WeatherBackground.tsx  # animated layer behind the cards + its picker (stage 6)
 │   │   ├── calendar/
 │   │   │   ├── CalendarWidget.tsx
 │   │   │   ├── buildMonthGrid.ts     # 42-day Sun-first grid for a month (month is 1-based)
