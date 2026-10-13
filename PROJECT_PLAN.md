@@ -947,7 +947,7 @@ family-dashboard/
 │   │   │   ├── AlertsModal.tsx       # every active alert; tidies the description text
 │   │   │   ├── alertTiming.ts        # "Starts / Until / Since ..." sentence for an alert
 │   │   │   ├── alertColors.ts        # severity -> color, for the banner and the modal
-│   │   │   └── severeBackgrounds.tsx
+│   │   │   └── SevereBackground.tsx   # animated layer behind the cards + its picker (stage 6)
 │   │   ├── calendar/
 │   │   │   ├── CalendarWidget.tsx
 │   │   │   ├── buildMonthGrid.ts     # 42-day Sun-first grid for a month (month is 1-based)

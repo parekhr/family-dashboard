@@ -94,3 +94,36 @@ body {
   --color-dec-icon3: #D6A01E;  /* star */
   --color-dec-icon4: #FFFDF8;  /* snowflakes (cream, needs high opacity) */
 }
+
+@keyframes weather-flash {
+  0%, 90%, 100% { opacity: 0; }
+  92% { opacity: 0.7; }
+  94% { opacity: 0.1; }
+  96% { opacity: 0.5; }
+}
+
+@keyframes weather-fall {
+  from { transform: translate(0, -20px); }
+  to { transform: translate(var(--drift), 260px); }
+}
+
+@keyframes weather-blow {
+  from { transform: translate(-80px, 0); }
+  to { transform: translate(1300px, var(--drift)); }
+}
+
+@keyframes weather-sway {
+  from { translate: calc(var(--sway) * -1) 0; }
+  to { translate: var(--sway) 0; }
+}
+
+@keyframes weather-bob {
+  from { translate: 0 calc(var(--sway) * -1); }
+  to { translate: 0 var(--sway); }
+}
+
+@keyframes weather-bolt {
+  0%, 90%, 100% { opacity: 0; }
+  91%, 96% { opacity: 1; }
+  98% { opacity: 0; }
+}

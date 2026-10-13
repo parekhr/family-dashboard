@@ -6,6 +6,9 @@ import { useNow } from '../../hooks/useNow'
 import { AlertsModal } from './AlertsModal'
 import { getAlertTiming } from './alertTiming'
 import { severityColors } from './alertColors'
+import { getBackgroundKind, WeatherBackground } from './WeatherBackground'
+
+
 
 const timeOfDayTints = {
     Morning: '#FCE4A0',
@@ -41,6 +44,7 @@ export function WeatherWidget() {
 
     return (
         <div className="relative flex flex-col flex-1 min-h-0 gap-2.5 rounded-3xl overflow-hidden p-3 pb-5 text-ink bg-muted/15">
+            <WeatherBackground kind={getBackgroundKind(weather.current.condition, weather.hours[0].rainChance)} />
             {/* top row: now (left), alert (middle), hourly/weekly switch (right) */}
             <div className="relative flex h-14 shrink-0 items-center justify-between">
                 {/* Now card */}
@@ -103,7 +107,7 @@ export function WeatherWidget() {
             </div>
 
             {/* bottom row: seven forecast cards (days or hours) */}
-            <div className="flex flex-1 min-h-0 gap-2.5">
+            <div className="flex flex-1 min-h-0 gap-2.5 relative">
                 {view === 'weekly' && weather.days.map(day => {
                     const icon = getWeatherIcon(day.condition, true)
                     const isSnow = day.condition.toLowerCase().includes('snow')
