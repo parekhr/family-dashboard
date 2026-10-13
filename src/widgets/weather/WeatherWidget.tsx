@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, Droplet, Snowflake } from 'lucide-react'
-import { useWeatherData, type WeatherAlert } from './useWeatherData'
+import { useWeatherData } from './useWeatherData'
 import { getWeatherIcon } from './weatherIcons'
 import { useState } from 'react'
 import { useNow } from '../../hooks/useNow'
@@ -7,8 +7,6 @@ import { AlertsModal } from './AlertsModal'
 import { getAlertTiming } from './alertTiming'
 import { severityColors } from './alertColors'
 import { getBackgroundKind, WeatherBackground } from './WeatherBackground'
-
-
 
 const timeOfDayTints = {
     Morning: '#FCE4A0',
@@ -25,14 +23,34 @@ const soonMessages = {
     rain: 'Chance of rain soon',
 }
 
+const statusMessages = {
+    loading: 'Loading weather…',
+    noLocation: 'Set a location to see the weather.',
+    error: "Couldn't load the weather.",
+}
+
+function shortCondition(condition: string) {
+    return condition.replace('Slight Chance ', '').replace('Chance ', '').replace(' Likely', '')
+}
+
 export function WeatherWidget() {
     const [view, setView] = useState<'hourly' | 'weekly'>('hourly')
     const [pageNumber, setPageNumber] = useState(0)
     const [showAlertsModal, setShowAlertsModal] = useState(false)
     const start = pageNumber * 6
 
-    const weather = useWeatherData()
+    const state = useWeatherData()
     const now = useNow()
+
+    if (state.status !== 'ready') {
+        return (
+            <div className="flex flex-1 min-h-0 items-center justify-center rounded-3xl bg-muted/15 text-sm font-semibold text-muted">
+                {statusMessages[state.status]}
+            </div>
+        )
+    }
+
+    const weather = state.data
     const nowIcon = getWeatherIcon(weather.current.condition, weather.current.isDaytime)
     const pageCount = Math.ceil(weather.hours.length / 6)
     const soonText = `${weather.hours[0].condition} ${weather.hours[1].condition}`.toLowerCase()
@@ -48,13 +66,13 @@ export function WeatherWidget() {
             {/* top row: now (left), alert (middle), hourly/weekly switch (right) */}
             <div className="relative flex h-14 shrink-0 items-center justify-between">
                 {/* Now card */}
-                <div className="flex h-full w-[320px] shrink-0 items-center gap-3 rounded-2xl bg-card px-4 shadow-sm">
+                <div className="flex h-full w-[400px] shrink-0 items-center gap-3 rounded-2xl bg-card px-4 shadow-sm">
                     <img src={nowIcon.animated} className={`h-12 w-12 shrink-0 ${nowIcon.outline ? iconOutline : ''}`} alt="" />
                     <span className="text-5xl font-bold leading-none tabular-nums">
                         {weather.current.temperature}°
                     </span>
-                    <div className="flex flex-col leading-tight">
-                        <span className="text-sm font-bold">{weather.current.condition}</span>
+                    <div className="flex min-w-0 flex-col leading-tight">
+                        <span className="truncate text-sm font-bold text-primary">{weather.current.condition}</span>
                         <span className="text-xs font-semibold text-muted">
                             H {weather.current.high}°  L {weather.current.low}°
                         </span>
@@ -115,7 +133,7 @@ export function WeatherWidget() {
                         <div key={day.label} className="flex flex-1 flex-col items-center justify-center gap-1 rounded-2xl bg-card shadow-sm p-1.5 pt-2">
                             <span className="text-sm font-bold leading-none">{day.label}</span>
                             <img src={icon.still} className={`h-8 w-8 shrink-0 ${icon.outline ? iconOutline : ''}`} alt="" />
-                            <span className="text-sm font-semibold leading-none text-muted">{day.condition}</span>
+                            <span className="-mb-1 w-full truncate px-1 pb-1 text-center text-sm font-semibold leading-none text-muted">{shortCondition(day.condition)}</span>
                             <span className="text-lg font-bold leading-none tabular-nums">
                                 {day.high}° <span className="text-sm font-semibold text-muted">/ {day.low}°</span>
                             </span>
@@ -131,7 +149,7 @@ export function WeatherWidget() {
                     <>
                         {/* previous page */}
                         <button
-                            className="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-full bg-card shadow-sm cursor-pointer disabled:cursor-default disabled:opacity-30 hover:bg-card/50"
+                            className="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-full bg-card shadow-sm cursor-pointer disabled:cursor-default disabled:opacity-30 enabled:hover:bg-card/50"
                             onClick={() => setPageNumber(pageNumber - 1)}
                             disabled={pageNumber === 0}
                             aria-label="Earlier hours"
@@ -149,7 +167,7 @@ export function WeatherWidget() {
                                         {hour.label}
                                     </span>
                                     <img src={icon.still} className={`h-8 w-8 shrink-0 ${icon.outline ? iconOutline : ''}`} alt="" />
-                                    <span className="text-sm font-semibold leading-none text-muted">{hour.condition}</span>
+                                    <span className="-mb-1 w-full truncate px-1 pb-1 text-center text-sm font-semibold leading-none text-muted">{shortCondition(hour.condition)}</span>
                                     <span className="text-lg font-bold leading-none tabular-nums">
                                         {hour.temperature}°
                                     </span>
@@ -163,7 +181,7 @@ export function WeatherWidget() {
 
                         {/* next page */}
                         <button
-                            className="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-full bg-card shadow-sm cursor-pointer disabled:cursor-default disabled:opacity-30 hover:bg-card/50"
+                            className="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-full bg-card shadow-sm cursor-pointer disabled:cursor-default disabled:opacity-30 enabled:hover:bg-card/50"
                             onClick={() => setPageNumber(pageNumber + 1)}
                             disabled={pageNumber === pageCount - 1}
                             aria-label="Later hours"

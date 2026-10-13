@@ -1,6 +1,18 @@
-import forecastHourly from './mock/forecastHourly.json'
-import forecast from './mock/forecast.json'
-import alertsSevere from './mock/alertsSevere.json'
+import hourlyMock from './mock/forecastHourly.json'
+import forecastMock from './mock/forecast.json'
+import alertsMock from './mock/alertsSevere.json'
+import { useEffect, useState } from 'react'
+import useHouseholdData from '../../hooks/useHouseholdData'
+
+type ForecastResponse = typeof forecastMock
+type HourlyResponse = typeof hourlyMock
+type AlertsResponse = typeof alertsMock
+
+export type WeatherState =
+    | { status: 'loading' }
+    | { status: 'noLocation' }
+    | { status: 'error' }
+    | { status: 'ready'; data: WeatherData }
 
 export type TimeOfDay = 'Morning' | 'Afternoon' | 'Evening' | 'Night'
 
@@ -46,13 +58,6 @@ export type WeatherData = {
     alerts: WeatherAlert[]
 }
 
-function getTimeOfDay(hour: number): TimeOfDay {
-    if (hour >= 5 && hour < 12) return 'Morning'
-    if (hour >= 12 && hour < 17) return 'Afternoon'
-    if (hour >= 17 && hour < 21) return 'Evening'
-    return 'Night'
-}
-
 const severityRank = {
     Extreme: 4,
     Severe: 3,
@@ -61,9 +66,36 @@ const severityRank = {
     Unknown: 0,
 }
 
-export function useWeatherData(): WeatherData {
+function getTimeOfDay(hour: number): TimeOfDay {
+    if (hour >= 5 && hour < 12) return 'Morning'
+    if (hour >= 12 && hour < 17) return 'Afternoon'
+    if (hour >= 17 && hour < 21) return 'Evening'
+    return 'Night'
+}
+
+async function fetchJson(url: string) {
+    const response = await fetch(url)
+    if (!response.ok) throw new Error(`NWS request failed (${response.status})`)
+    return response.json()
+}
+
+async function fetchWeather(latitude: number, longitude: number) {
+    const point = `${latitude},${longitude}`
+    const points = await fetchJson(`https://api.weather.gov/points/${point}`)
+
+    const [forecast, forecastHourly, alerts] = await Promise.all([
+        fetchJson(points.properties.forecast),
+        fetchJson(points.properties.forecastHourly),
+        fetchJson(`https://api.weather.gov/alerts/active?point=${point}`),
+    ])
+
+    return { forecast, forecastHourly, alerts }
+}
+
+function buildWeatherData(forecast: ForecastResponse, forecastHourly: HourlyResponse, alerts: AlertsResponse): WeatherData {
     const now = forecastHourly.properties.periods[0]
     const periods = forecast.properties.periods
+
     return {
         current: {
             temperature: now.temperature,
@@ -97,7 +129,7 @@ export function useWeatherData(): WeatherData {
                 isDaytime: period.isDaytime,
             }
         }),
-        alerts: alertsSevere.features.map(feature => {
+        alerts: alerts.features.map(feature => {
             return {
                 title: feature.properties.event,
                 severity: feature.properties.severity as WeatherAlert['severity'],
@@ -107,6 +139,23 @@ export function useWeatherData(): WeatherData {
                 expires: feature.properties.expires,
                 instruction: feature.properties.instruction ?? undefined,
             }
-        }).sort((a, b) => severityRank[b.severity] - severityRank[a.severity])
+        }).sort((a, b) => severityRank[b.severity] - severityRank[a.severity]),
     }
 }
+
+export function useWeatherData(): WeatherState {
+    const location = useHouseholdData().location
+    const [state, setState] = useState<WeatherState>({ status: 'loading' })
+
+    useEffect(() => {
+        if (!location) return
+
+        fetchWeather(location.latitude, location.longitude)
+            .then(raw => setState({ status: 'ready', data: buildWeatherData(raw.forecast, raw.forecastHourly, raw.alerts) }))
+            .catch(() => setState({ status: 'error' }))
+    }, [location?.latitude, location?.longitude])
+
+    if (!location) return { status: 'noLocation' }
+    return state
+}
+
