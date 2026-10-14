@@ -15,14 +15,16 @@ The header is built except for the parts that depend on other work: date and tim
 household name, and a settings button with no action yet (see "Header and household
 settings").
 
-**In progress: Weather.** The widget runs on live data from the National Weather
+**Built: Weather.** The widget runs on live data from the National Weather
 Service, refreshed every ten minutes and whenever the screen wakes: the Now card with
 its note for rain, snow or storms coming soon, the Hourly / Weekly switch, the day and
 hour cards, the alert banner and alerts modal with colors by severity, and the
 animated weather backgrounds. Alerts hide themselves when they end, and "Today" is
-decided by date, so evening forecasts are labeled correctly. The location is a fixed
-value on the mock household; the **location picker** is the one piece left (see the
-build stages under Weather).
+decided by date, so evening forecasts are labeled correctly. The place name in the
+widget opens a **location picker** that searches by town or ZIP code (Open-Meteo) and
+reloads the weather for the chosen place. Saving the chosen place waits for Supabase;
+until then a reload goes back to the mock household's location. All seven build
+stages are done (see the build stages under Weather).
 
 **Modals** all go through one shared `Modal` component (`src/components/Modal.tsx`) and
 open centered over the whole dashboard. It draws its overlay into the dashboard's root
@@ -218,10 +220,22 @@ weather API. This plan describes turning that design into an actual running app.
       on today's card. The high is the large number instead.
     - **The condition text is kept from the mockup**, under the icon.
     - **On the day and hour cards the condition is shortened** (`shortCondition` in
-      `WeatherWidget.tsx`): "Slight Chance ", "Chance " and " Likely" are removed,
-      because the rain chance shown just below already says how likely it is. The Now
-      card keeps the full text. Anything still too long is cut off with "…"; the
-      span has a little bottom padding so `truncate` doesn't clip letters like "y".
+      `WeatherWidget.tsx`): only the part before " then " is kept ("Rain Showers then
+      Partly Sunny" becomes "Rain Showers"), and "Slight Chance ", "Chance " and
+      " Likely" are removed, because the rain chance shown just below already says how
+      likely it is. The Now card keeps the full text. Anything still too long is cut
+      off with "…"; the span has a little bottom padding so `truncate` doesn't clip
+      letters like "y".
+      - **All cards keep equal widths** (`min-w-0` on each card). Without it, a long
+        one-line condition made its card wider than the others.
+      - **Two lines of condition text was tried and dropped**: the cards had no room,
+        so it meant smaller text, a smaller icon and tighter gaps, and it looked
+        cramped.
+      - **Next nice-to-have: tap a day for the full forecast.** NWS sends a
+        `detailedForecast` for every period ("Rain showers likely before noon, then
+        partly sunny. High near 50."). Tapping a day card could open it in a modal.
+        Needs the hook to carry `detailedForecast` through and the cards to become
+        buttons.
   - **Rain chance** (both views) is its own line, in blue, with a droplet icon. The
     value is NWS's `probabilityOfPrecipitation`, the chance of any precipitation, so
     the droplet becomes a snowflake when the condition mentions snow. The field is
@@ -297,7 +311,7 @@ weather API. This plan describes turning that design into an actual running app.
     data shape and types — done; (3) `useWeatherData()` returning that shape from the
     mock files — done; (4) the layout — done; (5) alerts — done; (6) weather
     backgrounds — done; (7) real fetching with loading and error states, using the
-    household's location — done, except the location picker.
+    household's location — done.
   - **Real fetching** (stage 7), built in steps that each left the app working:
     1. **The location lives on the household.** `useHouseholdData()` returns an
        optional `location: { latitude, longitude, name }`; the mock household is
@@ -341,7 +355,7 @@ weather API. This plan describes turning that design into an actual running app.
          now left out instead of copying the high (`low` is optional in
          `DayForecast`). The widget skips a missing high or low (`!== undefined`, so a
          temperature of 0 still shows).
-    7. **The location picker.** In progress. See "Setting the location".
+    7. **The location picker.** Built. See "Setting the location" for the design.
        - **The widget owns the location while running**: `WeatherWidget` keeps it in
          `useState`, starting from `useHouseholdData().location`, and passes it to
          `useWeatherData(location)`. The `Location` type is exported from
@@ -1017,6 +1031,8 @@ and in what order — a settings change, not a code change or a per-household fo
   "use my location" shortcut only, since the Fire tablet has no GPS and may not support it
   in a kiosk browser. Test on the real device. IP lookup may prefill the field but never
   sets the location silently. NWS is US-only, so a non-US location needs a clear error.
+  - **Built**: `LocationPicker.tsx` (the modal) and `searchLocations.ts` (the only file
+    that knows about Open-Meteo; it returns the app's own `Location` type).
   - **Layout** (mocked up and agreed): the place name is a small text button in the
     widget's top row, just left of the Hourly / Weekly switch, in the gap after the
     alert banner: a green pin, the name, and a small down arrow, with no background.
@@ -1027,24 +1043,42 @@ and in what order — a settings change, not a code change or a per-household fo
     current place is ticked. Tapping a match calls `setLocation` and closes the modal;
     no Save button. The weather then reloads by itself, because the hook watches
     `location`.
+    - **Up to ten results**, in a results area of fixed height (220px) that scrolls.
+      The fixed height stops the modal jumping: the shared `Modal` keeps the card
+      centered, so a list that grew and shrank moved the card on every keystroke.
+    - **Search accepts both** a town name and a ZIP code through the same field.
+      ZIP-only was considered (some apps do it); with Open-Meteo there's no cost to
+      supporting both.
+    - **The no-location button** sits in the widget's early return, which also draws
+      its own copy of the picker, since the main one is further down.
   - **Geocoding service: Open-Meteo's geocoding API** (free, no key, callable from the
     browser, can be limited to the US). NWS can't do it: `/points` turns coordinates
     into a place (`properties.relativeLocation` has city and state) but has no search
     from a name. Rejected: Nominatim (forbids search-as-you-type, one request a
     second), the Census geocoder (built for full street addresses), Google and Mapbox
     (need keys and billing), and a bundled Census ZIP-to-coordinates file (no outside
-    service, but ZIP only and about a megabyte). Confirm against Open-Meteo's docs how
-    to limit results to the US and whether it matches ZIP codes as well as names.
+    service, but ZIP only and about a megabyte).
+    - **Checked against the live API**: `https://geocoding-api.open-meteo.com/v1/search`
+      with `name`, `count` and `countryCode=US`. "Quincy" returned towns in IL, MA, FL,
+      CA and WA; "02169" returned only Quincy, MA; nonsense text returned a reply with
+      no `results` field at all (not an empty list). States come back as full names
+      (`admin1`). Their docs credit "Location data based on GeoNames"; the free service
+      is for non-commercial use. A credit line in the picker is worth adding.
   - **Details to handle**: wait for a pause in typing before searching (debounce, about
     300ms); ignore a reply for text no longer in the field, since replies can arrive out
     of order; states come back as full names, so show them or map them to the
     two-letter code; round coordinates to four decimals for NWS; a "No US places match"
     line for no results; a short error if the search fails, leaving the current
-    location unchanged.
+    location unchanged. **All built**: the debounce and the stale-reply check are both
+    done by the clean-up function of one `useEffect`; states map to two-letter codes
+    with a lookup in `searchLocations.ts`.
   - **Left out for now**: the "use my location" button (may not work on the tablet),
     and "Updated N minutes ago" under the place name (the row is tight).
-  - **Saving**: until Supabase, a chosen location resets on reload. Browser storage on
-    the device can stand in.
+  - **Saving waits for Supabase.** Until then, a chosen place resets to the mock
+    household's location on reload. Browser storage (`localStorage`) was considered as
+    a stand-in and skipped: it would save per device, not per household, and nothing
+    is used for real until the project is fully built. With Supabase, the location
+    loads from the household like its name, and choosing a place writes it back.
 
 ## Build order
 
@@ -1094,7 +1128,9 @@ family-dashboard/
 │   │   │   ├── AlertsModal.tsx       # every active alert; tidies the description text
 │   │   │   ├── alertTiming.ts        # "Starts / Until / Since ..." sentence for an alert
 │   │   │   ├── alertColors.ts        # severity -> color, for the banner and the modal
-│   │   │   └── WeatherBackground.tsx  # animated layer behind the cards + its picker (stage 6)
+│   │   │   ├── WeatherBackground.tsx  # animated layer behind the cards + its picker (stage 6)
+│   │   │   ├── LocationPicker.tsx    # search modal for the weather location
+│   │   │   └── searchLocations.ts    # Open-Meteo geocoding -> Location[]
 │   │   ├── calendar/
 │   │   │   ├── CalendarWidget.tsx
 │   │   │   ├── buildMonthGrid.ts     # 42-day Sun-first grid for a month (month is 1-based)

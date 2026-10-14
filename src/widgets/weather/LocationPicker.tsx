@@ -83,6 +83,9 @@ export function LocationPicker({ current, onChoose, onClose }: LocationPickerPro
                     </>
                 )}
             </div>
+            <p className="mt-3 text-center text-[11px] text-muted">
+                Location search by <a href="https://open-meteo.com/" target="_blank" rel="noreferrer" className="underline">Open-Meteo</a>, data from GeoNames
+            </p>
         </Modal>
     )
 }
