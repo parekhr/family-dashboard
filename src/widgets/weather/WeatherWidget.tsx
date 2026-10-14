@@ -4,7 +4,7 @@ import { getWeatherIcon } from './weatherIcons'
 import { useState } from 'react'
 import { useNow } from '../../hooks/useNow'
 import { AlertsModal } from './AlertsModal'
-import { getAlertTiming } from './alertTiming'
+import { getAlertTiming, isAlertActive } from './alertTiming'
 import { severityColors } from './alertColors'
 import { getBackgroundKind, WeatherBackground } from './WeatherBackground'
 
@@ -57,8 +57,9 @@ export function WeatherWidget() {
     const soonKind = soonText.includes('thunder') ? 'thunder' : soonText.includes('snow') ? 'snow' : 'rain'
     const soonIcon = getWeatherIcon(soonKind, true)
     const precipSoon = weather.hours[0].rainChance >= 30 || weather.hours[1].rainChance >= 30
-    const topAlert = weather.alerts[0]
-    const extraAlerts = weather.alerts.length - 1
+    const activeAlerts = weather.alerts.filter(alert => isAlertActive(alert, now))
+    const topAlert = activeAlerts[0]
+    const extraAlerts = activeAlerts.length - 1
 
     return (
         <div className="relative flex flex-col flex-1 min-h-0 gap-2.5 rounded-3xl overflow-hidden p-3 pb-5 text-ink bg-muted/15">
@@ -74,7 +75,7 @@ export function WeatherWidget() {
                     <div className="flex min-w-0 flex-col leading-tight">
                         <span className="truncate text-sm font-bold text-primary">{weather.current.condition}</span>
                         <span className="text-xs font-semibold text-muted">
-                            H {weather.current.high}°  L {weather.current.low}°
+                            {weather.current.high !== undefined && `H ${weather.current.high}°  `}L {weather.current.low}°
                         </span>
                         {precipSoon && (
                             <span className="flex items-center gap-1 text-xs font-bold text-sky-600">
@@ -103,7 +104,7 @@ export function WeatherWidget() {
                     </button>
                 )}
                 {/* alerts modal */}
-                {showAlertsModal && <AlertsModal onClose={() => setShowAlertsModal(false)} alerts={weather.alerts} now={now} />}
+                {showAlertsModal && <AlertsModal onClose={() => setShowAlertsModal(false)} alerts={activeAlerts} now={now} />}
                 <div className="relative grid h-9 w-[190px] shrink-0 grid-cols-2 rounded-full bg-muted/15 p-1">
                     {/* sliding highlight */}
                     <div
@@ -135,7 +136,7 @@ export function WeatherWidget() {
                             <img src={icon.still} className={`h-8 w-8 shrink-0 ${icon.outline ? iconOutline : ''}`} alt="" />
                             <span className="-mb-1 w-full truncate px-1 pb-1 text-center text-sm font-semibold leading-none text-muted">{shortCondition(day.condition)}</span>
                             <span className="text-lg font-bold leading-none tabular-nums">
-                                {day.high}° <span className="text-sm font-semibold text-muted">/ {day.low}°</span>
+                                {day.high}°{day.low !== undefined && <span className="text-sm font-semibold text-muted"> / {day.low}°</span>}
                             </span>
                             <span className="flex items-center gap-0.5 text-xs font-semibold leading-none text-sky-600 tabular-nums">
                                 {isSnow ? <Snowflake className="h-3 w-3" /> : <Droplet className="h-3 w-3" fill="currentColor" />}

@@ -15,14 +15,14 @@ The header is built except for the parts that depend on other work: date and tim
 household name, and a settings button with no action yet (see "Header and household
 settings").
 
-**In progress: Weather.** `useWeatherData()` builds its data from the saved NWS
-responses, and the layout is mostly built on it: the Now card, the Hourly / Weekly
-switch, the weekly day cards, and the hourly cards with paging arrows, page dots and
-the time-of-day tint, and the Now card's note for rain, snow or storms coming soon.
-The layout and alerts stages are done: the alert banner and the alerts modal are built
-on a saved sample of real alerts, with colors by severity. The animated weather
-backgrounds are built too. The only stage left is real fetching (see the build stages
-under Weather).
+**In progress: Weather.** The widget runs on live data from the National Weather
+Service, refreshed every ten minutes and whenever the screen wakes: the Now card with
+its note for rain, snow or storms coming soon, the Hourly / Weekly switch, the day and
+hour cards, the alert banner and alerts modal with colors by severity, and the
+animated weather backgrounds. Alerts hide themselves when they end, and "Today" is
+decided by date, so evening forecasts are labeled correctly. The location is a fixed
+value on the mock household; the **location picker** is the one piece left (see the
+build stages under Weather).
 
 **Modals** all go through one shared `Modal` component (`src/components/Modal.tsx`) and
 open centered over the whole dashboard. It draws its overlay into the dashboard's root
@@ -70,7 +70,9 @@ weather API. This plan describes turning that design into an actual running app.
     - **Padding**: 12px, except 20px at the bottom (`p-3 pb-5`), which is where the
       page dots sit.
   - **Now card**: icon (animated), large temperature, condition, and today's high and
-    low. **Fixed width** (320px), sized for its longest line, so it never changes size.
+    low. **Fixed width** (400px), so it never changes size. It was 320px; real
+    conditions such as "Slight Chance Rain Showers" didn't fit. The condition is one
+    line in the theme green (`text-primary`) and is cut off with "…" if still too long.
     - **The "soon" note lives here** (built), as a third line under the high/low,
       shown only when precipitation may be on the way. It needs no data of its own.
       - **When it shows**: the rain chance of the current hour or the next one
@@ -169,8 +171,8 @@ weather API. This plan describes turning that design into an actual running app.
         fails (e.g. wifi drops): skip an alert whose `ends` has passed, or whose
         `expires` has passed when it has no `ends`. It compares against `useNow()`, so
         it stays current on an idle tablet.
-      - Both belong to stage 7 (real fetching); mock files never change. Starting
-        intervals: alerts every 5–10 minutes, forecasts every 30–60.
+      - **Both are built** (see "Real fetching"). Everything refetches every ten
+        minutes for now.
     - **Collect real alerts as test samples.** Save alerts of different kinds into
       `mock/` as they come up (with markers, plain text, a flood warning, a winter
       storm), and check the tidy-up code against all of them whenever it changes.
@@ -178,8 +180,8 @@ weather API. This plan describes turning that design into an actual running app.
     (the mockup's paging), and **page dots centered under the cards**, as in the
     mockup. Built.
     - **Arrows** are small round buttons, vertically centered beside the cards. Each
-      is disabled and faded at its end of the range. Wrapping around like a carousel
-      was considered and rejected.
+      is disabled and faded at its end of the range (with no hover effect while
+      disabled). Wrapping around like a carousel was considered and rejected.
     - **Dots** sit inside the band's bottom padding, which was deepened from 12px to
       20px for them: 6px dots in a 12px strip looked squished.
     - **Each card**: time, icon, condition, temperature, rain chance. No high/low (an
@@ -215,6 +217,11 @@ weather API. This plan describes turning that design into an actual running app.
       high and low, which isn't a forecast value and would disagree with the Now card
       on today's card. The high is the large number instead.
     - **The condition text is kept from the mockup**, under the icon.
+    - **On the day and hour cards the condition is shortened** (`shortCondition` in
+      `WeatherWidget.tsx`): "Slight Chance ", "Chance " and " Likely" are removed,
+      because the rain chance shown just below already says how likely it is. The Now
+      card keeps the full text. Anything still too long is cut off with "…"; the
+      span has a little bottom padding so `truncate` doesn't clip letters like "y".
   - **Rain chance** (both views) is its own line, in blue, with a droplet icon. The
     value is NWS's `probabilityOfPrecipitation`, the chance of any precipitation, so
     the droplet becomes a snowflake when the condition mentions snow. The field is
@@ -241,11 +248,9 @@ weather API. This plan describes turning that design into an actual running app.
     in the layout, with everything above marked built. `useWeatherData.ts` has the
     types (`CurrentWeather`, `DayForecast`, `HourForecast`, `WeatherAlert` and
     `WeatherData`, which is `{ current, days, hours, alerts }`) and builds all four
-    from the mock files. `HourForecast` has `timeOfDay`
+    from live NWS responses (see "Real fetching" below). `HourForecast` has `timeOfDay`
     and `isDaytime`. Temperatures and rain chance are numbers; the "°" and "%" are
     added when drawing.
-    - **Because the mock is a snapshot**, "now" and the first hourly card are the hour
-      the files were saved (12 PM on October 6, 2026), whatever the real time is.
     - **Alerts in the hook**: each NWS feature becomes a `WeatherAlert`: `title` from
       `event` (not `headline`, which is a full sentence), `start` from `onset` (not
       `effective`, which is when the message was issued), `end` from `ends`, plus
@@ -256,9 +261,6 @@ weather API. This plan describes turning that design into an actual running app.
     - **The timing sentence** is `getAlertTiming(alert, now)` in `alertTiming.ts`, shared
       by the banner and the modal. Times are formatted by `formatWeekdayTime` in
       `src/lib/dates.ts` and shown in the device's time zone.
-    - **The mock shows ended alerts.** The sample's advisories ended on October 12,
-      2026, so the banner says "Until Monday 8:00 AM" about a time in the past.
-      Hiding ended alerts is the time check at stage 7.
   - **What the NWS data looks like** (checked against real responses):
     - Two steps: `/points/{lat},{lon}` returns links, not weather; follow its
       `forecast` (7-day) and `forecastHourly` links. Grid numbers can't be guessed (a
@@ -281,8 +283,11 @@ weather API. This plan describes turning that design into an actual running app.
     (`/alerts/active?event=Wind%20Advisory`): 22 alerts, all Moderate as fetched. **The saved
     file has been hand-edited for testing**: one alert's severity is set to Extreme
     and one to Minor, so the sort and the colors have something to show. It is no
-    longer an exact NWS response. The hook reads
-    `alertsSevere.json`; pointing its import at `alerts.json` tests the calm day.
+    longer an exact NWS response.
+    - **The app no longer reads these files at runtime**; it fetches live. They are
+      kept as test samples, for working offline, and as the source of the raw
+      response types. To test alerts, pass `alertsMock` in place of `raw.alerts` in
+      the hook temporarily, and reload the page.
     - **Limits of this sample**: one alert type and one severity, so it can't test
       ranking; and 22 alerts is far more than one location would get, so the chip
       reads "+21". A mixed sample (e.g. `/alerts/active?area=` plus a state code) and
@@ -291,12 +296,56 @@ weather API. This plan describes turning that design into an actual running app.
   - **Build stages**: (1) look at real data and save it — done; (2) decide the tidy
     data shape and types — done; (3) `useWeatherData()` returning that shape from the
     mock files — done; (4) the layout — done; (5) alerts — done; (6) weather
-    backgrounds — done;
-    (7) real fetching with loading and error states, using the household's location.
-    - **To check at stage 7: the "Today" label.** `useWeatherData()` labels the first
-      daytime period "Today". If a forecast is fetched in the evening its first period
-      is tonight, so the card labeled "Today" would really be tomorrow. The mock can't
-      show this (it was saved at midday); check it against a real evening response.
+    backgrounds — done; (7) real fetching with loading and error states, using the
+    household's location — done, except the location picker.
+  - **Real fetching** (stage 7), built in steps that each left the app working:
+    1. **The location lives on the household.** `useHouseholdData()` returns an
+       optional `location: { latitude, longitude, name }`; the mock household is
+       42.2555, -71.034, "Quincy, MA". It is optional because a new household starts
+       without one. Moved first, ahead of the fetch, so nothing had to be rewired.
+    2. **Building is separate from loading.** `buildWeatherData(forecast,
+       forecastHourly, alerts)` turns the three raw NWS responses into `WeatherData`.
+       Its parameter types come from the saved mock files (`typeof forecastMock` and
+       so on), which is one reason the mock files are kept.
+    3. **Fetching.** `fetchWeather(latitude, longitude)` calls `/points/{lat},{lon}`,
+       then fetches the forecast, the hourly forecast and
+       `/alerts/active?point={lat},{lon}` together (`Promise.all`). `fetchJson` throws
+       when a response isn't OK, since `fetch` doesn't treat 404 or 500 as failures.
+    4. **The hook reports a state, not just data.** `useWeatherData()` returns a
+       `WeatherState`: `loading`, `noLocation`, `error`, or `ready` with `data`. The
+       widget checks the status first and shows a short message for the other three
+       ("Loading weather…", "Set a location to see the weather.", "Couldn't load the
+       weather."), in the same grey box so the row doesn't change size. The check is
+       an early return after the widget's hooks, not a separate wrapper component.
+    5. **Keeping it fresh.** The fetch runs once on load, then every ten minutes
+       (`setInterval`), and again whenever the page becomes visible
+       (`visibilitychange`), which covers the screen waking up. Everything is
+       refetched together; splitting alerts (5–10 minutes) from forecasts (30–60) was
+       left for later. A **failed refresh keeps the last data** on screen; only a
+       failure with nothing loaded yet shows the error message. The effect re-runs
+       only when the location's latitude or longitude changes.
+    6. **Ended alerts and "Today".**
+       - `isAlertActive(alert, now)` in `alertTiming.ts`: an alert is over once its
+         `end` has passed, or its `expires` when it has no `end`. The widget filters
+         with it once (`activeAlerts`), and the banner, the count and the modal all
+         use that list. It re-checks every minute via `useNow()`, so an alert
+         disappears within a minute of ending without a fetch. Tested by feeding in
+         the saved October 11 advisories with the clock set to that evening: 19 of
+         the 22 showed, the three that had ended didn't.
+       - **"Today" is decided by date**, not by position: `isToday` compares a
+         period's date with `getTodayISO()` from `src/lib/dates.ts`. In the evening
+         the 7-day forecast starts with tonight, so the first day card is correctly
+         tomorrow's weekday. The Now card's high only uses a daytime period that is
+         today, so after dark it shows only the low (`high` is optional in
+         `CurrentWeather`). The last day card can have no night after it; its low is
+         now left out instead of copying the high (`low` is optional in
+         `DayForecast`). The widget skips a missing high or low (`!== undefined`, so a
+         temperature of 0 still shows).
+    7. **The location picker.** Not started. See "Setting the location".
+    - **Two things that cost time**: the dev server keeps a component's state when a
+      file is saved, so a change to what the next fetch does only shows after a page
+      reload; and the widget showed no alert banner on live data simply because
+      Quincy had no active alerts, which is correct.
   - Alerts are ranked so the banner shows the most serious one (the mockup's logic
     ranks rain < wind < storm < tornado; NWS's own `severity` field is the starting
     point). Built on `severity` alone; alerts of equal severity keep NWS's order.

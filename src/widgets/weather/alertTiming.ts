@@ -6,3 +6,7 @@ export function getAlertTiming(alert: WeatherAlert, now: Date) {
     if (alert.end) return `Until ${formatWeekdayTime(alert.end)}`
     return `Since ${formatWeekdayTime(alert.start)}`
 }
+
+export function isAlertActive(alert: WeatherAlert, now: Date) {
+    return now < new Date(alert.end ?? alert.expires)
+}

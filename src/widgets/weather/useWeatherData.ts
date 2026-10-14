@@ -3,6 +3,7 @@ import forecastMock from './mock/forecast.json'
 import alertsMock from './mock/alertsSevere.json'
 import { useEffect, useState } from 'react'
 import useHouseholdData from '../../hooks/useHouseholdData'
+import { getTodayISO, toISO } from '../../lib/dates'
 
 type ForecastResponse = typeof forecastMock
 type HourlyResponse = typeof hourlyMock
@@ -19,7 +20,7 @@ export type TimeOfDay = 'Morning' | 'Afternoon' | 'Evening' | 'Night'
 export type CurrentWeather = {
     temperature: number
     condition: string
-    high: number
+    high?: number
     low: number
     isDaytime: boolean
 }
@@ -27,7 +28,7 @@ export type CurrentWeather = {
 export type DayForecast = {
     label: string
     high: number
-    low: number
+    low?: number
     condition: string
     rainChance: number
 }
@@ -93,6 +94,7 @@ async function fetchWeather(latitude: number, longitude: number) {
 }
 
 function buildWeatherData(forecast: ForecastResponse, forecastHourly: HourlyResponse, alerts: AlertsResponse): WeatherData {
+    const isToday = (time: string) => toISO(new Date(time)) === getTodayISO()
     const now = forecastHourly.properties.periods[0]
     const periods = forecast.properties.periods
 
@@ -100,18 +102,18 @@ function buildWeatherData(forecast: ForecastResponse, forecastHourly: HourlyResp
         current: {
             temperature: now.temperature,
             condition: now.shortForecast,
-            high: periods.find(period => period.isDaytime)?.temperature ?? now.temperature,
+            high: periods.find(period => period.isDaytime && isToday(period.startTime))?.temperature,
             low: periods.find(period => !period.isDaytime)?.temperature ?? now.temperature,
             isDaytime: now.isDaytime,
         },
         days: periods.filter(period => period.isDaytime).map((period, index) => {
             const date = new Date(period.startTime)
-            const label = index === 0 ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short' })
+            const label = isToday(period.startTime) ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short' })
             const night = periods.find(p => p.number === period.number + 1)
             return {
                 label,
                 high: period.temperature,
-                low: night?.temperature ?? period.temperature,
+                low: night?.temperature,
                 condition: period.shortForecast,
                 rainChance: period.probabilityOfPrecipitation.value ?? 0,
             }
@@ -149,10 +151,26 @@ export function useWeatherData(): WeatherState {
 
     useEffect(() => {
         if (!location) return
+        const { latitude, longitude } = location
 
-        fetchWeather(location.latitude, location.longitude)
-            .then(raw => setState({ status: 'ready', data: buildWeatherData(raw.forecast, raw.forecastHourly, raw.alerts) }))
-            .catch(() => setState({ status: 'error' }))
+        function load() {
+            fetchWeather(latitude, longitude)
+                .then(raw => setState({ status: 'ready', data: buildWeatherData(raw.forecast, raw.forecastHourly, raw.alerts) }))
+                .catch(() => setState(previous => previous.status === 'ready' ? previous : { status: 'error' }))
+        }
+
+        function loadIfVisible() {
+            if (document.visibilityState === 'visible') load()
+        }
+
+        load()
+        const timer = setInterval(load, 10 * 60_000)
+        document.addEventListener('visibilitychange', loadIfVisible)
+
+        return () => {
+            clearInterval(timer)
+            document.removeEventListener('visibilitychange', loadIfVisible)
+        }
     }, [location?.latitude, location?.longitude])
 
     if (!location) return { status: 'noLocation' }
