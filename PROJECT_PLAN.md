@@ -50,7 +50,7 @@ weather API. This plan describes turning that design into an actual running app.
 ## MVP feature scope
 
 - **Date & time** — top-left of the wall dashboard.
-- **Location picker** — current location as the default/most prominent option.
+- **Location picker** — inside the Weather widget (see "Setting the location").
 - **Weather**
   - **Weather is the dominant widget**: it's the one looked at most, so it gets the top
     band and more height than a first guess would give it.
@@ -341,7 +341,14 @@ weather API. This plan describes turning that design into an actual running app.
          now left out instead of copying the high (`low` is optional in
          `DayForecast`). The widget skips a missing high or low (`!== undefined`, so a
          temperature of 0 still shows).
-    7. **The location picker.** Not started. See "Setting the location".
+    7. **The location picker.** In progress. See "Setting the location".
+       - **The widget owns the location while running**: `WeatherWidget` keeps it in
+         `useState`, starting from `useHouseholdData().location`, and passes it to
+         `useWeatherData(location)`. The `Location` type is exported from
+         `useHouseholdData.ts`. The hook's effect now depends on `[location]`: state
+         keeps the same object until it is replaced, so this refetches exactly when a
+         new place is chosen. (Earlier it watched latitude and longitude, because
+         `useHouseholdData()` builds a new object on every call.)
     - **Two things that cost time**: the dev server keeps a component's state when a
       file is saved, so a change to what the next fetch does only shows after a page
       reload; and the widget showed no alert banner on live data simply because
@@ -965,7 +972,7 @@ and in what order — a settings change, not a code change or a per-household fo
 ## Header and household settings
 
 - **Header** is a three-column grid (`grid grid-cols-3`): date and time on the left,
-  the household name centered, location picker and settings entry on the right. A grid,
+  the household name centered, the settings entry on the right. A grid,
   not flex `justify-between`, so the name stays centered whatever the sides contain. With
   no household name the middle column is rendered empty (not removed) so the left and
   right zones don't shift. Long names truncate with an ellipsis.
@@ -981,8 +988,7 @@ and in what order — a settings change, not a code change or a per-household fo
   - **Right**: a settings gear button, with no resting background (a soft circle shows
     only on hover/press, like the calendar's month arrows) and an `aria-label`. It has
     no action yet.
-- **Still to come**: the location picker (with the Weather widget, see below), the
-  settings button opening Settings, and the name's font choice and length limit (with
+- **Still to come**: the settings button opening Settings, and the name's font choice and length limit (with
   Settings).
 - **Household name**: optional `name` field on the household, edited in Settings. Display
   label only; `household_id` remains the identifier.
@@ -995,9 +1001,15 @@ and in what order — a settings change, not a code change or a per-household fo
   missing keys. Fonts are bundled with the app (e.g. `@fontsource`) rather than loaded
   from a CDN, since the tablet's wifi may be flaky. Register them as Tailwind theme
   fonts. Test every listed font with a maximum-length name.
-- **Location** is only used by Weather, so the header shows the location picker only when
-  Weather is enabled. If a second location-using widget appears, replace that check with a
-  `usesLocation` flag in the registry.
+- **The location picker lives in the Weather widget, not the header.** The plan and the
+  mockup first put it in the header beside the settings button; it was moved because:
+  - it then only exists when the Weather widget does, so no "is Weather enabled?" check
+    (or `usesLocation` registry flag) is needed;
+  - only the widget reads the location, so the state can live in the widget, with no
+    React context to share it with the header;
+  - the "no location" message is in the widget, so the fix sits next to the problem.
+  - Cost: the header no longer shows the place name. If a second widget ever needs the
+    location, it would have to move up again.
 - **Location is household-level** (latitude, longitude, display name on the household
   row), shared by every device. The phone view has no weather and ignores it.
 - **Setting the location**: manual entry (ZIP or city, geocoded to lat/long) is the
@@ -1005,6 +1017,34 @@ and in what order — a settings change, not a code change or a per-household fo
   "use my location" shortcut only, since the Fire tablet has no GPS and may not support it
   in a kiosk browser. Test on the real device. IP lookup may prefill the field but never
   sets the location silently. NWS is US-only, so a non-US location needs a clear error.
+  - **Layout** (mocked up and agreed): the place name is a small text button in the
+    widget's top row, just left of the Hourly / Weekly switch, in the gap after the
+    alert banner: a green pin, the name, and a small down arrow, with no background.
+    With no location set, the widget's "Set a location to see the weather." message is
+    itself a button. Both open the same picker modal (the shared `Modal`).
+  - **The picker**: one search field ("ZIP code or city", with a "US only" hint), and a
+    list of matches as you type, since town names repeat (Quincy, MA / IL / FL). The
+    current place is ticked. Tapping a match calls `setLocation` and closes the modal;
+    no Save button. The weather then reloads by itself, because the hook watches
+    `location`.
+  - **Geocoding service: Open-Meteo's geocoding API** (free, no key, callable from the
+    browser, can be limited to the US). NWS can't do it: `/points` turns coordinates
+    into a place (`properties.relativeLocation` has city and state) but has no search
+    from a name. Rejected: Nominatim (forbids search-as-you-type, one request a
+    second), the Census geocoder (built for full street addresses), Google and Mapbox
+    (need keys and billing), and a bundled Census ZIP-to-coordinates file (no outside
+    service, but ZIP only and about a megabyte). Confirm against Open-Meteo's docs how
+    to limit results to the US and whether it matches ZIP codes as well as names.
+  - **Details to handle**: wait for a pause in typing before searching (debounce, about
+    300ms); ignore a reply for text no longer in the field, since replies can arrive out
+    of order; states come back as full names, so show them or map them to the
+    two-letter code; round coordinates to four decimals for NWS; a "No US places match"
+    line for no results; a short error if the search fails, leaving the current
+    location unchanged.
+  - **Left out for now**: the "use my location" button (may not work on the tablet),
+    and "Updated N minutes ago" under the place name (the row is tight).
+  - **Saving**: until Supabase, a chosen location resets on reload. Browser storage on
+    the device can stand in.
 
 ## Build order
 

@@ -1,14 +1,16 @@
 import type { WidgetId } from '../widgets/registry'
 
+export type Location = {
+    latitude: number
+    longitude: number
+    name: string
+}
+
 type Household = {
     id: string
     widgetLayout: WidgetId[]
     name?: string
-    location?: {
-        latitude: number
-        longitude: number
-        name: string
-    }
+    location?: Location
 }
 
 function useHouseholdData(): Household {

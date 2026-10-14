@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Droplet, Snowflake } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, Droplet, MapPin, Snowflake } from 'lucide-react'
 import { useWeatherData } from './useWeatherData'
 import { getWeatherIcon } from './weatherIcons'
 import { useState } from 'react'
@@ -7,6 +7,8 @@ import { AlertsModal } from './AlertsModal'
 import { getAlertTiming, isAlertActive } from './alertTiming'
 import { severityColors } from './alertColors'
 import { getBackgroundKind, WeatherBackground } from './WeatherBackground'
+import useHouseholdData from '../../hooks/useHouseholdData'
+import { LocationPicker } from './LocationPicker'
 
 const timeOfDayTints = {
     Morning: '#FCE4A0',
@@ -25,27 +27,45 @@ const soonMessages = {
 
 const statusMessages = {
     loading: 'Loading weather…',
-    noLocation: 'Set a location to see the weather.',
     error: "Couldn't load the weather.",
 }
 
 function shortCondition(condition: string) {
-    return condition.replace('Slight Chance ', '').replace('Chance ', '').replace(' Likely', '')
+    return condition.split(' then ')[0].replace('Slight Chance ', '').replace('Chance ', '').replace(' Likely', '')
 }
 
 export function WeatherWidget() {
     const [view, setView] = useState<'hourly' | 'weekly'>('hourly')
     const [pageNumber, setPageNumber] = useState(0)
     const [showAlertsModal, setShowAlertsModal] = useState(false)
-    const start = pageNumber * 6
+    const [location, setLocation] = useState(useHouseholdData().location)
+    const [showLocationPicker, setShowLocationPicker] = useState(false)
 
-    const state = useWeatherData()
+    const start = pageNumber * 6
+    const state = useWeatherData(location)
     const now = useNow()
 
     if (state.status !== 'ready') {
         return (
             <div className="flex flex-1 min-h-0 items-center justify-center rounded-3xl bg-muted/15 text-sm font-semibold text-muted">
-                {statusMessages[state.status]}
+                {state.status === 'noLocation' ? (
+                    <button
+                        className="flex cursor-pointer items-center gap-1.5 rounded-full bg-card px-4 py-2 text-ink shadow-sm hover:brightness-95"
+                        onClick={() => setShowLocationPicker(true)}
+                    >
+                        <MapPin className="h-4 w-4 text-primary" />
+                        Set a location to see the weather
+                    </button>
+                ) : (
+                    statusMessages[state.status]
+                )}
+                {showLocationPicker && (
+                    <LocationPicker
+                        current={location}
+                        onChoose={setLocation}
+                        onClose={() => setShowLocationPicker(false)}
+                    />
+                )}
             </div>
         )
     }
@@ -104,24 +124,49 @@ export function WeatherWidget() {
                     </button>
                 )}
                 {/* alerts modal */}
-                {showAlertsModal && <AlertsModal onClose={() => setShowAlertsModal(false)} alerts={activeAlerts} now={now} />}
-                <div className="relative grid h-9 w-[190px] shrink-0 grid-cols-2 rounded-full bg-muted/15 p-1">
-                    {/* sliding highlight */}
-                    <div
-                        className={`absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-primary transition-transform duration-200 ${view === 'weekly' ? 'translate-x-full' : ''}`}
+                {showAlertsModal && (
+                    <AlertsModal
+                        onClose={() => setShowAlertsModal(false)}
+                        alerts={activeAlerts}
+                        now={now}
                     />
+                )}
+                {showLocationPicker && (
+                    <LocationPicker
+                        current={location}
+                        onChoose={setLocation}
+                        onClose={() => setShowLocationPicker(false)}
+                    />
+                )}
+                {/* location and hourly/weekly switch, together at the right end */}
+                <div className="flex items-center gap-2">
                     <button
-                        className={`relative z-10 rounded-full text-sm font-bold cursor-pointer transition-colors ${view === 'hourly' ? 'text-white' : 'text-muted'}`}
-                        onClick={() => setView('hourly')}
+                        className="flex cursor-pointer items-center gap-1 rounded-full px-2 py-1 text-sm font-semibold hover:bg-muted/15"
+                        onClick={() => setShowLocationPicker(true)}
                     >
-                        Hourly
+                        <MapPin className="h-3.5 w-3.5 text-primary" />
+                        {location?.name}
+                        <ChevronDown className="h-3.5 w-3.5 text-muted" />
                     </button>
-                    <button
-                        className={`relative z-10 rounded-full text-sm font-bold cursor-pointer transition-colors ${view === 'weekly' ? 'text-white' : 'text-muted'}`}
-                        onClick={() => setView('weekly')}
-                    >
-                        Weekly
-                    </button>
+
+                    <div className="relative grid h-9 w-[190px] shrink-0 grid-cols-2 rounded-full bg-muted/15 p-1">
+                        {/* sliding highlight */}
+                        <div
+                            className={`absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-primary transition-transform duration-200 ${view === 'weekly' ? 'translate-x-full' : ''}`}
+                        />
+                        <button
+                            className={`relative z-10 rounded-full text-sm font-bold cursor-pointer transition-colors ${view === 'hourly' ? 'text-white' : 'text-muted'}`}
+                            onClick={() => setView('hourly')}
+                        >
+                            Hourly
+                        </button>
+                        <button
+                            className={`relative z-10 rounded-full text-sm font-bold cursor-pointer transition-colors ${view === 'weekly' ? 'text-white' : 'text-muted'}`}
+                            onClick={() => setView('weekly')}
+                        >
+                            Weekly
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -131,7 +176,7 @@ export function WeatherWidget() {
                     const icon = getWeatherIcon(day.condition, true)
                     const isSnow = day.condition.toLowerCase().includes('snow')
                     return (
-                        <div key={day.label} className="flex flex-1 flex-col items-center justify-center gap-1 rounded-2xl bg-card shadow-sm p-1.5 pt-2">
+                        <div key={day.label} className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl bg-card shadow-sm p-1.5 pt-2">
                             <span className="text-sm font-bold leading-none">{day.label}</span>
                             <img src={icon.still} className={`h-8 w-8 shrink-0 ${icon.outline ? iconOutline : ''}`} alt="" />
                             <span className="-mb-1 w-full truncate px-1 pb-1 text-center text-sm font-semibold leading-none text-muted">{shortCondition(day.condition)}</span>
@@ -163,7 +208,7 @@ export function WeatherWidget() {
                             const isSnow = hour.condition.toLowerCase().includes('snow')
                             const tint = timeOfDayTints[hour.timeOfDay]
                             return (
-                                <div key={hour.label} style={{ backgroundColor: `color-mix(in srgb, ${tint} 30%, white)` }} className="flex flex-1 flex-col items-center justify-between gap-1 overflow-hidden rounded-2xl pb-1.5 shadow-sm">
+                                <div key={hour.label} style={{ backgroundColor: `color-mix(in srgb, ${tint} 30%, white)` }} className="flex min-w-0 flex-1 flex-col items-center justify-between gap-1 overflow-hidden rounded-2xl pb-1.5 shadow-sm">
                                     <span style={{ backgroundColor: tint }} className="w-full py-1 text-center text-sm font-bold leading-none">
                                         {hour.label}
                                     </span>

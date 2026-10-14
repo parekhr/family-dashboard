@@ -2,7 +2,7 @@ import hourlyMock from './mock/forecastHourly.json'
 import forecastMock from './mock/forecast.json'
 import alertsMock from './mock/alertsSevere.json'
 import { useEffect, useState } from 'react'
-import useHouseholdData from '../../hooks/useHouseholdData'
+import { type Location } from '../../hooks/useHouseholdData'
 import { getTodayISO, toISO } from '../../lib/dates'
 
 type ForecastResponse = typeof forecastMock
@@ -106,7 +106,7 @@ function buildWeatherData(forecast: ForecastResponse, forecastHourly: HourlyResp
             low: periods.find(period => !period.isDaytime)?.temperature ?? now.temperature,
             isDaytime: now.isDaytime,
         },
-        days: periods.filter(period => period.isDaytime).map((period, index) => {
+        days: periods.filter(period => period.isDaytime).map((period) => {
             const date = new Date(period.startTime)
             const label = isToday(period.startTime) ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short' })
             const night = periods.find(p => p.number === period.number + 1)
@@ -145,8 +145,7 @@ function buildWeatherData(forecast: ForecastResponse, forecastHourly: HourlyResp
     }
 }
 
-export function useWeatherData(): WeatherState {
-    const location = useHouseholdData().location
+export function useWeatherData(location: Location | undefined): WeatherState {
     const [state, setState] = useState<WeatherState>({ status: 'loading' })
 
     useEffect(() => {
@@ -171,7 +170,7 @@ export function useWeatherData(): WeatherState {
             clearInterval(timer)
             document.removeEventListener('visibilitychange', loadIfVisible)
         }
-    }, [location?.latitude, location?.longitude])
+    }, [location])
 
     if (!location) return { status: 'noLocation' }
     return state
