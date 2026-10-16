@@ -1,15 +1,19 @@
 import { useNow } from '../hooks/useNow'
 import { Settings } from 'lucide-react'
+import { SettingsModal } from './SettingsModal'
+import { useState } from 'react'
 
 type HeaderProps = {
     name?: string
+    themeKey: string
+    onThemeChange: (key: string) => void
 }
 
-export function Header({ name }: HeaderProps) {
+export function Header({ name, themeKey, onThemeChange }: HeaderProps) {
 
     const now = useNow()
     const [time, period] = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).split(' ')
-
+    const [settingsOpen, setSettingsOpen] = useState(false)
 
     return (
         <header className="grid grid-cols-3 items-center px-4 h-20 text-ink">
@@ -32,10 +36,18 @@ export function Header({ name }: HeaderProps) {
                 <button 
                     className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full hover:bg-muted/10 active:bg-muted/15 transition-colors"
                     aria-label="Settings"
+                    onClick={() => setSettingsOpen(true)}
                 >
                     <Settings />
                 </button>
             </div>
+            {settingsOpen && (
+                <SettingsModal
+                    themeKey={themeKey}
+                    onThemeChange={onThemeChange}
+                    onClose={() => setSettingsOpen(false)}
+                /> 
+            )}
         </header>
     );
 }

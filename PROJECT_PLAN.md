@@ -2,17 +2,27 @@
 
 Status: MVP build in progress. Layout shell, widget registry + `buildRows`, and the Home
 Care widget (log today, History modal with add/edit/delete) are built on mock data. Home
-Care item management (add/rename/delete/reorder) is deferred to Settings.
+Care item management (add/rename/delete/reorder) is a later feature.
+
+**MVP trimmed (October 16, 2026)** to get to real daily use sooner. With the three
+widgets built, what's left is **Supabase → deploy → tablet**, plus a small Settings
+screen whose only setting is the **color theme** (see "Settings (MVP): color theme").
+Everything else that was planned for the MVP is now listed under "Later features".
+
+**Built: Settings (color theme).** The header's gear opens a Settings modal with a 3×2
+grid of color swatches; tapping one recolors the dashboard's accent at once and the
+modal stays open. The choice lives in state in `App` and resets to Sage on reload until
+Supabase saves it.
 
 The Calendar widget is built on mock data: month grid (chips, bands, badge, today
 markers), monthly themes, holiday rings (fixed, floating, Easter, Chinese New Year), the
 day modal, add/edit/delete events through `EventForm`, and the today/tomorrow reminder
 strip. Nothing is left to build for the widget itself; what remains for calendar data
-lives elsewhere (managing categories and people and picking category colors in Settings;
-real persistence with Supabase).
+lives elsewhere (real persistence with Supabase; managing categories and people and
+picking category colors in Settings, now a later feature).
 
 The header is built except for the parts that depend on other work: date and time,
-household name, and a settings button with no action yet (see "Header and household
+household name, and a settings button that opens Settings (see "Header and household
 settings").
 
 **Built: Weather.** The widget runs on live data from the National Weather
@@ -53,6 +63,10 @@ weather API. This plan describes turning that design into an actual running app.
 
 - **Date & time** — top-left of the wall dashboard.
 - **Location picker** — inside the Weather widget (see "Setting the location").
+- **Settings** — opened from the header's gear button; for the MVP its only setting is
+  the color theme (see "Settings (MVP): color theme").
+- **Real data and a real device** — Supabase persistence, deployed, running on the
+  tablet. See "Build order".
 - **Weather**
   - **Weather is the dominant widget**: it's the one looked at most, so it gets the top
     band and more height than a first guess would give it.
@@ -903,6 +917,10 @@ weather API. This plan describes turning that design into an actual running app.
   screen ever again on that device. Per-person attribution (e.g. "Mom" vs "Dad" on an
   event) is handled by the existing People picker in the UI, not by per-person
   authentication.
+  - **Later feature.** For the MVP there is one household and one Supabase account,
+    signed in once on the tablet; the session stays saved on the device, which gives
+    nearly the same result. Tables still carry `household_id` with RLS from the start,
+    since adding it later would be painful.
 - **Weather API**: National Weather Service (`api.weather.gov`) — free, no key,
   covers both forecast (hourly/weekly) and active alerts by lat/long.
 
@@ -957,11 +975,12 @@ and in what order — a settings change, not a code change or a per-household fo
   relative to full widgets and other half widgets, some arrow presses would not change the
   layout, so the reorder arrows skip to the next position that does. The Settings preview
   shows the result after every move.
-- **Settings**: a toggle list of every widget in the catalog, plus up/down reorder.
+- **Settings** (later feature; the MVP's widget list is fixed in code): a toggle list
+  of every widget in the catalog, plus up/down reorder.
   Enabling a widget that would overflow the fixed 800px height is disabled, with a
   reason ("Turn something off to make room"). The same layout calculation answers
   "does this fit?", so no separate logic is needed.
-- **Settings preview**: a miniature 16:10 frame next to the toggle list that renders the
+- **Settings preview** (later feature): a miniature 16:10 frame next to the toggle list that renders the
   same rows the layout engine produces (labeled boxes, or the real layout scaled down
   with placeholders), so it cannot disagree with the real dashboard. It shows where a
   widget will land, why a toggle is disabled (frame is full), and how ordering changes
@@ -1000,16 +1019,80 @@ and in what order — a settings change, not a code change or a per-household fo
   - **Middle**: the household name, centered, one line, `truncate`. It comes from an
     optional `name` on the mock household (`useHouseholdData.ts`), passed in by `App`.
   - **Right**: a settings gear button, with no resting background (a soft circle shows
-    only on hover/press, like the calendar's month arrows) and an `aria-label`. It has
-    no action yet.
-- **Still to come**: the settings button opening Settings, and the name's font choice and length limit (with
-  Settings).
-- **Household name**: optional `name` field on the household, edited in Settings. Display
-  label only; `household_id` remains the identifier.
-- **Name length**: hard character limit in the Settings field (tentatively ~24; confirm
+    only on hover/press, like the calendar's month arrows) and an `aria-label`. It
+    opens the Settings modal.
+- **Still to come**: the name's font choice and length limit (later features).
+- **Settings (MVP): color theme.** The only setting in the MVP. A handful (about 4–6)
+  of hardcoded presets shown as swatches; tapping one applies it.
+  - **What it changes: the green accent only**, i.e. everything drawn with
+    `--color-primary` / `--color-primary-hover` (`src/index.css`): the Now card's
+    condition text, the location pin, the Hourly / Weekly switch and page dots, the
+    calendar's Today button, "+ Add Event", single-day event squares and multi-day
+    bands (`bg-primary/20`), Home Care's History link and "I changed this today"
+    buttons, and the modal buttons, tabs and pickers. Checked: every one of these
+    already uses the `primary` token, with no hardcoded greens, so a preset is just
+    those two values.
+  - **Not touched**: the monthly calendar themes (`--color-jan-*` etc.), which are
+    designed per month; the page and card backgrounds, text, today red and alert
+    colors.
+  - **Called "color theme"** in the UI and plan, to keep it apart from the monthly
+    calendar themes.
+  - **Saved on the household** in Supabase as a key (e.g. `color_theme: "blue"`), like
+    the name font, not as CSS. Unknown or missing keys fall back to the current green.
+    Until Supabase, it lives in state and resets on reload, like the location.
+  - **Behavior** (agreed October 16, 2026): the gear opens a "Settings" modal (the
+    shared `Modal`) with one "Color theme" section. **Tapping a swatch applies it at
+    once**, with no Save and no preview: the dashboard behind the overlay is the
+    preview, still easy to read through the 40% dim. **The modal stays open** after a
+    tap so colors can be compared; it closes only from the X (same button as the
+    location picker's) or a tap outside. A preview window inside the modal was
+    considered and dropped for that reason.
+  - **Layout** (mocked up and agreed): a compact 3×2 grid, fixed columns about 76px
+    wide with almost no gap, and the modal shrinks to fit it. Each option is a 40px
+    color circle with its name underneath (`text-sm font-semibold text-ink`; lighter
+    names were hard to read). The selected one gets a white check inside and a ring
+    around it. A list of rows was compared and rejected (taller, smaller targets).
+    Checked on the live app: "Terracotta", the longest name, fits its 76px column on
+    one line.
+  - **Presets** (starting values; confirm each against white text at 4.5:1 with a
+    contrast checker before calling them final):
+
+    | Key          | Name       | Primary   | Hover     |
+    | ------------ | ---------- | --------- | --------- |
+    | `sage`       | Sage       | `#3d7a6a` | `#33685a` |
+    | `blue`       | Blue       | `#3a6ea5` | `#315e8c` |
+    | `plum`       | Plum       | `#7a4a8c` | `#683f77` |
+    | `terracotta` | Terracotta | `#b0533c` | `#964733` |
+    | `slate`      | Slate      | `#4f5d75` | `#434f63` |
+    | `blossom`    | Blossom    | `#b0457e` | `#963b6b` |
+
+    Sage is the current green and the default. Hover shades are about 15% darker.
+    Blossom replaced an earlier Rose (`#b04a6a`): a cherry-blossom pink was wanted, and
+    real blossom pink is far too pale for white button text, so it's the deeper,
+    cooler pink from a blossom's center. Rose was dropped rather than kept as a
+    seventh, since the two looked alike and seven would break the 3×2 grid.
+  - **Built** (October 16, 2026):
+    - `src/lib/colorThemes.ts`: the `ColorTheme` type, the `colorThemes` array (Sage
+      first, as the default), and `getColorTheme(key)`, which falls back to
+      `colorThemes[0]` with `??` so it always returns a preset.
+    - `App.tsx` keeps `themeKey` in `useState('sage')` and sets `--color-primary` and
+      `--color-primary-hover` with an inline `style` on `#dashboard` (cast
+      `as React.CSSProperties`, since React's style type doesn't know `--` names).
+      CSS variables inherit, so everything inside, including modals portaled into
+      `#dashboard`, uses the theme. No effect needed.
+    - `Header` takes `themeKey` and `onThemeChange`, holds `settingsOpen`, and renders
+      `src/components/SettingsModal.tsx` (outside any widget, so in `components/`).
+    - `SettingsModal`: each circle's color is an inline `style` (Tailwind can't build
+      classes from runtime values); the selected one shows a `Check` and
+      `ring-2 ring-primary ring-offset-2 ring-offset-card`, the offset matching the
+      cream card instead of Tailwind's white default. `aria-pressed` marks it.
+- **Household name**: optional `name` field on the household. Display label only;
+  `household_id` remains the identifier. For the MVP it's set in Supabase's table
+  editor; editing it in Settings is a later feature.
+- **Name length** (later feature): hard character limit in the Settings field (tentatively ~24; confirm
   by testing the widest font at the real size in one header column, about 427px wide).
   Ellipsis truncation stays as a backstop, since font widths vary.
-- **Name font**: a dropdown of a short curated list (4-6 fonts) with a live preview in
+- **Name font** (later feature): a dropdown of a short curated list (4-6 fonts) with a live preview in
   Settings. Store a key on the household (e.g. `name_font: "handwritten"`), not CSS;
   the app maps keys to font-families and falls back to the default for unknown or
   missing keys. Fonts are bundled with the app (e.g. `@fontsource`) rather than loaded
@@ -1090,7 +1173,15 @@ and in what order — a settings change, not a code change or a per-household fo
    sample. Widgets only ever talk to the hook, so swapping in Supabase changes nothing
    in the widgets.
 3. Widgets one at a time: Home Care, Calendar, Weather.
-4. Settings, phone view, Supabase, device pairing.
+4. **Supabase**: schema with `household_id` + RLS, one household and one account, and
+   the hook's function bodies swapped from mock to real. This also saves the chosen
+   weather location.
+5. **Settings with the color theme** — done (built before Supabase; saving the choice
+   comes with step 4).
+6. **Deploy** (Vercel or similar).
+7. **Tablet**: kiosk browser on the Fire HD 10, signed in once, in daily use.
+
+Steps 1–3 and 5 are done. Anything else is under "Later features".
 
 ## Proposed folder structure
 
@@ -1176,6 +1267,25 @@ family-dashboard/
   mount (~$15–25).
 - **Per-household hardware cost**: roughly **$85–160** all-in. No recurring cost —
   Supabase and hosting both stay on free tiers at this scale.
+
+## Later features
+
+Moved out of the MVP on October 16, 2026. The designs written up elsewhere in this plan
+still stand; they're just not needed for daily use. Until they're built, the
+"management" ones are done by hand in Supabase's table editor.
+
+- **Device pairing** with short-lived setup codes (see "Architecture").
+- **More than one household.** The schema supports it from the start.
+- **Phone view** (the single scrolling column).
+- **Settings beyond the color theme**:
+  - widget catalog toggles and reordering, the Settings preview and the overflow
+    warning (see "Layout decisions");
+  - household name editing, its length limit and the name font;
+  - managing Home Care items (add / rename / delete / reorder);
+  - managing calendar categories and people, and the category color picker.
+- **Paged screens** for households that outgrow one screen.
+- **Weather**: tap a day card for NWS's `detailedForecast`; the "use my location"
+  button; "Updated N minutes ago" under the place name.
 
 ## Open / not yet decided
 
