@@ -9,6 +9,12 @@ widgets built, what's left is **Supabase → deploy → tablet**, plus a small S
 screen whose only setting is the **color theme** (see "Settings (MVP): color theme").
 Everything else that was planned for the MVP is now listed under "Later features".
 
+**In progress: Supabase** (build order step 4; see "Supabase build stages"). The
+project, client and sign-in are done, the `households` and `household_members` tables
+exist with RLS and grants, and the dashboard now loads the household (name, location,
+widget layout) from Supabase, shared through React context. Next: saving the location
+and color theme back (3.4), then Home Care and Calendar data.
+
 **Built: Settings (color theme).** The header's gear opens a Settings modal with a 3×2
 grid of color swatches; tapping one recolors the dashboard's accent at once and the
 modal stays open. The choice lives in state in `App` and resets to Sage on reload until
@@ -1174,14 +1180,123 @@ and in what order — a settings change, not a code change or a per-household fo
    in the widgets.
 3. Widgets one at a time: Home Care, Calendar, Weather.
 4. **Supabase**: schema with `household_id` + RLS, one household and one account, and
-   the hook's function bodies swapped from mock to real. This also saves the chosen
-   weather location.
+   the hooks swapped from mock to real. This also saves the chosen weather location
+   and color theme. In progress; see "Supabase build stages" below.
 5. **Settings with the color theme** — done (built before Supabase; saving the choice
    comes with step 4).
 6. **Deploy** (Vercel or similar).
 7. **Tablet**: kiosk browser on the Fire HD 10, signed in once, in daily use.
 
 Steps 1–3 and 5 are done. Anything else is under "Later features".
+
+### Supabase build stages
+
+Built in small stages that each leave the app working, like Weather's stage 7.
+
+1. **Setup** — done (October 16–17, 2026).
+   - Reused an empty project created earlier ("parekhr's Project", East US / Ohio): no
+     tables, no users, so as good as new. Free plan; projects pause after about a week
+     with no activity, which the tablet's daily use prevents.
+   - `.env.local` in the project root (ignored by git through `*.local`) holds
+     `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. Vite only exposes
+     variables with the `VITE_` prefix to the browser, and only reads `.env` files
+     when the dev server starts. The URL needs the full `https://<project id>.supabase.co`.
+   - **Publishable key, not the legacy anon key**: both work in the browser, but the
+     dashboard labels anon/service_role "Legacy", so the new key avoids a later switch.
+     Never the secret / `service_role` key in front-end code: it bypasses RLS, and
+     anything in the bundle is public.
+   - `src/lib/supabaseClient.ts` creates the one client with `createClient` and exports
+     it as `supabase`; every hook imports it from there.
+2. **Sign-in** — done.
+   - One user created in the dashboard (Authentication → Users, auto-confirmed), and
+     **"Allow new users to sign up" turned off**, since the publishable key is public.
+   - `App` keeps `session` in state with three values: `undefined` (still checking,
+     render nothing, so the sign-in screen doesn't flash on reload), `null` (show
+     `SignIn`), or a `Session` (show the dashboard). One `useEffect` calls
+     `supabase.auth.getSession()` and subscribes to `onAuthStateChange`, unsubscribing
+     in its clean-up.
+   - `src/components/SignIn.tsx`: email and password in a `<form>` (so Enter submits),
+     `signInWithPassword`, "Wrong email or password." on error. Nothing happens on
+     success: `onAuthStateChange` sets the session and `App` switches by itself. It
+     sits outside `#dashboard`, so its button is always Sage.
+   - supabase-js keeps the session in `localStorage` and refreshes it, which is what
+     "signed in once on the tablet" relies on. No sign-out button (not needed on a wall
+     tablet); `localStorage.clear()` in DevTools signs out for testing.
+3. **Household** — 3.1–3.3 done, 3.4 next.
+   1. **Tables, function, RLS, grants** in `supabase/schema.sql` (kept in the repo and
+      pasted into the SQL Editor to run):
+      - `households`: `id` (uuid, `gen_random_uuid()`), `name`, `location_name`,
+        `latitude`, `longitude` (nullable, like `name?` / `location?`),
+        `widget_layout text[]` defaulting to `{weather,homeCare,calendar}`,
+        `color_theme` defaulting to `'sage'`, `created_at`.
+      - `household_members`: `user_id` (primary key, references `auth.users`, so one
+        household per user) and `household_id`, both `on delete cascade`.
+      - `my_household_id()`: returns the signed-in user's household from
+        `household_members` via `auth.uid()`. `security definer` (so it can read the
+        membership table without tripping that table's own RLS), `stable`, and
+        `set search_path = ''` (hence the `public.` prefix).
+      - Policies: read and update your own household; read your own membership. No
+        insert or delete policies on purpose: households and memberships are created
+        by the admin in the SQL Editor, which runs as the owner and bypasses RLS.
+      - **Grants**: `select, update` on `households`, `select` on `household_members`,
+        `execute` on `my_household_id()`, all to `authenticated` only.
+        **Lesson: policies alone gave a 403 Forbidden.** Postgres checks grants
+        (may this role use the table at all?) before RLS (which rows?), and this
+        project doesn't grant new tables to `authenticated` automatically. Every new
+        table needs RLS, policies *and* grants.
+   2. **Data**: our household and membership inserted in the SQL Editor (not in
+      `schema.sql`, since it's data). One statement: a `with ... returning id` insert
+      into `households`, then the membership row looking the user up in `auth.users`
+      by email, so no UUIDs are copied by hand.
+   3. **Loading the household** — done.
+      - **Fetch once in `App`, share through React context.** Two components called
+        `useHouseholdData()` (`App` and `WeatherWidget`); with a real fetch that would
+        have meant two requests and two copies that could disagree.
+      - `src/hooks/useHouseholdData.ts` now has: `HouseholdRow` (the table's columns,
+        `snake_case`, `null` for empty) and `toHousehold` (the only place that knows
+        column names: `widget_layout` → `widgetLayout`, the three location columns →
+        one `location` or `undefined`, `null` → `undefined`); `useFetchHousehold(userId)`
+        (fetches with `.select('*').single()` and no filter, since RLS returns only our
+        row; `ignore` guards stale replies; returns `{ household, error }`);
+        `HouseholdContext`; and `useHouseholdData()`, which reads the context and throws
+        if it's used outside the provider, so callers always get a real `Household`.
+      - The hook takes the **user's id**, not the session: the session object is
+        replaced on each hourly token refresh, which would refetch for nothing.
+      - `App` order: all hooks → session checks → `if (error)` message →
+        `if (!household) return null` → `buildRows`. Waiting for the household before
+        rendering means `WeatherWidget`'s `useState(useHouseholdData().location)` gets
+        the real location on its first render, so the widget didn't change. The
+        provider wraps `Header` and the rows inside `#dashboard`; portaled modals still
+        see it.
+      - **Named export**: `useHouseholdData` was the one default export among the
+        hooks; it's now named like everything else (only `App` keeps a default export,
+        from Vite's template).
+      - Tested: renaming the household in Table Editor changes the header after a
+        reload.
+   4. **Saving the location and color theme** — next. `themeKey` starts from the
+      household's `color_theme` instead of `'sage'`, and choosing a color or a place
+      also writes it with `supabase.from('households').update({...}).eq('id', ...)`,
+      using the update policy and grant that already exist.
+4. **Home Care** — to do. `home_care_items` (`id`, `household_id`, `name`, `icon`,
+   `model`, `size`, `sort_order`) and **`home_care_logs`** (`id`, `household_id`,
+   `item_id` deleted with its item, `logged_on date`, **`unique (item_id, logged_on)`**,
+   which replaces the hook's `includes` check). Then `useHomeCareData` and its four
+   writes.
+5. **Calendar** — to do. `categories`, `people`, `events` (`category_id`, `title` with a
+   60-character check, `start_date`, `end_date` with `end_date >= start_date`,
+   `all_day`, `time` required unless all-day) and the **`event_people`** join table
+   (primary key `(event_id, person_id)`, links deleted with either side). Then
+   `useCalendarData`.
+
+**Schema conventions (decided October 17, 2026)**: every table has a uuid `id` from
+`gen_random_uuid()` and a `household_id`, including the join tables, so one rule fits
+all policies (`household_id = my_household_id()`); columns are `snake_case` and each hook
+converts rows to the existing camelCase types, so widgets don't change. **Separate
+tables** were chosen over arrays for Home Care history and event people: the database
+then rejects duplicate dates and links to people who don't exist, and it's standard
+relational design. (Arrays would have matched the current hook types more closely and
+been a little quicker.) `widget_layout` stays an array: it's one ordered list, not
+related records. Realtime waits until there's a second device.
 
 ## Proposed folder structure
 
@@ -1197,7 +1312,7 @@ family-dashboard/
 ├── index.html
 ├── package.json
 ├── vite.config.ts
-├── .env.example              # SUPABASE_URL / SUPABASE_ANON_KEY placeholders
+├── .env.example              # VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY placeholders (not created yet; real values live in .env.local)
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                # top-level shell; switches wall vs. phone layout
