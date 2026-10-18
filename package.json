@@ -13,6 +13,7 @@
   "dependencies": {
     "@meteocons/svg": "^0.1.0",
     "@meteocons/svg-static": "^0.1.0",
+    "@supabase/supabase-js": "^2.118.0",
     "@tailwindcss/vite": "^4.3.3",
     "lucide-react": "^1.47.0",
     "react": "^19.2.8",

@@ -1261,12 +1261,23 @@ family-dashboard/
   ~$77 at time of planning (list $154.99, frequently discounted). No Google Play
   Store; a kiosk browser is sideloaded once per device by the admin during setup,
   not something the household ever touches.
+  - **Bought October 17, 2026** for our household: $72.99 on sale (ASIN
+    B0GVTPKJVT), 32 GB, with lockscreen ads (cheaper; the kiosk browser keeps the
+    dashboard on screen, so the ads rarely show), linked to the Amazon account.
 - **Stand**: varies per household, all roughly similar cost —
   countertop stand (~$10–20), magnetic fridge mount (~$15–40, **verify the fridge
   front is actually magnetic first** — some stainless finishes aren't), or wall
   mount (~$15–25).
+  - **Bought October 17, 2026** for our household: a Vnicstick bamboo slot stand,
+    $11.69 (ASIN B0GVYHY5SJ), for the kitchen counter. It's light (about 4 oz against
+    the tablet's 15 oz) and shallow (about 2.7" deep), which is fine only because it
+    sits against the wall and the tablet leans on it; out on an open counter it would
+    tip when the top of the screen is tapped. Check when it arrives that the
+    charging cable on the short side isn't pinched, and move it an inch from the
+    wall if the screen is too upright to read.
 - **Per-household hardware cost**: roughly **$85–160** all-in. No recurring cost —
-  Supabase and hosting both stay on free tiers at this scale.
+  Supabase and hosting both stay on free tiers at this scale. Ours came to about
+  $85.
 
 ## Later features
 
@@ -1286,6 +1297,23 @@ still stand; they're just not needed for daily use. Until they're built, the
 - **Paged screens** for households that outgrow one screen.
 - **Weather**: tap a day card for NWS's `detailedForecast`; the "use my location"
   button; "Updated N minutes ago" under the place name.
+- **Portfolio presentation** (after the MVP, so interviewers can see and use it):
+  - **README**: a GIF or screenshots at the top, one paragraph on what it is and that
+    it's in daily family use, the stack and a small architecture diagram, and a
+    "Design decisions" section drawn from this plan (the reasons are the selling
+    point).
+  - **Demo video** (60–90s) of the real tablet on the kitchen counter, linked at the
+    top.
+  - **Live demo account** (chosen over a mock-data demo mode, so visitors use the
+    real Supabase + RLS path): a "Try the demo" button on the sign-in screen signs in
+    as a shared demo user whose membership points at a seeded sample household. The
+    demo credentials sit in the front end on purpose; RLS confines them to the demo
+    household, and public sign-ups stay off. A scheduled job (`pg_cron`) runs a
+    reset function nightly that restores the sample data.
+    - **To handle**: the demo user could change its own password or email through
+      Supabase Auth and lock everyone else out, so the reset also restores its
+      credentials (or block it another way); visitors can deface the sample data
+      between resets; keep the sample data free of anything personal.
 
 ## Open / not yet decided
 

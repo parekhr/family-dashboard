@@ -7,7 +7,7 @@ import { AlertsModal } from './AlertsModal'
 import { getAlertTiming, isAlertActive } from './alertTiming'
 import { severityColors } from './alertColors'
 import { getBackgroundKind, WeatherBackground } from './WeatherBackground'
-import useHouseholdData from '../../hooks/useHouseholdData'
+import { useHouseholdData}  from '../../hooks/useHouseholdData'
 import { LocationPicker } from './LocationPicker'
 
 const timeOfDayTints = {
