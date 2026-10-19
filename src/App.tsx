@@ -9,11 +9,12 @@ import { SignIn } from './components/SignIn'
 
 function App() {
 
-  const [themeKey, setThemeKey] = useState('sage')
+  const [pickedTheme, setPickedTheme] = useState<string | null>(null)
   const [session, setSession] = useState<Session | null | undefined>(undefined)
-
-  const theme = getColorTheme(themeKey)
   const { household, error } = useFetchHousehold(session?.user.id)
+
+  const themeKey = pickedTheme ?? household?.colorTheme ?? 'sage'
+  const theme = getColorTheme(themeKey)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session))
@@ -32,6 +33,15 @@ function App() {
 
   const rows = buildRows(household.widgetLayout, registry)
 
+  function handleThemeChange(key: string) {
+    setPickedTheme(key)
+    if (!household) return   // can't happen in practice: the swatches only show once it's loaded
+    supabase.from('households')
+      .update({ color_theme: key })
+      .eq('id', household.id)
+      .then(({ error }) => { if (error) console.error(error) })
+  }
+
   return (
     <div
       id="dashboard"
@@ -42,7 +52,7 @@ function App() {
         <Header
           name={household.name}
           themeKey={themeKey}
-          onThemeChange={setThemeKey}
+          onThemeChange={handleThemeChange}
         />
 
         <div className="flex-1 flex flex-col min-h-0">

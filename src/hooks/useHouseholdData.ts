@@ -13,6 +13,7 @@ type Household = {
     widgetLayout: WidgetId[]
     name?: string
     location?: Location
+    colorTheme: string
 }
 
 type HouseholdRow = {
@@ -22,6 +23,7 @@ type HouseholdRow = {
     latitude: number | null
     longitude: number | null
     widget_layout: string[]
+    color_theme: string
 }
 
 export const HouseholdContext = createContext<Household | null>(null)
@@ -40,6 +42,7 @@ export function toHousehold(row: HouseholdRow): Household {
         location: row.latitude !== null && row.longitude !== null && row.location_name !== null
             ? { latitude: row.latitude, longitude: row.longitude, name: row.location_name }
             : undefined,
+        colorTheme: row.color_theme
     }
 }
 
