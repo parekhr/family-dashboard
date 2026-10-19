@@ -7,8 +7,9 @@ import { AlertsModal } from './AlertsModal'
 import { getAlertTiming, isAlertActive } from './alertTiming'
 import { severityColors } from './alertColors'
 import { getBackgroundKind, WeatherBackground } from './WeatherBackground'
-import { useHouseholdData}  from '../../hooks/useHouseholdData'
+import { useHouseholdData, type Location } from '../../hooks/useHouseholdData'
 import { LocationPicker } from './LocationPicker'
+import { supabase } from '../../lib/supabaseClient'
 
 const timeOfDayTints = {
     Morning: '#FCE4A0',
@@ -38,12 +39,25 @@ export function WeatherWidget() {
     const [view, setView] = useState<'hourly' | 'weekly'>('hourly')
     const [pageNumber, setPageNumber] = useState(0)
     const [showAlertsModal, setShowAlertsModal] = useState(false)
-    const [location, setLocation] = useState(useHouseholdData().location)
+    const household = useHouseholdData()
+    const [location, setLocation] = useState(household.location)
     const [showLocationPicker, setShowLocationPicker] = useState(false)
 
     const start = pageNumber * 6
     const state = useWeatherData(location)
     const now = useNow()
+
+    function handleChooseLocation(place: Location) {
+        setLocation(place)
+        supabase.from('households')
+            .update({
+                location_name: place.name,
+                latitude: place.latitude,
+                longitude: place.longitude,
+            })
+            .eq('id', household.id)
+            .then(({ error }) => { if (error) console.error(error) })
+    }
 
     if (state.status !== 'ready') {
         return (
@@ -62,7 +76,7 @@ export function WeatherWidget() {
                 {showLocationPicker && (
                     <LocationPicker
                         current={location}
-                        onChoose={setLocation}
+                        onChoose={handleChooseLocation}
                         onClose={() => setShowLocationPicker(false)}
                     />
                 )}
@@ -134,7 +148,7 @@ export function WeatherWidget() {
                 {showLocationPicker && (
                     <LocationPicker
                         current={location}
-                        onChoose={setLocation}
+                        onChoose={handleChooseLocation}
                         onClose={() => setShowLocationPicker(false)}
                     />
                 )}
