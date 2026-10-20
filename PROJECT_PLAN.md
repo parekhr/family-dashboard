@@ -1187,13 +1187,28 @@ and in what order — a settings change, not a code change or a per-household fo
    and color theme (done). In progress; see "Supabase build stages" below.
 5. **Settings with the color theme** — done (built before Supabase; saved since
    Supabase stage 3.4).
-6. **New-household setup template**: `supabase/new_household.sql`, a fill-in-the-blanks
+6. **Migrations** (after Calendar, decided October 20, 2026): switch from one hand-run
+   `schema.sql` to versioned migrations with the Supabase CLI, so each schema change is
+   its own file instead of hunting for the new parts to paste into the SQL Editor.
+   - One-time setup (about an hour, no app code changes): `npx supabase init`, `login`,
+     `link` to the existing project, then a **baseline** migration describing the
+     tables that already exist, either `supabase db pull` (needs Docker running) or
+     `schema.sql` copied into `supabase/migrations/<timestamp>_initial.sql` and marked
+     as run with `supabase migration repair --status applied <timestamp>`, so it's never
+     run again. Then retire `schema.sql` (delete it, or keep it read-only) so there's
+     one source of truth.
+   - From then on: `supabase migration new <name>`, write the SQL, `supabase db push`.
+     A pushed migration is never edited; fixes are new migrations (`alter table ...`).
+     Unpushed ones are drafts and can be edited. Same idea as Django's
+     `makemigrations` / `migrate` and `prisma migrate dev`, except the SQL is
+     hand-written.
+7. **New-household setup template**: `supabase/new_household.sql`, a fill-in-the-blanks
    SQL file (placeholders for the email, household name, people, categories and Home
    Care items) run once in the SQL Editor to set up another household. Written after
    stages 4 and 5, once all tables exist. It's data, not schema, so it's kept apart from
-   `schema.sql` and holds no real names.
-7. **Deploy** (Vercel or similar).
-8. **Tablet**: kiosk browser on the Fire HD 10, signed in once, in daily use.
+   the schema and migrations and holds no real names.
+8. **Deploy** (Vercel or similar).
+9. **Tablet**: kiosk browser on the Fire HD 10, signed in once, in daily use.
 
 Steps 1–3 and 5 are done. Anything else is under "Later features".
 

@@ -1,9 +1,15 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { supabase } from "../../lib/supabaseClient"
 
 export type Category = {
     id: string
     name: string
-    color: string          
+    color?: string
+}
+type CategoryRow = {
+    id: string
+    name: string
+    color: string | null
 }
 
 export type Person = {
@@ -11,118 +17,71 @@ export type Person = {
     name: string
 }
 
+type PersonRow = {
+    id: string
+    name: string
+}
+
 export type CalendarEvent = {
     id: string
-    categoryId: string        
-    title?: string         
+    categoryId: string
+    title?: string
     start: string          //ISO YYYY-MM-DD
     end: string            //ISO YYYY-MM-DD, inclusive
     allDay: boolean
     time?: string          // 24 hour HH:mm, only when !allDay
-    personIds: string[]    
+    personIds: string[]
+}
+
+type CalendarEventRow = {
+    id: string
+    category_id: string
+    title: string | null
+    start_date: string
+    end_date: string
+    all_day: boolean
+    time: string | null
+    event_people: { person_id: string }[]
+}
+
+function toCategory(row: CategoryRow): Category {
+    return {
+        id: row.id,
+        name: row.name,
+        color: row.color ?? undefined
+    }
+}
+
+function toPerson(row: PersonRow): Person {
+    return {
+        id: row.id,
+        name: row.name
+    }
 }
 
 
 export function useCalendarData() {
-    const [categories, setCategories] = useState<Category[]>([
-        { id: "c1", name: "Meeting", color: "#378ADD" },
-        { id: "c2", name: "Appointment", color: "#FF5733" },
-        { id: "c3", name: "Vacation", color: "#335F57" }
-    ])
+    const [categories, setCategories] = useState<Category[]>([])
+    const [people, setPeople] = useState<Person[]>([])
+    const [events, setEvents] = useState<CalendarEvent[]>([])
 
-    const [people] = useState<Person[]>([
-        { id: "p1", name: "Alice" },
-        { id: "p2", name: "Bob" },
-        { id: "p3", name: "Charlie" }
-    ])
-
-    const [events, setEvents] = useState<CalendarEvent[]>([
-        {
-            id: "e1",
-            categoryId: "c1",
-            title: "Team Meeting",
-            start: "2026-09-01",
-            end: "2026-09-01",
-            allDay: false,
-            time: "10:00",
-            personIds: ["p1", "p2"]
-        },
-        {
-            id: "e2",
-            categoryId: "c2",
-            title: "Doctor Appointment",
-            start: "2026-09-02",
-            end: "2026-09-02",
-            allDay: false,
-            time: "14:00",
-            personIds: ["p3"]
-        },
-        {
-            id: "e3",
-            categoryId: "c2",
-            title: "Trash Pick Up",
-            start: "2026-09-03",
-            end: "2026-09-03",
-            allDay: true,
-            personIds: []
-        },
-        {
-            id: "e4",
-            categoryId: "c1",
-            title: "Project Kickoff",
-            start: "2026-09-03",
-            end: "2026-09-03",
-            allDay: false,
-            time: "09:00",
-            personIds: ["p1", "p3"]
-        },
-        {
-            id: "e5",
-            categoryId: "c2",
-            start: "2026-09-04",
-            end: "2026-09-04",
-            allDay: false,
-            time: "15:00",
-            personIds: ["p2"]
-        },
-        {
-            id: "e6",
-            categoryId: "c1",
-            title: "Team Lunch",
-            start: "2026-09-05",
-            end: "2026-09-05",
-            allDay: false,
-            time: "12:30",
-            personIds: []
-        },
-        {
-            id: "e7",
-            categoryId: "c3",
-            title: "Company Retreat",
-            start: "2026-10-01",
-            end: "2026-10-14",
-            allDay: true,
-            personIds: ["p1", "p2", "p3"]
-        },
-        {
-            id: "e8",
-            categoryId: "c3",
-            title: "Vacation",
-            start: "2026-08-30",
-            end: "2026-09-07",
-            allDay: true,
-            personIds: ["p2", "p3"]
-        },
-        {
-            id: "e9",
-            categoryId: "c2",
-            title: "School Starts",
-            start: "2026-10-02",
-            end: "2026-10-02",
-            allDay: true,
-            personIds: ["p1", "p3"]
-        }
-    ])
+    useEffect(() => {
+        let ignore = false
+        Promise.all([
+            supabase.from('categories').select('*'),
+            supabase.from('people').select('*'),
+            supabase.from('events').select('*')
+        ]).then(([categoriesResult, peopleResult, eventsResult]) => {
+            if (ignore) return
+            if (categoriesResult.error) console.error(categoriesResult.error)
+            if (peopleResult.error) console.error(peopleResult.error)
+            if (eventsResult.error) console.error(eventsResult.error)
+            if (categoriesResult.data) setCategories(categoriesResult.data.map(toCategory))
+            if (peopleResult.data) setPeople(peopleResult.data.map(toPerson))
+            if (eventsResult.data) setEvents(eventsResult.data)
+        })
+        return () => { ignore = true }
+    }, [])
 
     function addEvent(newEvent: Omit<CalendarEvent, 'id'>) {
         setEvents(prevEvents => [...prevEvents, { ...newEvent, id: crypto.randomUUID() }])
@@ -138,5 +97,6 @@ export function useCalendarData() {
         ))
     }
 
-    return { categories, setCategories, people, events, addEvent, deleteEvent, editEvent }
+
+    return { categories, setCategories, people, setPeople, events, addEvent, deleteEvent, editEvent }
 }
