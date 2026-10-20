@@ -1,8 +1,9 @@
 # Family Dashboard — Project Plan
 
 Status: MVP build in progress. Layout shell, widget registry + `buildRows`, and the Home
-Care widget (log today, History modal with add/edit/delete) are built on mock data. Home
-Care item management (add/rename/delete/reorder) is a later feature.
+Care widget (log today, History modal with add/edit/delete) are built; Home Care now
+loads and saves through Supabase. Home Care item management (add/rename/delete/reorder)
+is a later feature.
 
 **MVP trimmed (October 16, 2026)** to get to real daily use sooner. With the three
 widgets built, what's left is **Supabase → deploy → tablet**, plus a small Settings
@@ -11,14 +12,16 @@ Everything else that was planned for the MVP is now listed under "Later features
 
 **In progress: Supabase** (build order step 4; see "Supabase build stages"). The
 project, client and sign-in are done, the `households` and `household_members` tables
-exist with RLS and grants, and the dashboard now loads the household (name, location,
-widget layout) from Supabase, shared through React context. Next: saving the location
-and color theme back (3.4), then Home Care and Calendar data.
+exist with RLS and grants, and the dashboard loads the household (name, location,
+widget layout, color theme) from Supabase, shared through React context. Choosing a
+color theme or a weather location saves it back (stage 3 is done). Home Care items and
+their history load from Supabase and all four history writes save (stage 4 is done).
+Next: Calendar data (stage 5).
 
 **Built: Settings (color theme).** The header's gear opens a Settings modal with a 3×2
 grid of color swatches; tapping one recolors the dashboard's accent at once and the
-modal stays open. The choice lives in state in `App` and resets to Sage on reload until
-Supabase saves it.
+modal stays open. The choice is saved to the household's `color_theme` in Supabase and
+loads back on reload.
 
 The Calendar widget is built on mock data: month grid (chips, bands, badge, today
 markers), monthly themes, holiday rings (fixed, floating, Easter, Chinese New Year), the
@@ -38,8 +41,8 @@ hour cards, the alert banner and alerts modal with colors by severity, and the
 animated weather backgrounds. Alerts hide themselves when they end, and "Today" is
 decided by date, so evening forecasts are labeled correctly. The place name in the
 widget opens a **location picker** that searches by town or ZIP code (Open-Meteo) and
-reloads the weather for the chosen place. Saving the chosen place waits for Supabase;
-until then a reload goes back to the mock household's location. All seven build
+reloads the weather for the chosen place. The chosen place is saved to the household
+in Supabase and loads back on reload. All seven build
 stages are done (see the build stages under Weather).
 
 **Modals** all go through one shared `Modal` component (`src/components/Modal.tsx`) and
@@ -1045,7 +1048,7 @@ and in what order — a settings change, not a code change or a per-household fo
     calendar themes.
   - **Saved on the household** in Supabase as a key (e.g. `color_theme: "blue"`), like
     the name font, not as CSS. Unknown or missing keys fall back to the current green.
-    Until Supabase, it lives in state and resets on reload, like the location.
+    Saved and loaded since Supabase stage 3.4.
   - **Behavior** (agreed October 16, 2026): the gear opens a "Settings" modal (the
     shared `Modal`) with one "Color theme" section. **Tapping a swatch applies it at
     once**, with no Save and no preview: the dashboard behind the overlay is the
@@ -1163,8 +1166,8 @@ and in what order — a settings change, not a code change or a per-household fo
     with a lookup in `searchLocations.ts`.
   - **Left out for now**: the "use my location" button (may not work on the tablet),
     and "Updated N minutes ago" under the place name (the row is tight).
-  - **Saving waits for Supabase.** Until then, a chosen place resets to the mock
-    household's location on reload. Browser storage (`localStorage`) was considered as
+  - **Saved in Supabase** since stage 3.4 (see "Supabase build stages"). Before that,
+    a chosen place reset to the mock household's location on reload. Browser storage (`localStorage`) was considered as
     a stand-in and skipped: it would save per device, not per household, and nothing
     is used for real until the project is fully built. With Supabase, the location
     loads from the household like its name, and choosing a place writes it back.
@@ -1181,11 +1184,16 @@ and in what order — a settings change, not a code change or a per-household fo
 3. Widgets one at a time: Home Care, Calendar, Weather.
 4. **Supabase**: schema with `household_id` + RLS, one household and one account, and
    the hooks swapped from mock to real. This also saves the chosen weather location
-   and color theme. In progress; see "Supabase build stages" below.
-5. **Settings with the color theme** — done (built before Supabase; saving the choice
-   comes with step 4).
-6. **Deploy** (Vercel or similar).
-7. **Tablet**: kiosk browser on the Fire HD 10, signed in once, in daily use.
+   and color theme (done). In progress; see "Supabase build stages" below.
+5. **Settings with the color theme** — done (built before Supabase; saved since
+   Supabase stage 3.4).
+6. **New-household setup template**: `supabase/new_household.sql`, a fill-in-the-blanks
+   SQL file (placeholders for the email, household name, people, categories and Home
+   Care items) run once in the SQL Editor to set up another household. Written after
+   stages 4 and 5, once all tables exist. It's data, not schema, so it's kept apart from
+   `schema.sql` and holds no real names.
+7. **Deploy** (Vercel or similar).
+8. **Tablet**: kiosk browser on the Fire HD 10, signed in once, in daily use.
 
 Steps 1–3 and 5 are done. Anything else is under "Later features".
 
@@ -1222,7 +1230,7 @@ Built in small stages that each leave the app working, like Weather's stage 7.
    - supabase-js keeps the session in `localStorage` and refreshes it, which is what
      "signed in once on the tablet" relies on. No sign-out button (not needed on a wall
      tablet); `localStorage.clear()` in DevTools signs out for testing.
-3. **Household** — 3.1–3.3 done, 3.4 next.
+3. **Household** — done (October 17–19, 2026).
    1. **Tables, function, RLS, grants** in `supabase/schema.sql` (kept in the repo and
       pasted into the SQL Editor to run):
       - `households`: `id` (uuid, `gen_random_uuid()`), `name`, `location_name`,
@@ -1273,15 +1281,96 @@ Built in small stages that each leave the app working, like Weather's stage 7.
         from Vite's template).
       - Tested: renaming the household in Table Editor changes the header after a
         reload.
-   4. **Saving the location and color theme** — next. `themeKey` starts from the
-      household's `color_theme` instead of `'sage'`, and choosing a color or a place
-      also writes it with `supabase.from('households').update({...}).eq('id', ...)`,
-      using the update policy and grant that already exist.
-4. **Home Care** — to do. `home_care_items` (`id`, `household_id`, `name`, `icon`,
-   `model`, `size`, `sort_order`) and **`home_care_logs`** (`id`, `household_id`,
-   `item_id` deleted with its item, `logged_on date`, **`unique (item_id, logged_on)`**,
-   which replaces the hook's `includes` check). Then `useHomeCareData` and its four
-   writes.
+   4. **Saving the location and color theme** — done.
+      - **Optimistic saves**: the screen changes at once and the `update` runs in the
+        background; a failed save is only logged (`console.error`), so the worst case
+        is the old value coming back on the next reload. Reverting or showing an error
+        can come later if failures actually happen.
+      - **Saves go in the click handlers, not in a `useEffect`**: the save is caused by
+        a user action, not by the state changing, and an effect would also run on the
+        first render and write back the value just loaded.
+      - **Color theme** (in `App`): `HouseholdRow` gets `color_theme: string` (the
+        column is `not null default 'sage'`), `Household` gets `colorTheme: string`, and
+        `toHousehold` copies it. `App` keeps only `pickedTheme` (`string | null`) in
+        state and works out `themeKey = pickedTheme ?? household?.colorTheme ?? 'sage'`,
+        because `useState`'s starting value is used only on the first render, before
+        the household has loaded (copying it in with an effect was the alternative).
+        `handleThemeChange(key)` sets `pickedTheme`, returns early if there's no
+        household (narrowing for TypeScript; can't happen, since the swatches only show
+        once it has loaded), then updates `color_theme` with `.eq('id', household.id)`.
+        It saves `key`, not `themeKey`, which still holds the old value until the next
+        render. `SettingsModal` and `Header` didn't change.
+      - **No `ThemeKey` type for now**: keys stay plain `string`s everywhere, and
+        `getColorTheme` already falls back to Sage for unknown keys. A `ThemeKey` union
+        (from the list with `as const`) would catch typos at compile time; possible
+        cleanup later.
+      - **Location** (in `WeatherWidget`, which owns the location state):
+        `handleChooseLocation(place)` sets the location and updates the three columns
+        (`location_name: place.name`, `latitude`, `longitude`), the reverse of
+        `toHousehold`. No `undefined` check is needed there, since `useHouseholdData()`
+        throws outside the provider. Both `LocationPicker`s (the "Set a location" button
+        and the place name) use it. `LocationPicker` didn't change.
+      - Tested: both survive a reload and show up in Table Editor.
+      - **Hourly labels are in the location's time zone**, read straight from the NWS
+        `startTime`, while the header clock uses the device's. They only differ when
+        testing a place in another time zone (Cresco, IA showed 9 AM as the current
+        hour at 10:49 Eastern); for the tablet's own town they match, so this stays.
+4. **Home Care** — done (October 19, 2026).
+   1. **Tables** in `supabase/schema.sql`:
+      - `home_care_items`: `id`, `household_id` (references `households`), `name`,
+        `icon`, `sort_order` (all `not null`), `model` and `size` (nullable, like
+        `model?` / `size?`), `created_at`, and **`unique (id, household_id)`**, which
+        exists only as the target of the logs' composite foreign key (`id` is already
+        unique on its own). `sort_order` has no default, so every insert must place
+        the item.
+      - `home_care_logs`: `id`, `household_id` **`default my_household_id()`** (the app
+        never sends it), `item_id`, **`logged_on date`** (a day, not a timestamp:
+        `created_at` is shown in UTC, so a 9 PM log would read as the next day),
+        `created_at`, a **composite foreign key** `(item_id, household_id)` →
+        `home_care_items (id, household_id)` `on delete cascade`, and
+        **`unique (item_id, logged_on)`**, which replaces the mock's `includes` checks.
+      - **Why composite**: a plain `item_id` foreign key only checks that the item
+        exists, and foreign key checks ignore RLS, so a log could point at another
+        household's item. The pair makes the log's household equal its item's; it also
+        covers `household_id` pointing at a real household, so that column has no
+        separate `references`.
+      - **`my_household_id()` moved above the Home Care tables**: a column default that
+        calls a function needs the function to exist when the table is created.
+   2. **Policies and grants**: items are **read-only** (one select policy, `select`
+      grant); they're added in the SQL Editor like people and categories will be.
+      Logs get **four separate policies** (select and delete with `using`, insert with
+      `with check`, update with both) and all four grants. `for all` would also have
+      worked; separate ones spell out each action. **Lesson**: with RLS on, an action
+      with a grant but no policy is still blocked.
+   3. **Running it**: only the new parts were pasted into the SQL Editor, since
+      `schema.sql` describes a fresh database and rerunning `create table households`
+      fails. (Migrations, one numbered file per change, are the usual answer once this
+      gets annoying.)
+   4. **Data**: our 4 items inserted in the SQL Editor (not saved in the repo) with
+      `insert ... select h.id, v.* from households h cross join (values ...) as v (...)`,
+      looking up `household_id` by household name, since `my_household_id()` returns
+      null in the SQL Editor. History starts empty; the widget already shows "Never"
+      and "No entries yet". `icon` must be a key in `HomeCareWidget`'s `icons` map
+      (`air-vent`, `droplet`), or the widget would render `undefined`.
+   5. **Loading** (`useHomeCareData`): only `HomeCareWidget` uses the hook, so it
+      fetches inside itself (no context). One request with **embedding**:
+      `.select('id, name, icon, model, size, home_care_logs(logged_on)')`,
+      `.order('sort_order')`, no filter (RLS returns only our rows). `items` starts as
+      `[]`; `ignore` guards stale replies. `HomeCareItemRow` (database shape) and
+      `toHomeCareItem` (`null` → `undefined`, logs → `history: string[]`) follow the
+      `HouseholdRow` / `toHousehold` pattern. A failed load sets an `error`
+      boolean (state, since it's discovered after render) and the widget shows
+      "Couldn't load Home Care." instead of looking empty.
+   6. **Writes**: no log ids are needed in state, since `(item_id, logged_on)` is
+      unique: `logToday` and `addHistoryEntry` insert `{ item_id, logged_on }`,
+      `deleteHistoryEntry` deletes and `editHistoryEntry` updates with
+      `.eq('item_id', ...).eq('logged_on', ...)`. All optimistic like the theme and
+      location: an **early return** if the change isn't needed (duplicate date, or
+      the old date missing), then `setItems`, then the call; failures are only
+      `console.error`ed (not the load-error flag, whose message would be wrong).
+      `HistoryModal` also blocks duplicates, but the hook doesn't rely on it.
+   7. Tested: log today, add, edit (same row id, so a real update) and delete all
+      show up in Table Editor and survive a reload.
 5. **Calendar** — to do. `categories`, `people`, `events` (`category_id`, `title` with a
    60-character check, `start_date`, `end_date` with `end_date >= start_date`,
    `all_day`, `time` required unless all-day) and the **`event_people`** join table
@@ -1352,7 +1441,7 @@ family-dashboard/
 │   │   └── homeCare/
 │   │       ├── HomeCareWidget.tsx
 │   │       ├── HistoryModal.tsx      # per-item history: add/edit/delete dates
-│   │       └── useHomeCareData.ts    # mock items + log/add/edit/delete history
+│   │       └── useHomeCareData.ts    # items + history from Supabase; log/add/edit/delete history
 │   ├── settings/
 │   │   ├── SettingsPanel.tsx
 │   │   ├── WidgetToggleList.tsx
@@ -1398,7 +1487,10 @@ family-dashboard/
 
 Moved out of the MVP on October 16, 2026. The designs written up elsewhere in this plan
 still stand; they're just not needed for daily use. Until they're built, the
-"management" ones are done by hand in Supabase's table editor.
+"management" ones are done by hand in Supabase's table editor or SQL Editor: people,
+calendar categories and Home Care items are admin-managed, set up per household before
+handing over a tablet (see the new-household setup template in the build order). Events,
+Home Care history, the color theme and the location are edited in the app.
 
 - **Device pairing** with short-lived setup codes (see "Architecture").
 - **More than one household.** The schema supports it from the start.

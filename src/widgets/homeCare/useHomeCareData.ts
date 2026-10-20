@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getTodayISO } from '../../lib/dates'
+import { supabase } from '../../lib/supabaseClient'
 
 export type HomeCareItem = {
     id: string
@@ -10,29 +11,63 @@ export type HomeCareItem = {
     size?: string
 }
 
+type HomeCareItemRow = {
+    id: string
+    name: string
+    icon: string
+    model: string | null
+    size: string | null
+    home_care_logs: { logged_on: string }[]
+}
+
+function toHomeCareItem(row: HomeCareItemRow): HomeCareItem {
+    return {
+        id: row.id,
+        name: row.name,
+        icon: row.icon,
+        model: row.model ?? undefined,
+        size: row.size ?? undefined,
+        history: row.home_care_logs.map(log => log.logged_on)
+    }
+}
+
 export function useHomeCareData() {
-    const [items, setItems] = useState<HomeCareItem[]>([
-        { id: '1', name: 'Air Filter', icon: 'air-vent', history: ['2024-06-01', '2024-06-02'], model: 'XGRF14PA', size: '16X16' },
-        { id: '2', name: 'Refrigerator Filter', icon: 'droplet', history: ['2024-06-03', '2024-06-04'], model: 'WF1234', size: '10X10' },
-        { id: '3', name: 'Water Filter', icon: 'droplet', history: ['2024-06-05'], model: 'WF5678', size: '12X12' },
-        { id: '4', name: 'Humidifier Filter', icon: 'droplet', history: ['2024-06-06'], model: 'HF9012', size: '14X14' },
-        { id: '5', name: 'Dehumidifier Filter', icon: 'droplet', history: ['2024-06-07'], model: 'DF3456', size: '16X16' },
-        { id: '6', name: 'Vacuum Filter', icon: 'droplet', history: ['2024-06-08'], model: 'VF7890', size: '18X18' }
-    ])
+    const [items, setItems] = useState<HomeCareItem[]>([])
+    const [error, setError] = useState(false)
+
+    useEffect(() => {
+        let ignore = false
+        supabase
+            .from('home_care_items')
+            .select('id, name, icon, model, size, home_care_logs(logged_on)')
+            .order('sort_order')
+            .then(({ data, error }) => {
+                if (ignore) return
+                if (error) {
+                    console.error(error)
+                    setError(true)
+                    return
+                }
+                setItems(data.map(toHomeCareItem))
+            })
+        return () => { ignore = true }
+    }, [])
 
     function logToday(id: string) {
-        // get today's date in ISO format
-        // check the history of that item from its id
-        // if today is in there, then do nothing
-        // if today is not in there, then append to that history list
-
         const today = getTodayISO()
+        const item = items.find(i => i.id === id)
+        if (!item || item.history.includes(today)) return
 
         setItems(prev => prev.map(i =>
-            i.id === id && !i.history.includes(today)
-                ? { ...i, history: [...i.history, today] }
-                : i
+            i.id === id ? { ...i, history: [...i.history, today] } : i
         ))
+        supabase.from('home_care_logs')
+            .insert({ item_id: id, logged_on: today })
+            .then(({ error }) => {
+                if (error) {
+                    console.error(error)
+                }
+            })
     }
 
     function deleteHistoryEntry(id: string, date: string) {
@@ -41,24 +76,51 @@ export function useHomeCareData() {
                 ? { ...i, history: i.history.filter(d => d !== date) }
                 : i
         ))
+        supabase.from('home_care_logs')
+            .delete()
+            .eq('item_id', id)
+            .eq('logged_on', date)
+            .then(({ error }) => {
+                if (error) {
+                    console.error(error)
+                }
+            })
     }
 
     function addHistoryEntry(id: string, date: string) {
+        const item = items.find(i => i.id === id)
+        if (!item || item.history.includes(date)) return
+
         setItems(prev => prev.map(i =>
-            i.id === id && !i.history.includes(date)
-                ? { ...i, history: [...i.history, date] }
-                : i
+            i.id === id ? { ...i, history: [...i.history, date] } : i
         ))
+        supabase.from('home_care_logs')
+            .insert({ item_id: id, logged_on: date })
+            .then(({ error }) => {
+                if (error) {
+                    console.error(error)
+                }
+            })
     }
 
     function editHistoryEntry(id: string, oldDate: string, newDate: string) {
+        const item = items.find(i => i.id === id)
+        if (!item || !item.history.includes(oldDate) || item.history.includes(newDate)) return
+
         setItems(prev => prev.map(i =>
-            i.id === id && i.history.includes(oldDate) && !i.history.includes(newDate)
-                ? { ...i, history: i.history.map(d => d === oldDate ? newDate : d) }
-                : i
+            i.id === id ? { ...i, history: i.history.map(d => d === oldDate ? newDate : d) } : i
         ))
+        supabase.from('home_care_logs')
+            .update({ logged_on: newDate })
+            .eq('item_id', id)
+            .eq('logged_on', oldDate)
+            .then(({ error }) => {
+                if (error) {
+                    console.error(error)
+                }
+            })
     }
 
-    return { items, logToday, deleteHistoryEntry, addHistoryEntry, editHistoryEntry }
+    return { items, logToday, deleteHistoryEntry, addHistoryEntry, editHistoryEntry, error }
 }
 

@@ -11,14 +11,14 @@ const icons: Record<string, LucideIcon> = {
 }
 
 export function HomeCareWidget() {
-  const { items, logToday, deleteHistoryEntry, addHistoryEntry, editHistoryEntry } = useHomeCareData()
+  const { items, logToday, deleteHistoryEntry, addHistoryEntry, editHistoryEntry, error } = useHomeCareData()
   const [historyItemId, setHistoryItemId] = useState<string | null>(null)
   const historyItem = items.find((i) => i.id === historyItemId)
 
   return (
     <div className="flex flex-col flex-1 min-h-0 gap-3">
       <h2 className="text-[22px] font-extrabold text-ink">Home Care</h2>
-
+      {error && <p className="text-sm text-muted">Couldn't load Home Care.</p>}
       <div className="flex flex-col gap-3 flex-1 min-h-0 overflow-y-auto">
         {items.map((item) => {
           const Icon = icons[item.icon]
