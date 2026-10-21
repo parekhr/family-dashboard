@@ -183,17 +183,5 @@ grant select on public.people to authenticated;
 grant select, insert, update, delete on public.events to authenticated;
 grant select, insert, delete on public.event_people to authenticated;
 
-insert into categories (household_id, name, color)
-select h.id, 'Appointment', '#335F57'
-from households h
-where h.name = 'Parekh Household';
 
-insert into categories (household_id, name, color)
-select h.id, v.name, v.color
-from households h
-cross join (values
-    ('Appointment', null),
-    ('Vacation', null)
-) as v (name, color)
-where h.name = 'Parekh Household';
 

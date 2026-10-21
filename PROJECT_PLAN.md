@@ -10,7 +10,7 @@ widgets built, what's left is **Supabase → deploy → tablet**, plus a small S
 screen whose only setting is the **color theme** (see "Settings (MVP): color theme").
 Everything else that was planned for the MVP is now listed under "Later features".
 
-**In progress: Supabase** (build order step 4; see "Supabase build stages"). The
+**Done: Supabase** (build order step 4; see "Supabase build stages"). The
 project, client and sign-in are done, the `households` and `household_members` tables
 exist with RLS and grants, and the dashboard loads the household (name, location,
 widget layout, color theme) from Supabase, shared through React context. Choosing a
@@ -18,7 +18,8 @@ color theme or a weather location saves it back (stage 3 is done). Home Care ite
 their history load from Supabase and all four history writes save (stage 4 is done).
 Calendar categories, people and events load from Supabase, and adding, editing and
 deleting events (with their people) save (stage 5 is done). Every widget now uses real
-data. Next: migrations (build order step 6), then the setup template, deploy and tablet.
+data. **Migrations** (build order step 6) are set up: the schema now lives in
+`supabase/migrations/`. Next: the new-household setup template, then deploy and tablet.
 
 **Built: Settings (color theme).** The header's gear opens a Settings modal with a 3×2
 grid of color swatches; tapping one recolors the dashboard's accent at once and the
@@ -1190,16 +1191,26 @@ and in what order — a settings change, not a code change or a per-household fo
    and color theme. Done (October 16–21, 2026); see "Supabase build stages" below.
 5. **Settings with the color theme** — done (built before Supabase; saved since
    Supabase stage 3.4).
-6. **Migrations** (after Calendar, decided October 20, 2026): switch from one hand-run
-   `schema.sql` to versioned migrations with the Supabase CLI, so each schema change is
-   its own file instead of hunting for the new parts to paste into the SQL Editor.
-   - One-time setup (about an hour, no app code changes): `npx supabase init`, `login`,
-     `link` to the existing project, then a **baseline** migration describing the
-     tables that already exist, either `supabase db pull` (needs Docker running) or
-     `schema.sql` copied into `supabase/migrations/<timestamp>_initial.sql` and marked
-     as run with `supabase migration repair --status applied <timestamp>`, so it's never
-     run again. Then retire `schema.sql` (delete it, or keep it read-only) so there's
-     one source of truth.
+6. **Migrations** — done (October 21, 2026; decided October 20). Switched from one
+   hand-run `schema.sql` to versioned migrations with the Supabase CLI, so each schema
+   change is its own file instead of hunting for the new parts to paste into the SQL
+   Editor.
+   - Setup, all through `npx supabase` (CLI 2.121.0, nothing installed):
+     `init` (adds `supabase/config.toml` and a `supabase/.gitignore` that keeps
+     `.temp/`, which holds the project link, out of git), `login` (browser), `link`
+     (picked the project from a list).
+   - **No database password was needed** for `link`, `migration repair` or
+     `migration list`: the CLI uses the login token to create a short-lived login role
+     for each command ("Initialising login role...").
+   - **Baseline**: Docker wasn't running, so not `db pull`. Instead
+     `supabase migration new initial` made `supabase/migrations/20261021141620_initial.sql`,
+     filled with an exact copy of `schema.sql` (checked with a diff), then
+     `supabase migration repair --status applied 20261021141620` recorded it as already
+     run (it doesn't run the SQL; the tables already existed). `migration list` shows
+     it under both Local and Remote.
+   - **`schema.sql` deleted**: the migration has the same SQL and git history keeps the
+     old file, so there's one source of truth. The stage notes below that mention
+     `schema.sql` describe how things were built at the time.
    - From then on: `supabase migration new <name>`, write the SQL, `supabase db push`.
      A pushed migration is never edited; fixes are new migrations (`alter table ...`).
      Unpushed ones are drafts and can be edited. Same idea as Django's
@@ -1208,16 +1219,21 @@ and in what order — a settings change, not a code change or a per-household fo
 7. **New-household setup template**: `supabase/new_household.sql`, a fill-in-the-blanks
    SQL file (placeholders for the email, household name, people, categories and Home
    Care items) run once in the SQL Editor to set up another household. Written after
-   stages 4 and 5, once all tables exist. It's data, not schema, so it's kept apart from
-   the schema and migrations and holds no real names.
+   stages 4 and 5, once all tables exist. It's data, not schema, so it's not a
+   migration (migrations run on every database; this runs once per household) and
+   holds no real names.
 8. **Deploy** (Vercel or similar).
 9. **Tablet**: kiosk browser on the Fire HD 10, signed in once, in daily use.
 
-Steps 1–5 are done. Anything else is under "Later features".
+Steps 1–6 are done. Anything else is under "Later features".
 
 ### Supabase build stages
 
 Built in small stages that each leave the app working, like Weather's stage 7.
+Stages 1–5 used a single `supabase/schema.sql`, pasted into the SQL Editor a part at
+a time; since build step 6 that SQL is the baseline migration
+`supabase/migrations/20261021141620_initial.sql`, and new schema changes are new
+migrations.
 
 1. **Setup** — done (October 16–17, 2026).
    - Reused an empty project created earlier ("parekhr's Project", East US / Ohio): no
@@ -1543,7 +1559,8 @@ family-dashboard/
 │   └── styles/
 │       └── tokens.css            # design tokens ported from the mockup
 └── supabase/
-    ├── schema.sql                 # tables + RLS policies
+    ├── config.toml                # Supabase CLI settings (supabase init)
+    ├── migrations/                # versioned schema changes; 20261021141620_initial.sql is the baseline
     └── functions/                 # e.g. setup-code exchange as a Postgres function
 ```
 
