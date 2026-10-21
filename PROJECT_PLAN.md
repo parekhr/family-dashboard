@@ -19,7 +19,8 @@ their history load from Supabase and all four history writes save (stage 4 is do
 Calendar categories, people and events load from Supabase, and adding, editing and
 deleting events (with their people) save (stage 5 is done). Every widget now uses real
 data. **Migrations** (build order step 6) are set up: the schema now lives in
-`supabase/migrations/`. Next: the new-household setup template, then deploy and tablet.
+`supabase/migrations/`, and the **new-household setup template** (build order step 7)
+is written. Next: deploy, then the tablet.
 
 **Built: Settings (color theme).** The header's gear opens a Settings modal with a 3×2
 grid of color swatches; tapping one recolors the dashboard's accent at once and the
@@ -1216,16 +1217,31 @@ and in what order — a settings change, not a code change or a per-household fo
      Unpushed ones are drafts and can be edited. Same idea as Django's
      `makemigrations` / `migrate` and `prisma migrate dev`, except the SQL is
      hand-written.
-7. **New-household setup template**: `supabase/new_household.sql`, a fill-in-the-blanks
-   SQL file (placeholders for the email, household name, people, categories and Home
-   Care items) run once in the SQL Editor to set up another household. Written after
-   stages 4 and 5, once all tables exist. It's data, not schema, so it's not a
-   migration (migrations run on every database; this runs once per household) and
-   holds no real names.
+7. **New-household setup template** — done (October 21, 2026).
+   `supabase/new_household.sql`, a fill-in-the-blanks SQL file run once in the SQL
+   Editor to set up another household. It's data, not schema, so it's not a migration
+   (migrations run on every database; this runs once per household) and it lives next
+   to `config.toml`, not in `migrations/`. It holds only placeholders, no real names.
+   - **Before running**: create the user in Authentication → Users (auto-confirm;
+     accounts aren't made in SQL), then replace every `<PLACEHOLDER>` (search for `<`):
+     `<HOUSEHOLD NAME>`, `<EMAIL>`, and the example category, person and item rows.
+   - **Wrapped in `begin;` … `commit;`** (a transaction), so a typo in a later part
+     doesn't leave a half-built household: everything saves or nothing does.
+   - Parts, each finding the household **by name** (household names are assumed
+     unique): (1) the household, only `name` (theme, layout and ids use defaults; the
+     location is picked in the app); (2) the membership, `auth.users` by email
+     `cross join` the household by name; (3) categories with `null` colors (or a dark,
+     text-safe hex); (4) people; (5) Home Care items with `sort_order`, `icon` (one of
+     the keys in `HomeCareWidget`'s `icons` map, listed in a comment), `model` and
+     `size`.
+   - **Check query after `commit`**: joins the membership to `auth.users` and
+     `households`; it should show one row. A mistyped email or a user that wasn't
+     created first doesn't error: the membership insert just adds zero rows and the
+     transaction still commits, leaving a household nobody can sign in to.
 8. **Deploy** (Vercel or similar).
 9. **Tablet**: kiosk browser on the Fire HD 10, signed in once, in daily use.
 
-Steps 1–6 are done. Anything else is under "Later features".
+Steps 1–7 are done. Anything else is under "Later features".
 
 ### Supabase build stages
 
@@ -1561,6 +1577,7 @@ family-dashboard/
 └── supabase/
     ├── config.toml                # Supabase CLI settings (supabase init)
     ├── migrations/                # versioned schema changes; 20261021141620_initial.sql is the baseline
+    ├── new_household.sql          # fill-in-the-blanks setup for another household (run by hand, not a migration)
     └── functions/                 # e.g. setup-code exchange as a Postgres function
 ```
 
