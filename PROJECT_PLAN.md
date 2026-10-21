@@ -20,7 +20,8 @@ Calendar categories, people and events load from Supabase, and adding, editing a
 deleting events (with their people) save (stage 5 is done). Every widget now uses real
 data. **Migrations** (build order step 6) are set up: the schema now lives in
 `supabase/migrations/`, and the **new-household setup template** (build order step 7)
-is written. Next: deploy, then the tablet.
+is written. **Deployed** (build order step 8) at
+https://family-dashboard-lemon-three.vercel.app. Next: the tablet.
 
 **Built: Settings (color theme).** The header's gear opens a Settings modal with a 3×2
 grid of color swatches; tapping one recolors the dashboard's accent at once and the
@@ -1238,10 +1239,54 @@ and in what order — a settings change, not a code change or a per-household fo
      `households`; it should show one row. A mistyped email or a user that wasn't
      created first doesn't error: the membership insert just adds zero rows and the
      transaction still commits, leaving a household nobody can sign in to.
-8. **Deploy** (Vercel or similar).
+8. **Deploy** — done (October 21, 2026) on Vercel (Hobby, free):
+   **https://family-dashboard-lemon-three.vercel.app**.
+   - **Before deploying**: `main` pushed to GitHub, and `npm run build` (`tsc -b` +
+     `vite build`) passes locally. The build warns that the one JS chunk is over
+     500 kB (548 kB, 150 kB gzipped); fine for a page loaded once a day, code
+     splitting is optional later. `.env.local` and `dist` are git-ignored.
+   - **Import**: Add New → Project → `parekhr/family-dashboard`, root `./`, Vite
+     preset, default build settings (`npm run build`, output `dist`). Skipped the
+     Supabase integration (it can create a new, empty project; the env vars are all
+     that's needed).
+   - **Environment variables** `VITE_SUPABASE_URL` and
+     `VITE_SUPABASE_PUBLISHABLE_KEY`, for Production and Preview. Vite bakes them in
+     **at build time**, so they must exist before the build. Pasted **without
+     quotes**: `.env.local` has the values in quotes, which Vite strips, but in
+     Vercel quotes would become part of the value. Never the secret key.
+   - **Sign-in on the live site** uses the app user from Authentication → Users (not
+     the supabase.com login or the database password). If it's forgotten: set a new
+     one in the SQL Editor with
+     `update auth.users set encrypted_password = extensions.crypt('<new>', extensions.gen_salt('bf')) where email = '<email>'`
+     (the "send recovery" email won't help: the app has no set-new-password screen).
+     Chrome saves passwords per site, so each new domain needs typing once.
+   - **Deploys**: pushes to `main` deploy automatically. **October 21 incident**:
+     pushes stopped deploying although every setting was right (repo connected,
+     app access, GitHub linked to the Vercel account, production tracking `main`). It
+     was a **GitHub outage** in webhook deliveries (from 14:52 UTC), shown on
+     githubstatus.com and as a "GitHub Outage" notice in the Vercel dashboard, but not
+     on vercel-status.com, which only covers Vercel's own systems. Along the way the
+     first project was deleted and re-imported (new domain `-lemon-three` instead of
+     `-tan`) and the Vercel GitHub App was uninstalled and reinstalled (four repos).
+     **Lesson**: when a push doesn't deploy, check **githubstatus.com (Webhooks)** and
+     vercel-status.com before changing settings.
+   - **Fallbacks that skip GitHub's events**: Deployments → … → **Create
+     Deployment** (`main`), or a **Deploy Hook** (Settings → Git → Deploy Hooks,
+     branch `main`) called with `curl.exe -X POST "<hook URL>"` (in PowerShell plain
+     `curl` is `Invoke-WebRequest`). The hook URL is kept private: anyone with it can
+     start a rebuild of `main`. In the deployments list, hook deploys show a hook icon
+     and the Vercel avatar; Git deploys show the commit icon and your avatar.
+   - **Found on the live site**: the first hourly card and the Now card showed the
+     hour that had just ended (10 AM at 11:08), because NWS updates and caches the
+     hourly forecast about once an hour. `buildWeatherData` now drops periods whose
+     `endTime` has passed (falling back to the full list if none are left).
+   - An open page keeps running the old code until it's reloaded; the weather data
+     refreshes every ten minutes, but a new deploy needs a reload on the tablet.
+   - The repo is **public** (fine: no secrets or personal data are committed), so the
+     resume and README can link to it.
 9. **Tablet**: kiosk browser on the Fire HD 10, signed in once, in daily use.
 
-Steps 1–7 are done. Anything else is under "Later features".
+Steps 1–8 are done. Anything else is under "Later features".
 
 ### Supabase build stages
 
