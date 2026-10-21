@@ -3,7 +3,7 @@
 <!-- TODO: screenshot or GIF of the dashboard on the tablet -->
 <!-- TODO: link to the demo video once it exists -->
 
-**Live site:** [family-dashboard-tan.vercel.app](https://family-dashboard-lemon-three.vercel.app/)
+**Live site:** [family-dashboard-lemon-three.vercel.app](https://family-dashboard-lemon-three.vercel.app/)
 (sign-in required; public sign-ups are off, and a shared demo account is planned)
 
 A wall-mounted dashboard for a family's kitchen tablet: a shared calendar, a home
