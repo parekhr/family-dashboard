@@ -95,7 +95,12 @@ async function fetchWeather(latitude: number, longitude: number) {
 
 function buildWeatherData(forecast: ForecastResponse, forecastHourly: HourlyResponse, alerts: AlertsResponse): WeatherData {
     const isToday = (time: string) => toISO(new Date(time)) === getTodayISO()
-    const now = forecastHourly.properties.periods[0]
+    // NWS updates the hourly forecast about once an hour and caches it, so the first
+    // periods can already be over (the 10 AM period at 11:08); skip those
+    const allHours = forecastHourly.properties.periods
+    const upcomingHours = allHours.filter(period => new Date(period.endTime) > new Date())
+    const hourly = upcomingHours.length > 0 ? upcomingHours : allHours
+    const now = hourly[0]
     const periods = forecast.properties.periods
 
     return {
@@ -118,7 +123,7 @@ function buildWeatherData(forecast: ForecastResponse, forecastHourly: HourlyResp
                 rainChance: period.probabilityOfPrecipitation.value ?? 0,
             }
         }),
-        hours: forecastHourly.properties.periods.slice(0, 24).map(period => {
+        hours: hourly.slice(0, 24).map(period => {
             const hour = Number(period.startTime.slice(11, 13))
             const hour12 = hour % 12 || 12
             const ampm = hour >= 12 ? 'PM' : 'AM'
