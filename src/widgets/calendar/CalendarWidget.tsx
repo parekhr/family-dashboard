@@ -19,7 +19,7 @@ const MAX_REMINDER_CHIPS = 2
 export function CalendarWidget() {
 
     const today = useNow()
-    const { events, people, categories, addEvent, deleteEvent, editEvent } = useCalendarData()
+    const { events, people, categories, addEvent, deleteEvent, editEvent, error} = useCalendarData()
     const [month, setMonth] = useState(today.getMonth() + 1)
     const [year, setYear] = useState(today.getFullYear())
     const [selectedDay, setSelectedDay] = useState<string | null>(null)
@@ -102,8 +102,9 @@ export function CalendarWidget() {
                     </button>
                 </div>
                 <button
-                    className="justify-self-end px-3 h-11 rounded-xl cursor-pointer bg-primary text-white active:bg-primary-hover hover:bg-primary-hover whitespace-nowrap"
+                    className="justify-self-end px-3 h-11 rounded-xl cursor-pointer bg-primary text-white enabled:active:bg-primary-hover enabled:hover:bg-primary-hover disabled:cursor-default disabled:opacity-40 whitespace-nowrap"
                     onClick={() => setShowEventModal(true)}
+                    disabled={error}
                 >+ Add Event
                 </button>
             </div>
@@ -115,7 +116,9 @@ export function CalendarWidget() {
                     )
                 })}
                 <div className="flex items-center gap-2 h-9 shrink-0 justify-center">
-                    {anyReminders ? (
+                    {error ? (
+                        <span className="text-sm text-muted">Couldn't load events.</span>
+                    ) : anyReminders ? (
                         <>
                             {visibleToday.map((event) => (
                                 <div key={event.id} className="h-8 px-3 rounded-full bg-primary text-white text-sm font-semibold flex items-center gap-2 whitespace-nowrap">

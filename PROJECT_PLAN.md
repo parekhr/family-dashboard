@@ -16,19 +16,21 @@ exist with RLS and grants, and the dashboard loads the household (name, location
 widget layout, color theme) from Supabase, shared through React context. Choosing a
 color theme or a weather location saves it back (stage 3 is done). Home Care items and
 their history load from Supabase and all four history writes save (stage 4 is done).
-Next: Calendar data (stage 5).
+Calendar categories, people and events load from Supabase, and adding, editing and
+deleting events (with their people) save (stage 5 is done). Every widget now uses real
+data. Next: migrations (build order step 6), then the setup template, deploy and tablet.
 
 **Built: Settings (color theme).** The header's gear opens a Settings modal with a 3×2
 grid of color swatches; tapping one recolors the dashboard's accent at once and the
 modal stays open. The choice is saved to the household's `color_theme` in Supabase and
 loads back on reload.
 
-The Calendar widget is built on mock data: month grid (chips, bands, badge, today
+The Calendar widget is built and loads and saves through Supabase: month grid (chips, bands, badge, today
 markers), monthly themes, holiday rings (fixed, floating, Easter, Chinese New Year), the
 day modal, add/edit/delete events through `EventForm`, and the today/tomorrow reminder
-strip. Nothing is left to build for the widget itself; what remains for calendar data
-lives elsewhere (real persistence with Supabase; managing categories and people and
-picking category colors in Settings, now a later feature).
+strip. Nothing is left to build for the widget itself; managing categories and people
+and picking category colors in Settings is a later feature (they're admin-managed in
+Supabase until then).
 
 The header is built except for the parts that depend on other work: date and time,
 household name, and a settings button that opens Settings (see "Header and household
@@ -576,9 +578,10 @@ weather API. This plan describes turning that design into an actual running app.
   - **Category color is optional; picking one is deferred to Settings.** A category will
     start with **no color**, and a household can pick one later from a color picker in
     Settings.
-    - **For now the day modal shows the mock data's colors.** The three mock categories
-      have hardcoded colors in `useCalendarData.ts` (Meeting `#378ADD`, Appointment
-      `#FF5733`, Vacation `#335F57`), standing in for what Settings will provide.
+    - **Real categories start with no color** (`color` is nullable since Supabase
+      stage 5); until Settings has a picker, a color can be set by hand in the SQL
+      Editor. The mock data's colors (Meeting `#378ADD`, Appointment `#FF5733`,
+      Vacation `#335F57`) are gone with the mock data.
     - **Day modal (built)**: an event card's second row shows the **category name in its
       category's color**, then a `·`, then the people: e.g. `Meeting · 👤 Alice, Bob`.
       The name is looked up with `getCategoryText` and the color with
@@ -595,8 +598,8 @@ weather API. This plan describes turning that design into an actual running app.
     - **Pick text-safe colors**: the color is used as small text on the cream card, so
       it has to be dark enough to read (the mock Vacation green was darkened from
       `#33FF57` for this). Something for the Settings picker to enforce.
-    - The `Category` type's `color` field becomes optional (`color?`) when Settings
-      arrives.
+    - The `Category` type's `color` field is optional (`color?`) since Supabase
+      stage 5, ahead of the Settings picker.
   - **Month grid** (replaces the mockup's split-color chips, which were hard to read
     from a distance and broke down at 3+ events). The grid is a calm summary of the
     month's shape; details live in the Today chips and the day modal.
@@ -1184,7 +1187,7 @@ and in what order — a settings change, not a code change or a per-household fo
 3. Widgets one at a time: Home Care, Calendar, Weather.
 4. **Supabase**: schema with `household_id` + RLS, one household and one account, and
    the hooks swapped from mock to real. This also saves the chosen weather location
-   and color theme (done). In progress; see "Supabase build stages" below.
+   and color theme. Done (October 16–21, 2026); see "Supabase build stages" below.
 5. **Settings with the color theme** — done (built before Supabase; saved since
    Supabase stage 3.4).
 6. **Migrations** (after Calendar, decided October 20, 2026): switch from one hand-run
@@ -1210,7 +1213,7 @@ and in what order — a settings change, not a code change or a per-household fo
 8. **Deploy** (Vercel or similar).
 9. **Tablet**: kiosk browser on the Fire HD 10, signed in once, in daily use.
 
-Steps 1–3 and 5 are done. Anything else is under "Later features".
+Steps 1–5 are done. Anything else is under "Later features".
 
 ### Supabase build stages
 
@@ -1386,11 +1389,76 @@ Built in small stages that each leave the app working, like Weather's stage 7.
       `HistoryModal` also blocks duplicates, but the hook doesn't rely on it.
    7. Tested: log today, add, edit (same row id, so a real update) and delete all
       show up in Table Editor and survive a reload.
-5. **Calendar** — to do. `categories`, `people`, `events` (`category_id`, `title` with a
-   60-character check, `start_date`, `end_date` with `end_date >= start_date`,
-   `all_day`, `time` required unless all-day) and the **`event_people`** join table
-   (primary key `(event_id, person_id)`, links deleted with either side). Then
-   `useCalendarData`.
+5. **Calendar** — done (October 20–21, 2026).
+   1. **Tables** in `supabase/schema.sql`, run in this order since each points at the
+      ones before it:
+      - `categories`: `id`, `household_id`, `name`, **`color` nullable** (no color until
+        the Settings picker; text-safe dark colors only, since it's small text on the
+        cream card), `created_at`, `unique (id, household_id)`.
+      - `people`: `id`, `household_id`, `name`, `created_at`, `unique (id, household_id)`.
+        No `sort_order` for either: both are shown **alphabetically** (`.order('name')`).
+      - `events`: `id`, `household_id` `default my_household_id()`, `category_id`,
+        `title` with `check (char_length(title) <= 60)` (a null title passes: a check
+        that comes out null counts as passing), `start_date`, `end_date`, `all_day
+        boolean`, `time time` (Postgres returns `'14:30:00'`), `created_at`; table
+        rules `check (end_date >= start_date)`, a **strict time check**
+        `check ((all_day and time is null) or (not all_day and time is not null))`
+        (all-day events have no time, timed events must have one; `EventForm` already
+        saves `time: undefined` for all-day events), a composite foreign key
+        `(category_id, household_id)` → `categories` **`on delete restrict`**, and
+        `unique (id, household_id)` as the target for `event_people`.
+      - `event_people`: `household_id` `default my_household_id()`, `event_id`,
+        `person_id`, `created_at`, **`primary key (event_id, person_id)`** (no `id`
+        column: nothing ever points at a single link, and the pair also blocks adding
+        someone to the same event twice; a primary key is needed anyway, since Table
+        Editor can't edit or delete rows without one), and composite foreign keys to
+        `events` and `people`, both **`on delete cascade`**.
+      - **Deleting a category** that events use is **refused** (`restrict`): `cascade`
+        would silently wipe its events, and `set null` would break the required
+        `categoryId`. To delete one, move its events first. **Deleting a person or an
+        event** removes only the links (`cascade`): the event stays, minus that person,
+        since zero people is allowed.
+      - Check constraints: a rule on one column goes on that column's line; a rule
+        comparing columns goes at the bottom with the other table rules.
+   2. **Policies and grants**: `categories` and `people` read-only (admin-managed, like
+      Home Care items); `events` gets all four policies and grants; `event_people` gets
+      select, insert and delete only, since links are never updated (a changed link is
+      a different link).
+   3. **Data**: categories Appointment and Vacation (no colors; Meeting dropped) and four
+      people, inserted with the `cross join (values ...)` pattern, `household_id` from
+      `h.id` looked up by household name. Events start empty.
+   4. **Loading** (`useCalendarData`): one effect with **`Promise.all`** running the
+      three queries at once, since the widget needs all three before it can draw; one
+      `ignore` guard and one error check (any of the three failing counts as a failed
+      load, so nothing loads half-way). Events use embedding:
+      `.select('id, category_id, title, start_date, end_date, all_day, time, event_people(person_id)')`.
+      Row types `CategoryRow`, `PersonRow`, `CalendarEventRow` (app type name + `Row`)
+      and converters `toCategory`, `toPerson`, `toCalendarEvent`: `null` → `undefined`,
+      `snake_case` → camelCase, `time?.slice(0, 5)` (trims the seconds and passes null
+      through as undefined), and `event_people` → `personIds`. The hook no longer
+      returns `setCategories`. `CalendarWidget` shows **"Couldn't load events."** in
+      place of the reminder strip's text (fixed-height row, so the grid doesn't move)
+      and disables "+ Add Event" (no categories to pick from). The grid itself still
+      shows, since dates, holidays and themes come from code, not the database.
+   5. **Writes**:
+      - `addEvent` makes the id in the app with `crypto.randomUUID()` (Postgres only
+        uses its default when no id is sent), so the optimistic event already has its
+        real id and the links can use it right away. Insert the event, then, only if
+        that succeeded and there are people, insert one `event_people` row per person.
+        Inserts don't nest the way embedded selects do.
+      - `editEvent` updates the event row, then deletes all its links, then inserts the
+        new ones, each step inside the previous step's `.then` (so the old links are
+        gone before the new ones arrive).
+      - `deleteEvent` deletes only the event; the cascade removes its links.
+      - Writes use **`?? null`**, the reverse of loading: `undefined` fields are dropped
+        from the request, which in an update means "don't change", so clearing a title
+        would otherwise keep the old one.
+      - A Supabase query only sends when it's `.then`ed or awaited.
+      - **Known gap**: `editEvent` is three requests, so if the link insert fails after
+        the delete, the event loses its people in the database. Rare; the fix is a
+        transaction (see "Later features").
+   6. Tested: add with and without people, edit fields and people, delete (links
+      cascade), all surviving a reload, plus the load-error state.
 
 **Schema conventions (decided October 17, 2026)**: every table has a uuid `id` from
 `gen_random_uuid()` and a `household_id`, including the join tables, so one rule fits
@@ -1400,7 +1468,12 @@ tables** were chosen over arrays for Home Care history and event people: the dat
 then rejects duplicate dates and links to people who don't exist, and it's standard
 relational design. (Arrays would have matched the current hook types more closely and
 been a little quicker.) `widget_layout` stays an array: it's one ordered list, not
-related records. Realtime waits until there's a second device.
+related records. Realtime waits until there's a second device. **Exception (October 20,
+2026)**: the join table `event_people` has no `id`; its pair `(event_id, person_id)` is
+the primary key, since nothing points at a single link. Tables that others point at
+with a composite foreign key have `unique (id, household_id)`; a table the app inserts
+into has `household_id default my_household_id()`, one filled in the SQL Editor doesn't
+(the function returns null there).
 
 ## Proposed folder structure
 
@@ -1447,7 +1520,7 @@ family-dashboard/
 │   │   │   ├── dayEvents.ts          # events covering a given day
 │   │   │   ├── reminderEvents.ts     # events starting today / tomorrow, sorted for the strip
 │   │   │   ├── categories.ts         # getCategoryText(), getCategoryColor()
-│   │   │   ├── useCalendarData.ts    # mock categories, people, events + add/edit/delete event
+│   │   │   ├── useCalendarData.ts    # categories, people, events from Supabase + add/edit/delete event
 │   │   │   ├── DayModal.tsx          # a day's holiday + events; edit/delete per event
 │   │   │   ├── EventForm.tsx         # add + edit event form
 │   │   │   ├── holidays.ts           # holiday lists, Easter, Chinese New Year, checkHoliday()
@@ -1517,6 +1590,12 @@ Home Care history, the color theme and the location are edited in the app.
   - managing Home Care items (add / rename / delete / reorder);
   - managing calendar categories and people, and the category color picker.
 - **Paged screens** for households that outgrow one screen.
+- **Atomic event edits**: move `editEvent`'s update, link delete and link insert into
+  one Postgres function called with `supabase.rpc(...)`, so they save together or not
+  at all (see Supabase stage 5's known gap). Saving an event with its people in
+  `addEvent` could use the same function.
+- **Tell the user when a save fails**: today failed writes are only logged; a small
+  "Couldn't save" message (or undoing the optimistic change) could come later.
 - **Weather**: tap a day card for NWS's `detailedForecast`; the "use my location"
   button; "Updated N minutes ago" under the place name.
 - **Portfolio presentation** (after the MVP, so interviewers can see and use it):
