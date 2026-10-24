@@ -12,7 +12,7 @@ export function SignIn() {
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
         if (signInError) setError('Wrong email or password.')
     }
-
+    // Only users who have an account created on Supabase can sign in
     return (
         <div className="flex h-[800px] w-[1280px] items-center justify-center bg-page text-ink">
             <form onSubmit={handleSubmit} className="flex w-[360px] flex-col gap-3 rounded-3xl bg-card p-6">
