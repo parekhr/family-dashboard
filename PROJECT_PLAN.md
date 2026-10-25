@@ -267,7 +267,8 @@ weather API. This plan describes turning that design into an actual running app.
   - **Rain chance** (both views) is its own line, in blue, with a droplet icon. The
     value is NWS's `probabilityOfPrecipitation`, the chance of any precipitation, so
     the droplet becomes a snowflake when the condition mentions snow. The field is
-    still named `rainChance`.
+    still named `rainChance`. Below 10% the line is hidden with `invisible`, so it
+    keeps its space and the cards stay lined up.
   - **Icons are chosen from the condition text** at draw time; they are not stored in
     the data. `getWeatherIcon(condition, isDaytime)` in `weatherIcons.ts` matches
     keywords (thunder, snow, rain or shower, fog, partly / mostly sunny / mostly clear,

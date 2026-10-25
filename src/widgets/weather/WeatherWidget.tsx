@@ -197,7 +197,8 @@ export function WeatherWidget() {
                             <span className="text-lg font-bold leading-none tabular-nums">
                                 {day.high}°{day.low !== undefined && <span className="text-sm font-semibold text-muted"> / {day.low}°</span>}
                             </span>
-                            <span className="flex items-center gap-0.5 text-xs font-semibold leading-none text-sky-600 tabular-nums">
+                            {/* hidden (but still taking up space) below 10% so the cards stay lined up */}
+                            <span className={`flex items-center gap-0.5 text-xs font-semibold leading-none text-sky-600 tabular-nums ${day.rainChance < 10 ? 'invisible' : ''}`}>
                                 {isSnow ? <Snowflake className="h-3 w-3" /> : <Droplet className="h-3 w-3" fill="currentColor" />}
                                 {day.rainChance}%
                             </span>
@@ -231,7 +232,7 @@ export function WeatherWidget() {
                                     <span className="text-lg font-bold leading-none tabular-nums">
                                         {hour.temperature}°
                                     </span>
-                                    <span className="flex items-center gap-0.5 text-xs font-semibold leading-none text-sky-600 tabular-nums">
+                                    <span className={`flex items-center gap-0.5 text-xs font-semibold leading-none text-sky-600 tabular-nums ${hour.rainChance < 10 ? 'invisible' : ''}`}>
                                         {isSnow ? <Snowflake className="h-3 w-3" /> : <Droplet className="h-3 w-3" fill="currentColor" />}
                                         {hour.rainChance}%
                                     </span>
