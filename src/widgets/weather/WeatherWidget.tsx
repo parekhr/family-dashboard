@@ -35,6 +35,11 @@ function shortCondition(condition: string) {
     return condition.split(' then ')[0].replace('Slight Chance ', '').replace('Chance ', '').replace(' Likely', '')
 }
 
+// display only: the 30% / 50% checks still use the exact value
+function roundChance(chance: number) {
+    return Math.round(chance / 10) * 10
+}
+
 export function WeatherWidget() {
     const [view, setView] = useState<'hourly' | 'weekly'>('hourly')
     const [pageNumber, setPageNumber] = useState(0)
@@ -198,9 +203,9 @@ export function WeatherWidget() {
                                 {day.high}°{day.low !== undefined && <span className="text-sm font-semibold text-muted"> / {day.low}°</span>}
                             </span>
                             {/* hidden (but still taking up space) below 10% so the cards stay lined up */}
-                            <span className={`flex items-center gap-0.5 text-xs font-semibold leading-none text-sky-600 tabular-nums ${day.rainChance < 10 ? 'invisible' : ''}`}>
+                            <span className={`flex items-center gap-0.5 text-xs font-semibold leading-none text-sky-600 tabular-nums ${roundChance(day.rainChance) < 10 ? 'invisible' : ''}`}>
                                 {isSnow ? <Snowflake className="h-3 w-3" /> : <Droplet className="h-3 w-3" fill="currentColor" />}
-                                {day.rainChance}%
+                                {roundChance(day.rainChance)}%
                             </span>
                         </div>
                     )
@@ -232,9 +237,9 @@ export function WeatherWidget() {
                                     <span className="text-lg font-bold leading-none tabular-nums">
                                         {hour.temperature}°
                                     </span>
-                                    <span className={`flex items-center gap-0.5 text-xs font-semibold leading-none text-sky-600 tabular-nums ${hour.rainChance < 10 ? 'invisible' : ''}`}>
+                                    <span className={`flex items-center gap-0.5 text-xs font-semibold leading-none text-sky-600 tabular-nums ${roundChance(hour.rainChance) < 10 ? 'invisible' : ''}`}>
                                         {isSnow ? <Snowflake className="h-3 w-3" /> : <Droplet className="h-3 w-3" fill="currentColor" />}
-                                        {hour.rainChance}%
+                                        {roundChance(hour.rainChance)}%
                                     </span>
                                 </div>
                             )
