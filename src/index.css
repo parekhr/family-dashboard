@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Bebas Neue for the Sports widget's title, tabs and scores (bundled, not loaded from
+   Google, so it works on flaky wifi). Latin only, the one weight it comes in. */
+@import "@fontsource/bebas-neue/latin-400.css";
 
 html,
 body,
@@ -12,6 +15,7 @@ body {
 }
 
 @theme {
+  --font-sports: 'Bebas Neue', 'Arial Narrow', sans-serif;   /* class: font-sports */
   --color-page: #edf3f0;
   --color-card: #fffdf8;
   --color-ink: #2b241d;

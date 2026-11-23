@@ -22,7 +22,8 @@ export function ItemDetailsForm({ initial, otherNames, showReminder, onSave, onC
     const [icon, setIcon] = useState(initial?.icon ?? homeCareIcons[0].key)
     const [model, setModel] = useState(initial?.model ?? '')
     const [size, setSize] = useState(initial?.size ?? '')
-    const [intervalMonths, setIntervalMonths] = useState<number | undefined>(initial?.intervalMonths ?? 6)
+    // a new item starts at every 6 months; an existing one keeps what it has (including "Off")
+    const [intervalMonths, setIntervalMonths] = useState<number | undefined>(initial ? initial.intervalMonths : 6)
     const [error, setError] = useState('')
 
     function handleSave() {

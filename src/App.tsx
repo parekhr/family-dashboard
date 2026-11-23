@@ -10,11 +10,13 @@ import { useHomeCareData } from './widgets/homeCare/useHomeCareData'
 import { HomeCareContext } from './widgets/homeCare/HomeCareContext'
 import { useCalendarData } from './widgets/calendar/useCalendarData'
 import { CalendarContext } from './widgets/calendar/CalendarContext'
+import { SportsContext } from './widgets/sports/SportsContext'
 
 function App() {
 
   const [pickedTheme, setPickedTheme] = useState<string | null>(null)
   const [pickedWidgets, setPickedWidgets] = useState<WidgetChoices | null>(null)   // set from Settings' Widgets tab, like pickedTheme
+  const [pickedFavorites, setPickedFavorites] = useState<string[] | null>(null)    // set from Settings' Favorite teams page
   const [session, setSession] = useState<Session | null | undefined>(undefined)
   const { household, error } = useFetchHousehold(session?.user.id)
   const homeCare = useHomeCareData(session?.user.id)   // loaded here so the header's reminders work without the widget
@@ -57,6 +59,18 @@ function App() {
       .then(({ error }) => { if (error) console.error(error) })
   }
 
+  const sports = {
+    favorites: pickedFavorites ?? household.favoriteTeams,
+    setFavorites(next: string[]) {
+      setPickedFavorites(next)
+      if (!household) return
+      supabase.from('households')
+        .update({ favorite_teams: next })
+        .eq('id', household.id)
+        .then(({ error }) => { if (error) console.error(error) })
+    },
+  }
+
   function handleThemeChange(key: string) {
     setPickedTheme(key)
     if (!household) return   // can't happen in practice: the swatches only show once it's loaded
@@ -75,6 +89,7 @@ function App() {
       <HouseholdContext.Provider value={household}>
       <HomeCareContext.Provider value={homeCare}>
       <CalendarContext.Provider value={calendar}>
+      <SportsContext.Provider value={sports}>
         <Header
           name={household.name}
           themeKey={themeKey}
@@ -97,6 +112,7 @@ function App() {
             </div>
           ))}
         </div>
+      </SportsContext.Provider>
       </CalendarContext.Provider>
       </HomeCareContext.Provider>
       </HouseholdContext.Provider>

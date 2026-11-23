@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Bell, Check, Clock, X } from 'lucide-react'
 import { addDaysISO, formatShortDate, getTodayISO } from '../../lib/dates'
 import { useHomeCare } from './HomeCareContext'
-import { HomeCareModal } from './HomeCareModal'
 import { HomeCareIcon } from './HomeCareIcon'
 import { SNOOZE_DAYS, getDueDate, getIntervalText, getLastChanged, getReminder, getReminderText, isSnoozed } from './reminders'
 import type { Reminder } from './reminders'
@@ -16,12 +15,12 @@ function getQuietText(item: HomeCareItem, todayISO: string): string {
     return dueDate ? `Due ${formatShortDate(dueDate)}` : 'Never logged'
 }
 
-// Header bell: always there (it's also the way into Home Care when the widget isn't
-// on screen), with a red count when something is due. Tapping it opens the reminders panel.
+// Header bell: Home Care's reminders, whether or not the widget is on. A red count when
+// something is due; tapping opens the panel, where a due item can be marked Done or snoozed.
+// It only does reminders: items are set up (and their history fixed) in Settings → Widgets.
 export function RemindersBell() {
     const { items, error, logToday, snooze } = useHomeCare()
     const [panelOpen, setPanelOpen] = useState(false)
-    const [homeCareOpen, setHomeCareOpen] = useState<{ historyItemId: string | null } | null>(null)
 
     // worked out on every draw; the header redraws each minute (useNow), so reminders roll over at midnight
     const todayISO = getTodayISO()
@@ -30,11 +29,6 @@ export function RemindersBell() {
         .filter((reminder): reminder is Reminder => reminder !== null)
         .sort((a, b) => a.daysLeft - b.daysLeft)   // most overdue first
     const quietItems = items.filter(item => !reminders.some(reminder => reminder.item.id === item.id))
-
-    function openHomeCare(historyItemId: string | null) {
-        setPanelOpen(false)
-        setHomeCareOpen({ historyItemId })
-    }
 
     return (
         <div className="relative">
@@ -77,17 +71,13 @@ export function RemindersBell() {
 
                             return (
                                 <div key={item.id} className="mt-3 rounded-2xl bg-muted/10 p-3">
-                                    {/* tapping the name goes straight to this item's History */}
-                                    <button
-                                        className="flex w-full cursor-pointer items-center gap-2 text-left"
-                                        onClick={() => openHomeCare(item.id)}
-                                    >
+                                    <div className="flex w-full items-center gap-2">
                                         <HomeCareIcon icon={item.icon} size={20} className="shrink-0" />
                                         <span className="flex-1 font-bold">{item.name}</span>
                                         <span className={`text-sm font-semibold ${reminder.daysLeft < 0 ? 'text-red-600' : 'text-primary'}`}>
                                             {getReminderText(reminder)}
                                         </span>
-                                    </button>
+                                    </div>
                                     <div className="ml-7 flex flex-col text-xs text-muted">
                                         {lastChanged && <span>Last changed {formatShortDate(lastChanged)}</span>}
                                         {item.intervalMonths && <span>{getIntervalText(item.intervalMonths)}</span>}
@@ -132,22 +122,11 @@ export function RemindersBell() {
                             </div>
                         )}
 
-                        <button
-                            className="mt-3 w-full cursor-pointer border-t border-muted/20 pt-3 text-left text-sm font-bold text-primary"
-                            onClick={() => openHomeCare(null)}
-                        >
-                            Open Home Care ›
-                        </button>
+                        {!error && items.length === 0 && <p className="py-2 text-sm text-muted">No reminders</p>}
                     </div>
                 </>
             )}
 
-            {homeCareOpen && (
-                <HomeCareModal
-                    initialHistoryItemId={homeCareOpen.historyItemId}
-                    onClose={() => setHomeCareOpen(null)}
-                />
-            )}
         </div>
     )
 }

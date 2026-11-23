@@ -93,7 +93,27 @@ async function fetchWeather(latitude: number, longitude: number) {
     return { forecast, forecastHourly, alerts }
 }
 
-function buildWeatherData(forecast: ForecastResponse, forecastHourly: HourlyResponse, alerts: AlertsResponse): WeatherData {
+// Around 6 PM NWS drops today's daytime period ("This Afternoon") from its forecast, so
+// today's high disappears for the evening. Whenever the forecast does include it, it's saved
+// on this tablet with the date and place; later the same day it's read back from here.
+// Browser storage can be unavailable (private mode), so failures just mean no high.
+const HIGH_KEY = 'familyDashboard.todaysHigh'
+
+function rememberTodaysHigh(place: string, high: number | undefined): number | undefined {
+    const today = getTodayISO()
+    try {
+        if (high !== undefined) {
+            localStorage.setItem(HIGH_KEY, JSON.stringify({ date: today, place, high }))
+            return high
+        }
+        const saved = JSON.parse(localStorage.getItem(HIGH_KEY) ?? 'null')
+        return saved?.date === today && saved.place === place && typeof saved.high === 'number' ? saved.high : undefined
+    } catch {
+        return high
+    }
+}
+
+function buildWeatherData(forecast: ForecastResponse, forecastHourly: HourlyResponse, alerts: AlertsResponse, place: string): WeatherData {
     const isToday = (time: string) => toISO(new Date(time)) === getTodayISO()
     // NWS updates the hourly forecast about once an hour and caches it, so the first
     // periods can already be over (the 10 AM period at 11:08); skip those
@@ -107,7 +127,7 @@ function buildWeatherData(forecast: ForecastResponse, forecastHourly: HourlyResp
         current: {
             temperature: now.temperature,
             condition: now.shortForecast,
-            high: periods.find(period => period.isDaytime && isToday(period.startTime))?.temperature,
+            high: rememberTodaysHigh(place, periods.find(period => period.isDaytime && isToday(period.startTime))?.temperature),
             low: periods.find(period => !period.isDaytime)?.temperature ?? now.temperature,
             isDaytime: now.isDaytime,
         },
@@ -159,7 +179,7 @@ export function useWeatherData(location: Location | undefined): WeatherState {
 
         function load() {
             fetchWeather(latitude, longitude)
-                .then(raw => setState({ status: 'ready', data: buildWeatherData(raw.forecast, raw.forecastHourly, raw.alerts) }))
+                .then(raw => setState({ status: 'ready', data: buildWeatherData(raw.forecast, raw.forecastHourly, raw.alerts, `${latitude},${longitude}`) }))
                 .catch(() => setState(previous => previous.status === 'ready' ? previous : { status: 'error' }))
         }
 

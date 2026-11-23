@@ -1,30 +1,18 @@
-import type { HomeCareItem, HomeCareItemDetails } from "./useHomeCareData"
-import { Trash2, Pencil, ChevronDown } from "lucide-react"
-import { getIntervalText, intervalChoices } from "./reminders"
+import type { HomeCareItem } from "./useHomeCareData"
+import { Trash2, Pencil } from "lucide-react"
 import { formatDate, getTodayISO } from "../../lib/dates"
 import { useState } from "react"
-import { Modal } from "../../components/Modal"
-import { HomeCareIcon } from "./HomeCareIcon"
-import { ItemDetailsForm } from "./ItemDetailsForm"
 
-type HistoryModalProps = {
+type ItemHistoryProps = {
     item: HomeCareItem
-    otherNames: string[]                // the other items' names, for the rename check
-    onClose: () => void
     onDelete: (date: string) => void
     onAdd: (date: string) => void
     onEdit: (oldDate: string, newDate: string) => void
-    onIntervalChange: (months: number | null) => void   // null = no reminder
-    onUpdateDetails: (details: Omit<HomeCareItemDetails, 'intervalMonths'>) => void
-    onDeleteItem: () => void
 }
 
-// An item's page: its details (name, icon, model, size: the pencil edits them),
-// its reminder, its history, and deleting the item.
-export function HistoryModal({ item, otherNames, onClose, onDelete, onAdd, onEdit, onIntervalChange, onUpdateDetails, onDeleteItem }: HistoryModalProps) {
-
-    const [editingDetails, setEditingDetails] = useState(false)
-    const [confirmingDelete, setConfirmingDelete] = useState(false)
+// One item's details and history (see, add, fix or delete the dates it was done), shown
+// inside Settings → Widgets → Home Care → Home Care items when an item is tapped.
+export function ItemHistory({ item, onDelete, onAdd, onEdit }: ItemHistoryProps) {
 
     const [editingDate, setEditingDate] = useState<string | null>(null)   // which row is being edited (null = none)
     const [editValue, setEditValue] = useState('')                       // the date typed in the edit field
@@ -89,72 +77,15 @@ export function HistoryModal({ item, otherNames, onClose, onDelete, onAdd, onEdi
         cancelEditing()
     }
 
-    const closeButton = (
-        <button
-            className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors"
-            onClick={onClose}
-        >
-            ✕
-        </button>
-    )
-
-    // Editing the details takes over the page, so the form has room and nothing else competes
-    if (editingDetails) {
-        return (
-            <Modal onClose={onClose} className="w-[480px]">
-                <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-xl font-extrabold">Edit {item.name}</h3>
-                    {closeButton}
-                </div>
-                <ItemDetailsForm
-                    initial={item}
-                    otherNames={otherNames}
-                    showReminder={false}
-                    onSave={(details) => { onUpdateDetails(details); setEditingDetails(false) }}
-                    onCancel={() => setEditingDetails(false)}
-                />
-            </Modal>
-        )
-    }
-
     return (
-        <Modal onClose={onClose} className="w-[480px]">
-            <div className="flex items-center gap-2">
-                <HomeCareIcon icon={item.icon} size={22} className="shrink-0" />
-                <h3 className="min-w-0 flex-1 truncate text-xl font-extrabold">{item.name}</h3>
-                <button
-                    className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-muted hover:bg-muted/10"
-                    aria-label={`Edit ${item.name}`}
-                    onClick={() => { setConfirmingDelete(false); setEditingDetails(true) }}
-                >
-                    <Pencil size={18} />
-                </button>
-                {closeButton}
-            </div>
+        <>
+            {/* what it is, for reference (the pencil on the list changes these) */}
             {(item.model || item.size) && (
-                <div className="mt-1 flex flex-col text-sm text-muted">
+                <div className="flex flex-col text-sm text-muted">
                     {item.model && <span>Model: {item.model}</span>}
                     {item.size && <span>Size: {item.size}</span>}
                 </div>
             )}
-
-            {/* How often this item needs changing; the reminder date is worked out from it */}
-            <label className="mt-4 flex items-center justify-between gap-3 text-sm font-semibold text-muted">
-                Reminder
-                <div className="relative">
-                    <select
-                        className="h-11 cursor-pointer appearance-none rounded-xl border border-muted/30 bg-white pl-3 pr-10 text-base font-normal text-ink"
-                        value={item.intervalMonths ?? ''}
-                        onChange={(e) => onIntervalChange(e.target.value ? Number(e.target.value) : null)}
-                    >
-                        <option value="">Off</option>
-                        {intervalChoices.map(months => (
-                            <option key={months} value={months}>{getIntervalText(months)}</option>
-                        ))}
-                    </select>
-                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink" />
-                </div>
-            </label>
 
             <div className="mt-4 text-sm font-semibold text-muted">History</div>
             <div className="max-h-[260px] overflow-y-auto">
@@ -241,32 +172,6 @@ export function HistoryModal({ item, otherNames, onClose, onDelete, onAdd, onEdi
                     + Add Entry
                 </button>
             )}
-
-            {/* Deleting the item: asks first, same swap as the other deletes (cancel sits
-                where "Delete item" was, so a double tap can't delete) */}
-            <div className="mt-4 flex min-h-11 items-center justify-end gap-2 border-t border-muted/20 pt-3">
-                {confirmingDelete ? (
-                    <>
-                        <span className="flex-1 text-sm font-semibold text-red-600">
-                            Delete {item.name} and its history?
-                        </span>
-                        <button className="h-11 shrink-0 cursor-pointer rounded-xl bg-red-600 px-4 font-bold text-white" onClick={onDeleteItem}>
-                            Delete
-                        </button>
-                        <button className="h-11 shrink-0 cursor-pointer px-3 text-muted" onClick={() => setConfirmingDelete(false)}>
-                            Cancel
-                        </button>
-                    </>
-                ) : (
-                    <button
-                        className="flex h-11 cursor-pointer items-center gap-1.5 rounded-xl px-3 text-sm font-semibold text-red-600 hover:bg-red-100"
-                        onClick={() => setConfirmingDelete(true)}
-                    >
-                        <Trash2 size={16} />
-                        Delete item
-                    </button>
-                )}
-            </div>
-        </Modal>
+        </>
     )
 }

@@ -5,6 +5,7 @@ import { colorThemes } from '../lib/colorThemes'
 import { PeopleSettings } from './settings/PeopleSettings'
 import { CategorySettings } from './settings/CategorySettings'
 import { WidgetSettings } from './settings/WidgetSettings'
+import { HomeCareItemsPage } from './settings/HomeCareItemsPage'
 import type { WidgetChoices } from '../widgets/registry'
 
 type SettingsModalProps = {
@@ -17,6 +18,9 @@ type SettingsModalProps = {
 
 type Tab = 'theme' | 'widgets' | 'people' | 'categories'
 
+// A widget's own settings page, opened from its row in the Widgets tab
+export type SettingsPage = 'homeCareItems'
+
 const tabs: { key: Tab; label: string }[] = [
     { key: 'theme', label: 'Theme' },
     { key: 'widgets', label: 'Widgets' },
@@ -26,6 +30,17 @@ const tabs: { key: Tab; label: string }[] = [
 
 export function SettingsModal({ themeKey, onThemeChange, widgets, onWidgetsChange, onClose }: SettingsModalProps) {
     const [tab, setTab] = useState<Tab>('theme')
+    const [page, setPage] = useState<SettingsPage | null>(null)
+
+    // A widget's settings page replaces the tabs; its back arrow returns to the Widgets tab.
+    // Every widget's own settings are reached from its row there, so they're all in one place.
+    if (page) {
+        return (
+            <Modal onClose={onClose} className="flex w-[480px] flex-col">
+                {page === 'homeCareItems' && <HomeCareItemsPage onBack={() => setPage(null)} onClose={onClose} />}
+            </Modal>
+        )
+    }
 
     return (
         <Modal onClose={onClose} className="flex w-[480px] flex-col">
@@ -85,7 +100,7 @@ export function SettingsModal({ themeKey, onThemeChange, widgets, onWidgetsChang
                         </div>
                     </>
                 )}
-                {tab === 'widgets' && <WidgetSettings widgets={widgets} onChange={onWidgetsChange} />}
+                {tab === 'widgets' && <WidgetSettings widgets={widgets} onChange={onWidgetsChange} onOpenPage={setPage} />}
                 {tab === 'people' && <PeopleSettings />}
                 {tab === 'categories' && <CategorySettings />}
             </div>

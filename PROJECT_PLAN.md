@@ -1698,12 +1698,23 @@ Home Care history, the color theme and the location are edited in the app.
     arrow skipping, left out while every combination of the three widgets fits;
   - household name editing, its length limit and the name font;
   - ~~managing Home Care items (add / rename / delete / reorder)~~ — **built November
-    23, 2026, inside Home Care rather than Settings** (rule agreed that day: data
-    several widgets could use, like people and categories, goes in Settings; data one
-    widget owns is managed in that widget). "+ Add Item" at the bottom of the Home Care
-    list opens a form (name, icon picker, model, size, reminder defaulting to every 6
-    months); an item's History page shows its icon and details with a pencil to edit
-    them and "Delete item" at the bottom (its history is deleted with it). Icons come
+    23, 2026; moved November 24 to Settings → Widgets → Home Care → "Home Care items ›"**.
+    Rule settled the 24th: *every widget's own settings are reached from its row in the
+    Widgets tab* (Sports' favorites later moved onto the widget, see below);
+    shared data (people, categories) keeps its own tabs. The page lists items (icon,
+    name, reminder) with edit and delete (confirm swap, "Its history is deleted too")
+    and "+ Add Item"; the form (name, icon picker, model, size, reminder defaulting to
+    every 6 months) takes over the page while open. Tapping an item opens its history
+    there too (see, add, fix, delete dates; `ItemHistory.tsx`).
+  - **Where things live (settled November 24, 2026)**, for every widget: **use** a widget
+    on the dashboard while it's on; a widget that's off shows nowhere, except that
+    **reminders** reach the header bell; **setup and records** are in Settings → Widgets
+    → the widget's link, on or off. So Home Care is: the widget's cards (status and "I
+    changed this today", no History link), the bell (due items with Done / Snooze and the
+    Upcoming list; the bell's "Open Home Care" pop-up was removed), and Settings (items
+    and their history). Sports: scores and the Favorite teams star both in the widget,
+    since picking favorites is part of using it and the widget is always on when it
+    matters (nothing of Sports in Settings). Icons come
     from a list of 14 (`homeCareIcons` in `icons.ts`), drawn through `HomeCareIcon`,
     and an unknown key falls back to a wrench instead of crashing the dashboard.
     Migration `20261123230000_manage_home_care_items.sql`. New items go to the end;
@@ -1727,6 +1738,27 @@ Home Care history, the color theme and the location are edited in the app.
   "Couldn't save" message (or undoing the optimistic change) could come later.
 - **Weather**: tap a day card for NWS's `detailedForecast`; the "use my location"
   button; "Updated N minutes ago" under the place name.
+- **Sports widget — built November 24, 2026** (`src/widgets/sports/`), a half-width
+  widget for the row Home Care left. Chosen over chores, shopping list, dinner plan and
+  notes (no daily routines to track, and typing on the tablet is a pain; shopping stays
+  on phones). Results only, no player stats:
+  - **Data**: ESPN's public scoreboard and groups feeds (`espn.ts`, the only file that
+    knows their shape). Free, no key, CORS-open so the tablet reads them directly (no
+    Supabase function), but unofficial; on failure the widget says "Scores unavailable".
+    Refreshes every 30 s while a game is live, every 5 min otherwise (`useScoreboard`).
+  - **Layout**: NBA / NFL tabs; arrows step a day (NBA) or a week (NFL, incl. preseason
+    and playoffs) with a jump back to Today / This week; a scrolling list of every game,
+    favorites' games first under a "Favorites" heading, each group live → upcoming →
+    final. Cards: logos, a 1-2-3-4(-OT) points-per-quarter table with the total, live
+    quarter in red, the loser greyed; upcoming games show start time and TV channel.
+  - **Favorites**: picked from a star button in the widget's header, beside the NBA /
+    NFL tabs (first built as a Settings → Widgets link, moved the same day), which opens
+    a "Favorite teams" pop-up (`FavoriteTeamsModal.tsx`): NBA / NFL switch, A–Z / Division sort (remembered per tablet in
+    localStorage), a 4-across grid of logos and nicknames sized so the longest
+    ("Timberwolves") fits. Saved on the household as `favorite_teams` ('nba:2' = league
+    + ESPN team id; migration `20261124020000_favorite_teams.sql`), shared through
+    `SportsContext`. A small star marks favorites on the cards.
+  - New widgets start off (see `resolveWidgets`), so Sports has to be turned on.
 - **Ideas noted November 23, 2026** (not planned yet; written down so they aren't lost):
   - **Chores widget** for daily or every-few-days tasks (feed Hazelnut, water plants).
     Kept out of Home Care on purpose: Home Care is rare maintenance behind the header

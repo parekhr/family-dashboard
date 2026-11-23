@@ -11,6 +11,7 @@ type Household = {
     id: string
     widgetLayout: string[]      // every widget in order, on or off (checked by resolveWidgets)
     hiddenWidgets: string[]     // the ones that are off
+    favoriteTeams: string[]     // Sports widget favorites, e.g. 'nba:2'
     name?: string
     location?: Location
     colorTheme: string
@@ -24,6 +25,7 @@ type HouseholdRow = {
     longitude: number | null
     widget_layout: string[]
     hidden_widgets: string[]
+    favorite_teams?: string[]
     color_theme: string
 }
 
@@ -41,6 +43,7 @@ export function toHousehold(row: HouseholdRow): Household {
         name: row.name ?? undefined,
         widgetLayout: row.widget_layout,
         hiddenWidgets: row.hidden_widgets ?? [],
+        favoriteTeams: row.favorite_teams ?? [],   // missing until the favorite_teams migration is pushed
         location: row.latitude !== null && row.longitude !== null && row.location_name !== null
             ? { latitude: row.latitude, longitude: row.longitude, name: row.location_name }
             : undefined,
