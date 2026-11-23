@@ -36,14 +36,15 @@ cross join (values
 ) as v (name)
 where h.name = '<HOUSEHOLD NAME>';
 
--- 5. Home Care items (icon must be one of: 'air-vent', 'droplet' (the icons map in HomeCareWidget.tsx))
-insert into home_care_items (household_id, name, sort_order, icon, model, size)
-select h.id, v.name, v.sort_order, v.icon, v.model, v.size
+-- 5. Home Care items (icon must be one of: 'air-vent', 'droplet' (homeCareIcons in src/widgets/homeCare/icons.ts))
+--    interval_months: remind every N months, or null for no reminder (can be changed later in the item's History)
+insert into home_care_items (household_id, name, sort_order, icon, model, size, interval_months)
+select h.id, v.name, v.sort_order, v.icon, v.model, v.size, v.interval_months
 from households h
 cross join (values
-    ('<HOME CARE ITEM NAME>', 1, '<ICON>', null, null),  -- model, size: text or null
-    ('<HOME CARE ITEM NAME>', 2, '<ICON>', null, null)
-) as v (name, sort_order, icon, model, size)
+    ('<HOME CARE ITEM NAME>', 1, '<ICON>', null, null, 6),  -- model, size: text or null
+    ('<HOME CARE ITEM NAME>', 2, '<ICON>', null, null, 6)
+) as v (name, sort_order, icon, model, size, interval_months)
 where h.name = '<HOUSEHOLD NAME>';
 
 commit;

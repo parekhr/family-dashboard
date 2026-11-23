@@ -2,6 +2,7 @@ import { useNow } from '../hooks/useNow'
 import { Settings } from 'lucide-react'
 import { SettingsModal } from './SettingsModal'
 import { useState } from 'react'
+import { RemindersBell } from '../widgets/homeCare/RemindersBell'
 
 type HeaderProps = {
     name?: string
@@ -33,7 +34,8 @@ export function Header({ name, themeKey, onThemeChange }: HeaderProps) {
 
             {/* Location and settings section */}
             <div className="flex items-center justify-end gap-2">
-                <button 
+                <RemindersBell />
+                <button
                     className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full hover:bg-muted/10 active:bg-muted/15 transition-colors"
                     aria-label="Settings"
                     onClick={() => setSettingsOpen(true)}

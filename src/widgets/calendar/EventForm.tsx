@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { CalendarEvent, Category, Person } from './useCalendarData'
 import { getTodayISO } from '../../lib/dates'
-import { Users } from 'lucide-react'
+import { ChevronDown, Users } from 'lucide-react'
 import { Modal } from '../../components/Modal'
 
 type EventFormProps = {
@@ -89,11 +89,16 @@ export function EventForm({ onClose, onSave, categories, people, event }: EventF
 
                         <label className={labelClass}>
                             Category
-                            <select className={inputClass} value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-                                {categories.map(category => (
-                                    <option key={category.id} value={category.id}>{category.name}</option>
-                                ))}
-                            </select>
+                            {/* appearance-none drops Chrome's own arrow and text indent, so the text lines up
+                                with the other fields; the chevron is drawn on top and lets clicks pass through */}
+                            <div className="relative">
+                                <select className={`${inputClass} appearance-none pr-10 cursor-pointer`} value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+                                    {categories.map(category => (
+                                        <option key={category.id} value={category.id}>{category.name}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink" />
+                            </div>
                         </label>
                     </div>
 

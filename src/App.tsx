@@ -6,12 +6,15 @@ import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import type { Session } from '@supabase/supabase-js'
 import { SignIn } from './components/SignIn'
+import { useHomeCareData } from './widgets/homeCare/useHomeCareData'
+import { HomeCareContext } from './widgets/homeCare/HomeCareContext'
 
 function App() {
 
   const [pickedTheme, setPickedTheme] = useState<string | null>(null)
   const [session, setSession] = useState<Session | null | undefined>(undefined)
   const { household, error } = useFetchHousehold(session?.user.id)
+  const homeCare = useHomeCareData(session?.user.id)   // loaded here so the header's reminders work without the widget
 
   const themeKey = pickedTheme ?? household?.colorTheme ?? 'sage'
   const theme = getColorTheme(themeKey)
@@ -49,6 +52,7 @@ function App() {
       style={{ '--color-primary': theme.primary, '--color-primary-hover': theme.primaryHover } as React.CSSProperties}
     >
       <HouseholdContext.Provider value={household}>
+      <HomeCareContext.Provider value={homeCare}>
         <Header
           name={household.name}
           themeKey={themeKey}
@@ -69,6 +73,7 @@ function App() {
             </div>
           ))}
         </div>
+      </HomeCareContext.Provider>
       </HouseholdContext.Provider>
     </div>
   )

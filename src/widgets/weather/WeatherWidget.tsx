@@ -106,7 +106,7 @@ export function WeatherWidget() {
             {/* top row: now (left), alert (middle), hourly/weekly switch (right) */}
             <div className="relative flex h-14 shrink-0 items-center justify-between">
                 {/* Now card */}
-                <div className="flex h-full w-[400px] shrink-0 items-center gap-3 rounded-2xl bg-card px-4 shadow-sm">
+                <div className="flex h-full max-w-[400px] shrink-0 items-center gap-3 rounded-2xl bg-card px-4 shadow-sm">
                     <img src={nowIcon.animated} className={`h-12 w-12 shrink-0 ${nowIcon.outline ? iconOutline : ''}`} alt="" />
                     <span className="text-5xl font-bold leading-none tabular-nums">
                         {weather.current.temperature}°

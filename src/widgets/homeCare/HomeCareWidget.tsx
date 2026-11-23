@@ -1,73 +1,21 @@
-import { useHomeCareData } from './useHomeCareData'
-import { AirVent, Droplet } from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
-import { formatDate } from '../../lib/dates'
 import { useState } from 'react'
-import { HistoryModal } from './HistoryModal'
+import { useHomeCare } from './HomeCareContext'
+import { HomeCareCards, HomeCareHistory } from './HomeCareCards'
 
-const icons: Record<string, LucideIcon> = {
-  'air-vent': AirVent,
-  'droplet': Droplet,
-}
-
+// Home Care as a dashboard widget. Households that leave it out of widget_layout
+// get the same cards in a pop-up from the header's reminders bell instead.
 export function HomeCareWidget() {
-  const { items, logToday, deleteHistoryEntry, addHistoryEntry, editHistoryEntry, error } = useHomeCareData()
+  const { error } = useHomeCare()
   const [historyItemId, setHistoryItemId] = useState<string | null>(null)
-  const historyItem = items.find((i) => i.id === historyItemId)
 
   return (
     <div className="flex flex-col flex-1 min-h-0 gap-3">
       <h2 className="text-[22px] font-extrabold text-ink">Home Care</h2>
       {error && <p className="text-sm text-muted">Couldn't load Home Care.</p>}
-      <div className="flex flex-col gap-3 flex-1 min-h-0 overflow-y-auto">
-        {items.map((item) => {
-          const Icon = icons[item.icon]
-          const lastChanged = [...item.history].sort().at(-1)
+      <HomeCareCards onOpenHistory={setHistoryItemId} />
 
-          return (
-            <div key={item.id} className="flex flex-col gap-2 rounded-2xl p-4 shadow-sm text-ink bg-card">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Icon size={20} />
-                  <span className="text-lg font-extrabold">{item.name}</span>
-                </div>
-                <button
-                  className="cursor-pointer text-sm font-bold text-primary"
-                  onClick={() => setHistoryItemId(item.id)}
-                >
-                  History ›
-                </button>
-              </div>
-
-              <div className="flex items-baseline gap-2">
-                <span className="text-xs font-semibold text-muted">Last changed:</span>
-                <span className="text-[15px] font-bold">
-                  {lastChanged ? formatDate(lastChanged) : 'Never'}
-                </span>
-              </div>
-
-              {item.model && <span className="text-xs text-muted">Model: {item.model}</span>}
-              {item.size && <span className="text-xs text-muted">Size: {item.size}</span>}
-
-              <button
-                className="h-[42px] w-full rounded-xl font-bold text-white bg-primary hover:bg-primary-hover active:bg-primary-hover cursor-pointer"
-                onClick={() => logToday(item.id)}
-              >
-                I changed this today
-              </button>
-            </div>
-          )
-        })}
-      </div>
-
-      {historyItem && (
-        <HistoryModal
-          item={historyItem}
-          onClose={() => setHistoryItemId(null)}
-          onDelete={(date) => deleteHistoryEntry(historyItem.id, date)}
-          onAdd={(date) => addHistoryEntry(historyItem.id, date)}
-          onEdit={(oldDate, newDate) => editHistoryEntry(historyItem.id, oldDate, newDate)}
-        />
+      {historyItemId && (
+        <HomeCareHistory itemId={historyItemId} onClose={() => setHistoryItemId(null)} />
       )}
     </div>
   )

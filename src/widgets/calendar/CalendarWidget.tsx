@@ -1,10 +1,11 @@
 import { buildMonthGrid } from './buildMonthGrid'
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, List } from 'lucide-react'
 import { getTodayISO, getTomorrowISO } from '../../lib/dates'
 import { useCalendarData, type CalendarEvent } from './useCalendarData'
 import { dayEvents } from './dayEvents'
 import { DayModal } from './DayModal'
+import { AllEventsModal } from './AllEventsModal'
 import { checkHoliday } from '../../widgets/calendar/holidays'
 import { getDefaultSeasonalTheme } from './seasonalThemes'
 import { EventForm } from './EventForm'
@@ -26,6 +27,7 @@ export function CalendarWidget() {
     const [showEventModal, setShowEventModal] = useState(false)
     const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null)   // which event is being edited (null = none)
     const [showReminderTabs, setShowReminderTabs] = useState(false)
+    const [showAllEvents, setShowAllEvents] = useState(false)
 
     // after an edit or delete, close the day modal if its day has nothing left to show
     function closeDayIfEmpty(nextEvents: CalendarEvent[]) {
@@ -86,10 +88,20 @@ export function CalendarWidget() {
     return (
         <div className="relative flex flex-col flex-1 min-h-0 rounded-3xl overflow-hidden">
             <div className={`grid grid-cols-[1fr_auto_1fr] items-center px-4 py-2 ${seasonalTheme.header}`}>
-                <button className="justify-self-start px-2 h-11 rounded-lg cursor-pointer text-primary font-semibold active:bg-muted/15 hover:bg-muted/10"
-                    onClick={() => { setMonth(today.getMonth() + 1); setYear(today.getFullYear()); }}>
-                    Today
-                </button>
+                <div className="justify-self-start flex items-center gap-1">
+                    <button className="px-2 h-11 rounded-lg cursor-pointer text-primary font-semibold active:bg-muted/15 hover:bg-muted/10"
+                        onClick={() => { setMonth(today.getMonth() + 1); setYear(today.getFullYear()); }}>
+                        Today
+                    </button>
+                    <button
+                        className="flex items-center justify-center cursor-pointer text-ink w-11 h-11 rounded-full enabled:active:bg-muted/15 enabled:hover:bg-muted/10 disabled:cursor-default disabled:opacity-40"
+                        onClick={() => setShowAllEvents(true)}
+                        disabled={error}
+                        aria-label="All events"
+                    >
+                        <List />
+                    </button>
+                </div>
                 <div className="flex items-center gap-2">
                     <button onClick={handlePrevMonth} className="flex items-center justify-center cursor-pointer text-ink w-11 h-11 rounded-full active:bg-muted/15 hover:bg-muted/10">
                         <ChevronLeft />
@@ -194,6 +206,9 @@ export function CalendarWidget() {
             </div>
             {selectedDay && !editingEvent && (
                 <DayModal iso={selectedDay} onClose={() => {setShowReminderTabs(false); setSelectedDay(null)}} events={dayEvents(events, selectedDay)} people={people} categories={categories} holiday={checkHoliday(selectedDay)} onEdit={setEditingEvent} onDelete={handleDeleteEvent} showTabs={showReminderTabs} activeTab={selectedDay === todayISO ? 'today' : 'tomorrow'} onTabChange={handleOnTabChange} />
+            )}
+            {showAllEvents && !editingEvent && (
+                <AllEventsModal onClose={() => setShowAllEvents(false)} events={events} people={people} categories={categories} onEdit={setEditingEvent} onDelete={handleDeleteEvent} />
             )}
             {showEventModal && (
                 <EventForm onClose={() => setShowEventModal(false)} onSave={addEvent} categories={categories} people={people} />

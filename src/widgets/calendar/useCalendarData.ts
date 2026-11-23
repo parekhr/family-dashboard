@@ -52,6 +52,11 @@ function toCategory(row: CategoryRow): Category {
     }
 }
 
+// Supabase sorts categories by name; this keeps that order but moves "Other" to the end
+function otherLast(categories: Category[]): Category[] {
+    return [...categories].sort((a, b) => Number(a.name === 'Other') - Number(b.name === 'Other'))
+}
+
 function toPerson(row: PersonRow): Person {
     return {
         id: row.id,
@@ -92,10 +97,10 @@ export function useCalendarData() {
                 setError(true)
                 return
             }
-            setCategories(categoriesResult.data.map(toCategory))
+            setCategories(otherLast(categoriesResult.data.map(toCategory)))
             setPeople(peopleResult.data.map(toPerson))
             setEvents(eventsResult.data.map(toCalendarEvent))
-            if (categoriesResult.data) setCategories(categoriesResult.data.map(toCategory))
+            if (categoriesResult.data) setCategories(otherLast(categoriesResult.data.map(toCategory)))
             if (peopleResult.data) setPeople(peopleResult.data.map(toPerson))
             if (eventsResult.data) setEvents(eventsResult.data.map(toCalendarEvent))
         })

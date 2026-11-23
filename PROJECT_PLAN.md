@@ -967,10 +967,13 @@ and in what order — a settings change, not a code change or a per-household fo
 
 ### Layout decisions
 
-- **Default layout**: every new household starts with `[weather, calendar, homeCare]`
-  (Weather as a full-width band, Calendar and Home Care side by side). That list is
-  seeded as data and passes through `buildRows()` like any custom layout. Changing
-  the default later only affects households created afterward.
+- **Default layout**: every new household starts with `[weather, calendar]` (Weather as
+  a full-width band, Calendar alone filling the row below). That list is seeded as data
+  and passes through `buildRows()` like any custom layout. Changing the default later
+  only affects households created afterward. It was `[weather, calendar, homeCare]`
+  until November 23, 2026, when Home Care moved behind the header's reminders bell
+  (migration `20261123190000_home_care_reminders.sql`); the Home Care widget still
+  exists and can be added back to a household's `widget_layout`.
 - **Weather is optional but on by default.** It is the only widget with external
   dependencies (location, NWS, US-only coverage), so it must be removable. A separate
   always-on alert banner is a possible later addition, not part of the MVP.
@@ -1678,6 +1681,18 @@ Home Care history, the color theme and the location are edited in the app.
   "Couldn't save" message (or undoing the optimistic change) could come later.
 - **Weather**: tap a day card for NWS's `detailedForecast`; the "use my location"
   button; "Updated N minutes ago" under the place name.
+- **Ideas noted November 23, 2026** (not planned yet; written down so they aren't lost):
+  - **Chores widget** for daily or every-few-days tasks (feed Hazelnut, water plants).
+    Kept out of Home Care on purpose: Home Care is rare maintenance behind the header
+    bell, while daily tasks need to be on screen, reset each day, and can be assigned
+    to people. Its own table (tasks, assignee, a dated check-off log like
+    `home_care_logs`) and its own `half` entry in the widget registry. Rule of thumb:
+    daily → Chores; weekly and tied to a day → calendar; every few months → Home Care.
+  - **Any widget can feed the reminders bell.** The bell only knows about Home Care
+    today; generalize it once a second source exists (e.g. Chores nagging "not done
+    yet" in the evening), not before.
+  - **Repeating calendar events** (trash night every Tuesday), which the calendar
+    doesn't support yet.
 - **Portfolio presentation** (after the MVP, so interviewers can see and use it):
   - **README**: a GIF or screenshots at the top, one paragraph on what it is and that
     it's in daily family use, the stack and a small architecture diagram, and a

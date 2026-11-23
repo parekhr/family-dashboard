@@ -1,5 +1,6 @@
 import type { HomeCareItem } from "./useHomeCareData"
-import { Trash2, Pencil } from "lucide-react"
+import { Trash2, Pencil, ChevronDown } from "lucide-react"
+import { getIntervalText } from "./reminders"
 import { formatDate, getTodayISO } from "../../lib/dates"
 import { useState } from "react"
 import { Modal } from "../../components/Modal"
@@ -10,9 +11,12 @@ type HistoryModalProps = {
     onDelete: (date: string) => void
     onAdd: (date: string) => void
     onEdit: (oldDate: string, newDate: string) => void
+    onIntervalChange: (months: number | null) => void   // null = no reminder
 }
 
-export function HistoryModal({ item, onClose, onDelete, onAdd, onEdit }: HistoryModalProps) {
+const intervalChoices = [1, 2, 3, 4, 6, 12]   // months
+
+export function HistoryModal({ item, onClose, onDelete, onAdd, onEdit, onIntervalChange }: HistoryModalProps) {
 
 
     const [editingDate, setEditingDate] = useState<string | null>(null)   // which row is being edited (null = none)
@@ -89,6 +93,24 @@ export function HistoryModal({ item, onClose, onDelete, onAdd, onEdit }: History
                     ✕
                 </button>
             </div>
+
+            {/* How often this item needs changing; the reminder date is worked out from it */}
+            <label className="mt-4 flex items-center justify-between gap-3 text-sm font-semibold text-muted">
+                Reminder
+                <div className="relative">
+                    <select
+                        className="h-11 cursor-pointer appearance-none rounded-xl border border-muted/30 bg-white pl-3 pr-10 text-base font-normal text-ink"
+                        value={item.intervalMonths ?? ''}
+                        onChange={(e) => onIntervalChange(e.target.value ? Number(e.target.value) : null)}
+                    >
+                        <option value="">Off</option>
+                        {intervalChoices.map(months => (
+                            <option key={months} value={months}>{getIntervalText(months)}</option>
+                        ))}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink" />
+                </div>
+            </label>
 
             <div className="mt-4 max-h-[320px] overflow-y-auto">
                 {item.history.length === 0 && <p className="py-3 text-sm text-muted">No entries yet</p>}

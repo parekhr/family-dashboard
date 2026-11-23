@@ -9,6 +9,8 @@ export type HomeCareItem = {
     history: string[]
     model?: string
     size?: string
+    intervalMonths?: number    // change every N months; absent = no reminder
+    snoozedUntil?: string      // ISO YYYY-MM-DD; the reminder stays hidden until this day
 }
 
 type HomeCareItemRow = {
@@ -17,6 +19,8 @@ type HomeCareItemRow = {
     icon: string
     model: string | null
     size: string | null
+    interval_months: number | null
+    snoozed_until: string | null
     home_care_logs: { logged_on: string }[]
 }
 
@@ -27,19 +31,25 @@ function toHomeCareItem(row: HomeCareItemRow): HomeCareItem {
         icon: row.icon,
         model: row.model ?? undefined,
         size: row.size ?? undefined,
+        intervalMonths: row.interval_months ?? undefined,
+        snoozedUntil: row.snoozed_until ?? undefined,
         history: row.home_care_logs.map(log => log.logged_on)
     }
 }
 
-export function useHomeCareData() {
+// Called once in App (not inside the widget), so the header's reminders and the
+// Home Care view share one copy of the data, and it loads even when the widget isn't on screen.
+// Waits for the signed-in user, like useFetchHousehold.
+export function useHomeCareData(userId: string | undefined) {
     const [items, setItems] = useState<HomeCareItem[]>([])
     const [error, setError] = useState(false)
 
     useEffect(() => {
+        if (!userId) return
         let ignore = false
         supabase
             .from('home_care_items')
-            .select('id, name, icon, model, size, home_care_logs(logged_on)')
+            .select('id, name, icon, model, size, interval_months, snoozed_until, home_care_logs(logged_on)')
             .order('sort_order')
             .then(({ data, error }) => {
                 if (ignore) return
@@ -51,7 +61,7 @@ export function useHomeCareData() {
                 setItems(data.map(toHomeCareItem))
             })
         return () => { ignore = true }
-    }, [])
+    }, [userId])
 
     function logToday(id: string) {
         const today = getTodayISO()
@@ -121,6 +131,30 @@ export function useHomeCareData() {
             })
     }
 
-    return { items, logToday, deleteHistoryEntry, addHistoryEntry, editHistoryEntry, error }
-}
+    // months = null turns the reminder off
+    function setIntervalMonths(id: string, months: number | null) {
+        setItems(prev => prev.map(i =>
+            i.id === id ? { ...i, intervalMonths: months ?? undefined } : i
+        ))
+        supabase.from('home_care_items')
+            .update({ interval_months: months })
+            .eq('id', id)
+            .then(({ error }) => {
+                if (error) console.error(error)
+            })
+    }
 
+    function snooze(id: string, untilISO: string) {
+        setItems(prev => prev.map(i =>
+            i.id === id ? { ...i, snoozedUntil: untilISO } : i
+        ))
+        supabase.from('home_care_items')
+            .update({ snoozed_until: untilISO })
+            .eq('id', id)
+            .then(({ error }) => {
+                if (error) console.error(error)
+            })
+    }
+
+    return { items, logToday, deleteHistoryEntry, addHistoryEntry, editHistoryEntry, setIntervalMonths, snooze, error }
+}
