@@ -961,14 +961,21 @@ and in what order — a settings change, not a code change or a per-household fo
   widgets sharing a row stretch/scroll to match whatever height that row ends up
   being. Every widget built going forward must follow this so that any combination
   of enabled widgets fills the screen exactly, with no dead gap and nothing clipped.
+- **Plug and play** (November 23, 2026): every widget must look right at any height from
+  its normal size up to the whole screen below the header, because the layout gives the
+  leftover space to whatever is on (with no half-width widget on, full-width widgets
+  stretch too). Settings has no layout rules beyond "keep one widget on"; a widget that
+  would look empty when tall shows more instead (Weather adds its weekly row).
 - Future widgets with a genuinely different footprint would need a third shape —
   the model isn't infinitely flexible, it's "a few known shapes that combine
   predictably."
 
 ### Layout decisions
 
-- **Default layout**: every new household starts with `[weather, calendar]` (Weather as
-  a full-width band, Calendar alone filling the row below). That list is seeded as data
+- **Default layout**: every new household starts with `[weather, calendar]` on (Weather as
+  a full-width band, Calendar alone filling the row below); since the November 24
+  migration that's stored as `widget_layout = {weather,calendar,homeCare}` with
+  `hidden_widgets = {homeCare}`. That list is seeded as data
   and passes through `buildRows()` like any custom layout. Changing the default later
   only affects households created afterward. It was `[weather, calendar, homeCare]`
   until November 23, 2026, when Home Care moved behind the header's reminders bell
@@ -1671,9 +1678,22 @@ Home Care history, the color theme and the location are edited in the app.
     warning (see "Layout decisions"). **Toggles and reordering built November 23,
     2026** as Settings' Widgets tab (`src/components/settings/WidgetSettings.tsx`): a
     row per widget with up/down arrows and an on/off switch; widgets that are on come
-    first in screen order, the rest are listed below, greyed. Changes apply at once and
-    save to `widget_layout` (`App` holds `pickedLayout`, like `pickedTheme`); the last
-    widget that's on can't be turned off; unknown ids in the saved list are dropped
+    first in screen order, the rest are listed below, greyed. **Rows never move when
+    toggled** (changed the same day; the jumping felt janky): `widget_layout` now lists
+    every widget in the household's order, on or off, and a new `hidden_widgets` column
+    lists the ones that are off (migration `20261124010000_widget_order_and_hidden.sql`,
+    which backfills missing widgets at the end, off). `resolveWidgets()` in
+    `registry.ts` drops unknown ids and adds widgets newer than the saved list at the
+    end, off, so new widgets stay opt-in. Every row has arrows, including off ones (that
+    sets where it appears when turned back on). Changes apply at once (`App` holds
+    `pickedWidgets`, like `pickedTheme`); the only rule is that the last widget that's
+    on can't be turned off, and its "Keep at least one widget on" note shows only for 3
+    seconds after trying. Any combination works
+    ("plug and play", agreed November 23, 2026, after testing showed Weather alone left
+    the bottom of the screen empty): full-width rows are a fixed 250px only when a
+    half-width row is on to take the rest; otherwise the full-width rows share the
+    screen. Weather measures itself (`ResizeObserver`) and from 400px tall shows the
+    hourly and weekly rows together with bigger icons, hiding the Hourly / Weekly switch; unknown ids in the saved list are dropped
     before `buildRows`. **Still to do**: the preview, the overflow warning and the
     arrow skipping, left out while every combination of the three widgets fits;
   - household name editing, its length limit and the name font;

@@ -3,17 +3,17 @@ import { Settings } from 'lucide-react'
 import { SettingsModal } from './SettingsModal'
 import { useState } from 'react'
 import { RemindersBell } from '../widgets/homeCare/RemindersBell'
-import type { WidgetId } from '../widgets/registry'
+import type { WidgetChoices } from '../widgets/registry'
 
 type HeaderProps = {
     name?: string
     themeKey: string
     onThemeChange: (key: string) => void
-    widgetLayout: WidgetId[]
-    onWidgetLayoutChange: (layout: WidgetId[]) => void
+    widgets: WidgetChoices
+    onWidgetsChange: (widgets: WidgetChoices) => void
 }
 
-export function Header({ name, themeKey, onThemeChange, widgetLayout, onWidgetLayoutChange }: HeaderProps) {
+export function Header({ name, themeKey, onThemeChange, widgets, onWidgetsChange }: HeaderProps) {
 
     const now = useNow()
     const [time, period] = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).split(' ')
@@ -50,8 +50,8 @@ export function Header({ name, themeKey, onThemeChange, widgetLayout, onWidgetLa
                 <SettingsModal
                     themeKey={themeKey}
                     onThemeChange={onThemeChange}
-                    widgetLayout={widgetLayout}
-                    onWidgetLayoutChange={onWidgetLayoutChange}
+                    widgets={widgets}
+                    onWidgetsChange={onWidgetsChange}
                     onClose={() => setSettingsOpen(false)}
                 /> 
             )}

@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronLeft, ChevronRight, Droplet, MapPin, Snowflake } from 'lucide-react'
 import { useWeatherData } from './useWeatherData'
 import { getWeatherIcon } from './weatherIcons'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNow } from '../../hooks/useNow'
 import { AlertsModal } from './AlertsModal'
 import { getAlertTiming, isAlertActive } from './alertTiming'
@@ -10,6 +10,10 @@ import { getBackgroundKind, WeatherBackground } from './WeatherBackground'
 import { useHouseholdData, type Location } from '../../hooks/useHouseholdData'
 import { LocationPicker } from './LocationPicker'
 import { supabase } from '../../lib/supabaseClient'
+
+// At this height or more (e.g. Weather is the only widget on), there's room to show the
+// hourly and weekly forecasts together instead of switching between them
+const TALL_HEIGHT = 400
 
 const timeOfDayTints = {
     Morning: '#FCE4A0',
@@ -51,6 +55,17 @@ export function WeatherWidget() {
     const start = pageNumber * 6
     const state = useWeatherData(location)
     const now = useNow()
+
+    // Widgets get whatever height the layout gives them, so Weather measures itself
+    // and switches to its tall layout when there's room
+    const [rootEl, setRootEl] = useState<HTMLDivElement | null>(null)
+    const [tall, setTall] = useState(false)
+    useEffect(() => {
+        if (!rootEl) return
+        const observer = new ResizeObserver(([entry]) => setTall(entry.contentRect.height >= TALL_HEIGHT))
+        observer.observe(rootEl)
+        return () => observer.disconnect()
+    }, [rootEl])
 
     function handleChooseLocation(place: Location) {
         setLocation(place)
@@ -100,8 +115,88 @@ export function WeatherWidget() {
     const topAlert = activeAlerts[0]
     const extraAlerts = activeAlerts.length - 1
 
+    // bigger icons and temperatures in the tall layout, where the cards have the room
+    const cardIconClass = tall ? 'h-12 w-12' : 'h-8 w-8'
+    const cardTempClass = tall ? 'text-2xl' : 'text-lg'
+
+    // seven day cards
+    const weeklyRow = weather.days.map(day => {
+        const icon = getWeatherIcon(day.condition, true)
+        const isSnow = day.condition.toLowerCase().includes('snow')
+        return (
+            <div key={day.label} className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl bg-card shadow-sm p-1.5 pt-2">
+                <span className="text-sm font-bold leading-none">{day.label}</span>
+                <img src={icon.still} className={`${cardIconClass} shrink-0 ${icon.outline ? iconOutline : ''}`} alt="" />
+                <span className="-mb-1 w-full truncate px-1 pb-1 text-center text-sm font-semibold leading-none text-muted">{shortCondition(day.condition)}</span>
+                <span className={`${cardTempClass} font-bold leading-none tabular-nums`}>
+                    {day.high}°{day.low !== undefined && <span className="text-sm font-semibold text-muted"> / {day.low}°</span>}
+                </span>
+                {/* hidden (but still taking up space) below 10% so the cards stay lined up */}
+                <span className={`flex items-center gap-0.5 text-xs font-semibold leading-none text-sky-600 tabular-nums ${roundChance(day.rainChance) < 10 ? 'invisible' : ''}`}>
+                    {isSnow ? <Snowflake className="h-3 w-3" /> : <Droplet className="h-3 w-3" fill="currentColor" />}
+                    {roundChance(day.rainChance)}%
+                </span>
+            </div>
+        )
+    })
+
+    // six hour cards between the previous / next page arrows
+    const hourlyRow = (
+        <>
+            <button
+                className="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-full bg-card shadow-sm cursor-pointer disabled:cursor-default disabled:opacity-30 enabled:hover:bg-card/50"
+                onClick={() => setPageNumber(pageNumber - 1)}
+                disabled={pageNumber === 0}
+                aria-label="Earlier hours"
+            >
+                <ChevronLeft className="h-5 w-5" />
+            </button>
+
+            {weather.hours.slice(start, start + 6).map(hour => {
+                const icon = getWeatherIcon(hour.condition, hour.isDaytime)
+                const isSnow = hour.condition.toLowerCase().includes('snow')
+                const tint = timeOfDayTints[hour.timeOfDay]
+                return (
+                    <div key={hour.label} style={{ backgroundColor: `color-mix(in srgb, ${tint} 30%, white)` }} className="flex min-w-0 flex-1 flex-col items-center overflow-hidden rounded-2xl pb-1.5 shadow-sm">
+                        <span style={{ backgroundColor: tint }} className="w-full shrink-0 py-1 text-center text-sm font-bold leading-none">
+                            {hour.label}
+                        </span>
+                        {/* the rest stays grouped in the middle however tall the card gets */}
+                        <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-1 pt-1">
+                            <img src={icon.still} className={`${cardIconClass} shrink-0 ${icon.outline ? iconOutline : ''}`} alt="" />
+                            <span className="-mb-1 w-full truncate px-1 pb-1 text-center text-sm font-semibold leading-none text-muted">{shortCondition(hour.condition)}</span>
+                            <span className={`${cardTempClass} font-bold leading-none tabular-nums`}>
+                                {hour.temperature}°
+                            </span>
+                            <span className={`flex items-center gap-0.5 text-xs font-semibold leading-none text-sky-600 tabular-nums ${roundChance(hour.rainChance) < 10 ? 'invisible' : ''}`}>
+                                {isSnow ? <Snowflake className="h-3 w-3" /> : <Droplet className="h-3 w-3" fill="currentColor" />}
+                                {roundChance(hour.rainChance)}%
+                            </span>
+                        </div>
+                    </div>
+                )
+            })}
+
+            <button
+                className="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-full bg-card shadow-sm cursor-pointer disabled:cursor-default disabled:opacity-30 enabled:hover:bg-card/50"
+                onClick={() => setPageNumber(pageNumber + 1)}
+                disabled={pageNumber === pageCount - 1}
+                aria-label="Later hours"
+            >
+                <ChevronRight className="h-5 w-5" />
+            </button>
+        </>
+    )
+
+    const pageDots = Array.from({ length: pageCount }, (_, index) => (
+        <span
+            key={index}
+            className={`h-1.5 w-1.5 rounded-full ${index === pageNumber ? 'bg-primary' : 'bg-muted/40'}`}
+        />
+    ))
+
     return (
-        <div className="relative flex flex-col flex-1 min-h-0 gap-2.5 rounded-3xl overflow-hidden p-3 pb-5 text-ink bg-muted/15">
+        <div ref={setRootEl} className="relative flex flex-col flex-1 min-h-0 gap-2.5 rounded-3xl overflow-hidden p-3 pb-5 text-ink bg-muted/15">
             <WeatherBackground kind={getBackgroundKind(weather.current.condition, weather.hours[0].rainChance)} />
             {/* top row: now (left), alert (middle), hourly/weekly switch (right) */}
             <div className="relative flex h-14 shrink-0 items-center justify-between">
@@ -168,6 +263,8 @@ export function WeatherWidget() {
                         <ChevronDown className="h-3.5 w-3.5 text-muted" />
                     </button>
 
+                    {/* no switch in the tall layout: both forecasts are showing */}
+                    {!tall && (
                     <div className="relative grid h-9 w-[190px] shrink-0 grid-cols-2 rounded-full bg-muted/15 p-1">
                         {/* sliding highlight */}
                         <div
@@ -186,88 +283,34 @@ export function WeatherWidget() {
                             Weekly
                         </button>
                     </div>
+                    )}
                 </div>
             </div>
 
-            {/* bottom row: seven forecast cards (days or hours) */}
-            <div className="flex flex-1 min-h-0 gap-2.5 relative">
-                {view === 'weekly' && weather.days.map(day => {
-                    const icon = getWeatherIcon(day.condition, true)
-                    const isSnow = day.condition.toLowerCase().includes('snow')
-                    return (
-                        <div key={day.label} className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl bg-card shadow-sm p-1.5 pt-2">
-                            <span className="text-sm font-bold leading-none">{day.label}</span>
-                            <img src={icon.still} className={`h-8 w-8 shrink-0 ${icon.outline ? iconOutline : ''}`} alt="" />
-                            <span className="-mb-1 w-full truncate px-1 pb-1 text-center text-sm font-semibold leading-none text-muted">{shortCondition(day.condition)}</span>
-                            <span className="text-lg font-bold leading-none tabular-nums">
-                                {day.high}°{day.low !== undefined && <span className="text-sm font-semibold text-muted"> / {day.low}°</span>}
-                            </span>
-                            {/* hidden (but still taking up space) below 10% so the cards stay lined up */}
-                            <span className={`flex items-center gap-0.5 text-xs font-semibold leading-none text-sky-600 tabular-nums ${roundChance(day.rainChance) < 10 ? 'invisible' : ''}`}>
-                                {isSnow ? <Snowflake className="h-3 w-3" /> : <Droplet className="h-3 w-3" fill="currentColor" />}
-                                {roundChance(day.rainChance)}%
-                            </span>
-                        </div>
-                    )
-                })}
-
-                {view === 'hourly' && (
-                    <>
-                        {/* previous page */}
-                        <button
-                            className="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-full bg-card shadow-sm cursor-pointer disabled:cursor-default disabled:opacity-30 enabled:hover:bg-card/50"
-                            onClick={() => setPageNumber(pageNumber - 1)}
-                            disabled={pageNumber === 0}
-                            aria-label="Earlier hours"
-                        >
-                            <ChevronLeft className="h-5 w-5" />
-                        </button>
-
-                        {weather.hours.slice(start, start + 6).map(hour => {
-                            const icon = getWeatherIcon(hour.condition, hour.isDaytime)
-                            const isSnow = hour.condition.toLowerCase().includes('snow')
-                            const tint = timeOfDayTints[hour.timeOfDay]
-                            return (
-                                <div key={hour.label} style={{ backgroundColor: `color-mix(in srgb, ${tint} 30%, white)` }} className="flex min-w-0 flex-1 flex-col items-center justify-between gap-1 overflow-hidden rounded-2xl pb-1.5 shadow-sm">
-                                    <span style={{ backgroundColor: tint }} className="w-full py-1 text-center text-sm font-bold leading-none">
-                                        {hour.label}
-                                    </span>
-                                    <img src={icon.still} className={`h-8 w-8 shrink-0 ${icon.outline ? iconOutline : ''}`} alt="" />
-                                    <span className="-mb-1 w-full truncate px-1 pb-1 text-center text-sm font-semibold leading-none text-muted">{shortCondition(hour.condition)}</span>
-                                    <span className="text-lg font-bold leading-none tabular-nums">
-                                        {hour.temperature}°
-                                    </span>
-                                    <span className={`flex items-center gap-0.5 text-xs font-semibold leading-none text-sky-600 tabular-nums ${roundChance(hour.rainChance) < 10 ? 'invisible' : ''}`}>
-                                        {isSnow ? <Snowflake className="h-3 w-3" /> : <Droplet className="h-3 w-3" fill="currentColor" />}
-                                        {roundChance(hour.rainChance)}%
-                                    </span>
-                                </div>
-                            )
-                        })}
-
-                        {/* next page */}
-                        <button
-                            className="flex h-8 w-8 shrink-0 self-center items-center justify-center rounded-full bg-card shadow-sm cursor-pointer disabled:cursor-default disabled:opacity-30 enabled:hover:bg-card/50"
-                            onClick={() => setPageNumber(pageNumber + 1)}
-                            disabled={pageNumber === pageCount - 1}
-                            aria-label="Later hours"
-                        >
-                            <ChevronRight className="h-5 w-5" />
-                        </button>
-                    </>
-                )}
-            </div>
-
-            {/* page dots, in the bottom padding */}
-            {view === 'hourly' && (
-                <div className="absolute inset-x-0 bottom-[7px] flex justify-center gap-1.5">
-                    {Array.from({ length: pageCount }, (_, index) => (
-                        <span
-                            key={index}
-                            className={`h-1.5 w-1.5 rounded-full ${index === pageNumber ? 'bg-primary' : 'bg-muted/40'}`}
-                        />
-                    ))}
-                </div>
+            {/* The forecast: normally one row of cards (hours or days, picked with the switch);
+                in the tall layout both rows, hourly above weekly, with bigger icons and temps */}
+            {tall ? (
+                <>
+                    <div className="flex flex-1 min-h-0 flex-col gap-1.5">
+                        <span className="text-sm font-bold text-muted">Hourly</span>
+                        <div className="relative flex flex-1 min-h-0 gap-2.5">{hourlyRow}</div>
+                        <div className="flex justify-center gap-1.5">{pageDots}</div>
+                    </div>
+                    <div className="flex flex-1 min-h-0 flex-col gap-1.5">
+                        <span className="text-sm font-bold text-muted">This week</span>
+                        <div className="relative flex flex-1 min-h-0 gap-2.5">{weeklyRow}</div>
+                    </div>
+                </>
+            ) : (
+                <>
+                    <div className="flex flex-1 min-h-0 gap-2.5 relative">
+                        {view === 'weekly' ? weeklyRow : hourlyRow}
+                    </div>
+                    {/* page dots, in the bottom padding */}
+                    {view === 'hourly' && (
+                        <div className="absolute inset-x-0 bottom-[7px] flex justify-center gap-1.5">{pageDots}</div>
+                    )}
+                </>
             )}
         </div>
     )

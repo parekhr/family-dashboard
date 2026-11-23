@@ -5,13 +5,13 @@ import { colorThemes } from '../lib/colorThemes'
 import { PeopleSettings } from './settings/PeopleSettings'
 import { CategorySettings } from './settings/CategorySettings'
 import { WidgetSettings } from './settings/WidgetSettings'
-import type { WidgetId } from '../widgets/registry'
+import type { WidgetChoices } from '../widgets/registry'
 
 type SettingsModalProps = {
     themeKey: string
     onThemeChange: (key: string) => void
-    widgetLayout: WidgetId[]
-    onWidgetLayoutChange: (layout: WidgetId[]) => void
+    widgets: WidgetChoices
+    onWidgetsChange: (widgets: WidgetChoices) => void
     onClose: () => void
 }
 
@@ -24,7 +24,7 @@ const tabs: { key: Tab; label: string }[] = [
     { key: 'categories', label: 'Categories' },
 ]
 
-export function SettingsModal({ themeKey, onThemeChange, widgetLayout, onWidgetLayoutChange, onClose }: SettingsModalProps) {
+export function SettingsModal({ themeKey, onThemeChange, widgets, onWidgetsChange, onClose }: SettingsModalProps) {
     const [tab, setTab] = useState<Tab>('theme')
 
     return (
@@ -85,7 +85,7 @@ export function SettingsModal({ themeKey, onThemeChange, widgetLayout, onWidgetL
                         </div>
                     </>
                 )}
-                {tab === 'widgets' && <WidgetSettings layout={widgetLayout} onChange={onWidgetLayoutChange} />}
+                {tab === 'widgets' && <WidgetSettings widgets={widgets} onChange={onWidgetsChange} />}
                 {tab === 'people' && <PeopleSettings />}
                 {tab === 'categories' && <CategorySettings />}
             </div>

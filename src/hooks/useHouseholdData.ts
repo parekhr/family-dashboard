@@ -1,5 +1,4 @@
 import { supabase } from '../lib/supabaseClient'
-import type { WidgetId } from '../widgets/registry'
 import { createContext, useContext, useEffect, useState } from 'react'
 
 export type Location = {
@@ -10,7 +9,8 @@ export type Location = {
 
 type Household = {
     id: string
-    widgetLayout: WidgetId[]
+    widgetLayout: string[]      // every widget in order, on or off (checked by resolveWidgets)
+    hiddenWidgets: string[]     // the ones that are off
     name?: string
     location?: Location
     colorTheme: string
@@ -23,6 +23,7 @@ type HouseholdRow = {
     latitude: number | null
     longitude: number | null
     widget_layout: string[]
+    hidden_widgets: string[]
     color_theme: string
 }
 
@@ -38,7 +39,8 @@ export function toHousehold(row: HouseholdRow): Household {
     return {
         id: row.id,
         name: row.name ?? undefined,
-        widgetLayout: row.widget_layout as WidgetId[],
+        widgetLayout: row.widget_layout,
+        hiddenWidgets: row.hidden_widgets ?? [],
         location: row.latitude !== null && row.longitude !== null && row.location_name !== null
             ? { latitude: row.latitude, longitude: row.longitude, name: row.location_name }
             : undefined,
