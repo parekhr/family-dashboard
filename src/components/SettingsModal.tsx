@@ -1,16 +1,34 @@
+import { useState } from 'react'
 import { Check } from 'lucide-react'
 import { Modal } from './Modal'
 import { colorThemes } from '../lib/colorThemes'
+import { PeopleSettings } from './settings/PeopleSettings'
+import { CategorySettings } from './settings/CategorySettings'
+import { WidgetSettings } from './settings/WidgetSettings'
+import type { WidgetId } from '../widgets/registry'
 
 type SettingsModalProps = {
     themeKey: string
     onThemeChange: (key: string) => void
+    widgetLayout: WidgetId[]
+    onWidgetLayoutChange: (layout: WidgetId[]) => void
     onClose: () => void
 }
 
-export function SettingsModal({ themeKey, onThemeChange, onClose }: SettingsModalProps) {
+type Tab = 'theme' | 'widgets' | 'people' | 'categories'
+
+const tabs: { key: Tab; label: string }[] = [
+    { key: 'theme', label: 'Theme' },
+    { key: 'widgets', label: 'Widgets' },
+    { key: 'people', label: 'People' },
+    { key: 'categories', label: 'Categories' },
+]
+
+export function SettingsModal({ themeKey, onThemeChange, widgetLayout, onWidgetLayoutChange, onClose }: SettingsModalProps) {
+    const [tab, setTab] = useState<Tab>('theme')
+
     return (
-        <Modal onClose={onClose}>
+        <Modal onClose={onClose} className="flex w-[480px] flex-col">
             <div className="flex items-center justify-between gap-10">
                 <h3 className="text-xl font-extrabold">Settings</h3>
                 <button
@@ -22,29 +40,54 @@ export function SettingsModal({ themeKey, onThemeChange, onClose }: SettingsModa
                 </button>
             </div>
 
-            <div className="mt-4 text-sm font-semibold text-muted">Color theme</div>
+            {/* same pill tabs as the day modal's Today / Tomorrow */}
+            <div className="mt-4 flex gap-2">
+                {tabs.map(({ key, label }) => (
+                    <button
+                        key={key}
+                        className={`h-11 flex-1 cursor-pointer rounded-full font-semibold transition-colors ${tab === key ? 'bg-primary text-white' : 'bg-muted/15 text-ink hover:bg-muted/25'}`}
+                        aria-pressed={tab === key}
+                        onClick={() => setTab(key)}
+                    >
+                        {label}
+                    </button>
+                ))}
+            </div>
 
-            {/* Tapping a color applies it right away; the modal stays open */}
-            <div className="mt-2 grid grid-cols-[repeat(3,76px)] gap-0.5">
-                {colorThemes.map((theme) => {
-                    const selected = theme.key === themeKey
-                    return (
-                        <button
-                            key={theme.key}
-                            className="flex cursor-pointer flex-col items-center gap-1 rounded-xl py-1 hover:bg-muted/10 active:bg-muted/15 transition-colors"
-                            aria-pressed={selected}
-                            onClick={() => onThemeChange(theme.key)}
-                        >
-                            <span
-                                className={`flex h-10 w-10 items-center justify-center rounded-full text-white ${selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-card' : ''}`}
-                                style={{ backgroundColor: theme.primary }}
-                            >
-                                {selected && <Check className="h-5 w-5" />}
-                            </span>
-                            <span className="text-sm font-semibold text-ink">{theme.name}</span>
-                        </button>
-                    )
-                })}
+            {/* fixed height, so switching tabs doesn't make the pop-up jump in size */}
+            <div className="mt-4 h-[400px] overflow-y-auto pr-1">
+                {tab === 'theme' && (
+                    <>
+                        <div className="text-sm font-semibold text-muted">Color theme</div>
+
+                        {/* Tapping a color applies it right away; the modal stays open.
+                            Tiles fill the tab's width (3 across) now that Settings is a fixed 480px. */}
+                        <div className="mt-1.5 grid grid-cols-3 gap-3 p-0.5">{/* p-0.5: room for the selected ring inside the scroll area */}
+                            {colorThemes.map((theme) => {
+                                const selected = theme.key === themeKey
+                                return (
+                                    <button
+                                        key={theme.key}
+                                        className={`flex cursor-pointer flex-col items-center gap-2 rounded-2xl py-4 transition-colors ${selected ? 'bg-primary/10 ring-2 ring-primary' : 'bg-muted/10 hover:bg-muted/15 active:bg-muted/20'}`}
+                                        aria-pressed={selected}
+                                        onClick={() => onThemeChange(theme.key)}
+                                    >
+                                        <span
+                                            className="flex h-14 w-14 items-center justify-center rounded-full text-white"
+                                            style={{ backgroundColor: theme.primary }}
+                                        >
+                                            {selected && <Check className="h-6 w-6" />}
+                                        </span>
+                                        <span className="text-sm font-semibold text-ink">{theme.name}</span>
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    </>
+                )}
+                {tab === 'widgets' && <WidgetSettings layout={widgetLayout} onChange={onWidgetLayoutChange} />}
+                {tab === 'people' && <PeopleSettings />}
+                {tab === 'categories' && <CategorySettings />}
             </div>
         </Modal>
     )

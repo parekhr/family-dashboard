@@ -2,7 +2,8 @@ import { buildMonthGrid } from './buildMonthGrid'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, List } from 'lucide-react'
 import { getTodayISO, getTomorrowISO } from '../../lib/dates'
-import { useCalendarData, type CalendarEvent } from './useCalendarData'
+import type { CalendarEvent } from './useCalendarData'
+import { useCalendar } from './CalendarContext'
 import { dayEvents } from './dayEvents'
 import { DayModal } from './DayModal'
 import { AllEventsModal } from './AllEventsModal'
@@ -20,7 +21,7 @@ const MAX_REMINDER_CHIPS = 2
 export function CalendarWidget() {
 
     const today = useNow()
-    const { events, people, categories, addEvent, deleteEvent, editEvent, error} = useCalendarData()
+    const { events, people, categories, addEvent, deleteEvent, editEvent, error} = useCalendar()
     const [month, setMonth] = useState(today.getMonth() + 1)
     const [year, setYear] = useState(today.getFullYear())
     const [selectedDay, setSelectedDay] = useState<string | null>(null)

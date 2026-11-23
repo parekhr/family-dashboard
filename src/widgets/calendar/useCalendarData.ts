@@ -52,9 +52,16 @@ function toCategory(row: CategoryRow): Category {
     }
 }
 
-// Supabase sorts categories by name; this keeps that order but moves "Other" to the end
-function otherLast(categories: Category[]): Category[] {
-    return [...categories].sort((a, b) => Number(a.name === 'Other') - Number(b.name === 'Other'))
+// Alphabetical, with "Other" always last. Also used after adds and renames in Settings,
+// so the list stays in order without reloading.
+function sortCategories(categories: Category[]): Category[] {
+    return [...categories].sort((a, b) =>
+        Number(a.name === 'Other') - Number(b.name === 'Other') || a.name.localeCompare(b.name)
+    )
+}
+
+function sortPeople(people: Person[]): Person[] {
+    return [...people].sort((a, b) => a.name.localeCompare(b.name))
 }
 
 function toPerson(row: PersonRow): Person {
@@ -78,13 +85,17 @@ function toCalendarEvent(row: CalendarEventRow): CalendarEvent {
 }
 
 
-export function useCalendarData() {
+// Called once in App (like useHomeCareData), so the calendar and Settings share one copy:
+// renaming a category or person in Settings shows up in the calendar straight away.
+// Waits for the signed-in user.
+export function useCalendarData(userId: string | undefined) {
     const [categories, setCategories] = useState<Category[]>([])
     const [people, setPeople] = useState<Person[]>([])
     const [events, setEvents] = useState<CalendarEvent[]>([])
     const [error, setError] = useState(false)
 
     useEffect(() => {
+        if (!userId) return
         let ignore = false
         Promise.all([
             supabase.from('categories').select('id, name, color').order('name'),
@@ -97,15 +108,12 @@ export function useCalendarData() {
                 setError(true)
                 return
             }
-            setCategories(otherLast(categoriesResult.data.map(toCategory)))
-            setPeople(peopleResult.data.map(toPerson))
+            setCategories(sortCategories(categoriesResult.data.map(toCategory)))
+            setPeople(sortPeople(peopleResult.data.map(toPerson)))
             setEvents(eventsResult.data.map(toCalendarEvent))
-            if (categoriesResult.data) setCategories(otherLast(categoriesResult.data.map(toCategory)))
-            if (peopleResult.data) setPeople(peopleResult.data.map(toPerson))
-            if (eventsResult.data) setEvents(eventsResult.data.map(toCalendarEvent))
         })
         return () => { ignore = true }
-    }, [])
+    }, [userId])
 
     function addEvent(newEvent: Omit<CalendarEvent, 'id'>) {
         const id = crypto.randomUUID()
@@ -180,5 +188,79 @@ export function useCalendarData() {
     }
 
 
-    return { categories, setCategories, people, setPeople, events, addEvent, deleteEvent, editEvent, error }
+    // ---- Categories and people, managed from Settings ----
+    // Same optimistic pattern as events: update the screen first, then save.
+
+    function addCategory(name: string, color: string | null) {
+        const id = crypto.randomUUID()
+        setCategories(prev => sortCategories([...prev, { id, name, color: color ?? undefined }]))
+        supabase.from('categories')
+            .insert({ id, name, color })
+            .then(({ error }) => { if (error) console.error(error) })
+    }
+
+    function updateCategory(id: string, name: string, color: string | null) {
+        setCategories(prev => sortCategories(prev.map(category =>
+            category.id === id ? { ...category, name, color: color ?? undefined } : category
+        )))
+        supabase.from('categories')
+            .update({ name, color })
+            .eq('id', id)
+            .then(({ error }) => { if (error) console.error(error) })
+    }
+
+    // Events can't be left without a category (the database blocks it), so any events
+    // using this one move to `moveToId` first. The delete waits for the move to save.
+    function deleteCategory(id: string, moveToId: string | null) {
+        setCategories(prev => prev.filter(category => category.id !== id))
+        if (moveToId) {
+            setEvents(prev => prev.map(event => event.categoryId === id ? { ...event, categoryId: moveToId } : event))
+        }
+        const moveEvents = moveToId
+            ? supabase.from('events').update({ category_id: moveToId }).eq('category_id', id)
+            : Promise.resolve({ error: null })
+        moveEvents.then(({ error }) => {
+            if (error) {
+                console.error(error)
+                return
+            }
+            supabase.from('categories')
+                .delete()
+                .eq('id', id)
+                .then(({ error }) => { if (error) console.error(error) })
+        })
+    }
+
+    function addPerson(name: string) {
+        const id = crypto.randomUUID()
+        setPeople(prev => sortPeople([...prev, { id, name }]))
+        supabase.from('people')
+            .insert({ id, name })
+            .then(({ error }) => { if (error) console.error(error) })
+    }
+
+    function renamePerson(id: string, name: string) {
+        setPeople(prev => sortPeople(prev.map(person => person.id === id ? { ...person, name } : person)))
+        supabase.from('people')
+            .update({ name })
+            .eq('id', id)
+            .then(({ error }) => { if (error) console.error(error) })
+    }
+
+    // The database removes them from their events too (event_people cascades)
+    function deletePerson(id: string) {
+        setPeople(prev => prev.filter(person => person.id !== id))
+        setEvents(prev => prev.map(event => ({ ...event, personIds: event.personIds.filter(personId => personId !== id) })))
+        supabase.from('people')
+            .delete()
+            .eq('id', id)
+            .then(({ error }) => { if (error) console.error(error) })
+    }
+
+    return {
+        categories, people, events, error,
+        addEvent, deleteEvent, editEvent,
+        addCategory, updateCategory, deleteCategory,
+        addPerson, renamePerson, deletePerson,
+    }
 }

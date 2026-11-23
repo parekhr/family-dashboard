@@ -1668,10 +1668,26 @@ Home Care history, the color theme and the location are edited in the app.
 - **Phone view** (the single scrolling column).
 - **Settings beyond the color theme**:
   - widget catalog toggles and reordering, the Settings preview and the overflow
-    warning (see "Layout decisions");
+    warning (see "Layout decisions"). **Toggles and reordering built November 23,
+    2026** as Settings' Widgets tab (`src/components/settings/WidgetSettings.tsx`): a
+    row per widget with up/down arrows and an on/off switch; widgets that are on come
+    first in screen order, the rest are listed below, greyed. Changes apply at once and
+    save to `widget_layout` (`App` holds `pickedLayout`, like `pickedTheme`); the last
+    widget that's on can't be turned off; unknown ids in the saved list are dropped
+    before `buildRows`. **Still to do**: the preview, the overflow warning and the
+    arrow skipping, left out while every combination of the three widgets fits;
   - household name editing, its length limit and the name font;
   - managing Home Care items (add / rename / delete / reorder);
-  - managing calendar categories and people, and the category color picker.
+  - ~~managing calendar categories and people, and the category color picker~~ —
+    **built November 23, 2026**: Settings has Theme / People / Categories tabs.
+    People and categories can be added, renamed and deleted in the app (migration
+    `20261123210000_manage_categories_people.sql` grants the writes and defaults
+    `household_id`). Deleting a person removes them from their events; deleting a
+    category in use asks which category its events move to (suggesting Other), then
+    moves them and deletes. Category colors come from a fixed palette of 9
+    text-safe colors plus "No color" (`src/lib/categoryColors.ts`). Calendar data
+    (`useCalendarData`) now loads once in `App` and is shared through
+    `CalendarContext`, like Home Care, so Settings changes show in the calendar at once.
 - **Paged screens** for households that outgrow one screen.
 - **Atomic event edits**: move `editEvent`'s update, link delete and link insert into
   one Postgres function called with `supabase.rpc(...)`, so they save together or not
@@ -1718,9 +1734,8 @@ Home Care history, the color theme and the location are edited in the app.
   been called final.
 - Phone companion: its "today's appointments (dismissible)" list predates the wall's
   reminder-strip design (no dismissing on the wall); revisit the phone's version later.
-- The category color picker in Settings: which colors are offered (a fixed palette
-  avoids clashes with holiday rings and monthly themes; free choice doesn't, and every color must
-  be readable as small text), and whether reminder chips show the color too.
+- Whether reminder chips show the category color too. (The picker itself was decided
+  November 23, 2026: a fixed palette, see "Later features".)
 - Exact seasonal theme color values (the rendered mockup values are a starting point).
 - Full Supabase schema details (exact tables/columns beyond `household_id` + RLS).
 - Which kiosk browser APK to sideload on the Fire HD 10.
