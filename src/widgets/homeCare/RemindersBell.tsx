@@ -3,7 +3,7 @@ import { Bell, Check, Clock, X } from 'lucide-react'
 import { addDaysISO, formatShortDate, getTodayISO } from '../../lib/dates'
 import { useHomeCare } from './HomeCareContext'
 import { HomeCareModal } from './HomeCareModal'
-import { homeCareIcons } from './icons'
+import { HomeCareIcon } from './HomeCareIcon'
 import { SNOOZE_DAYS, getDueDate, getIntervalText, getLastChanged, getReminder, getReminderText, isSnoozed } from './reminders'
 import type { Reminder } from './reminders'
 import type { HomeCareItem } from './useHomeCareData'
@@ -73,7 +73,6 @@ export function RemindersBell() {
 
                         {reminders.map((reminder) => {
                             const { item } = reminder
-                            const Icon = homeCareIcons[item.icon]
                             const lastChanged = getLastChanged(item)
 
                             return (
@@ -83,7 +82,7 @@ export function RemindersBell() {
                                         className="flex w-full cursor-pointer items-center gap-2 text-left"
                                         onClick={() => openHomeCare(item.id)}
                                     >
-                                        <Icon size={20} className="shrink-0" />
+                                        <HomeCareIcon icon={item.icon} size={20} className="shrink-0" />
                                         <span className="flex-1 font-bold">{item.name}</span>
                                         <span className={`text-sm font-semibold ${reminder.daysLeft < 0 ? 'text-red-600' : 'text-primary'}`}>
                                             {getReminderText(reminder)}
@@ -119,13 +118,12 @@ export function RemindersBell() {
                             <div className="mt-3 flex flex-col gap-2">
                                 <span className="text-xs font-bold uppercase tracking-wide text-muted">Upcoming</span>
                                 {quietItems.map(item => {
-                                    const Icon = homeCareIcons[item.icon]
                                     return (
                                         <div
                                             key={item.id}
                                             className={`flex h-11 items-center gap-2 rounded-xl bg-muted/10 px-3 ${item.intervalMonths ? '' : 'text-muted'}`}
                                         >
-                                            <Icon size={18} className="shrink-0" />
+                                            <HomeCareIcon icon={item.icon} size={18} className="shrink-0" />
                                             <span className="flex-1 truncate font-semibold">{item.name}</span>
                                             <span className="shrink-0 text-sm text-muted">{getQuietText(item, todayISO)}</span>
                                         </div>

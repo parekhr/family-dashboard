@@ -36,7 +36,9 @@ cross join (values
 ) as v (name)
 where h.name = '<HOUSEHOLD NAME>';
 
--- 5. Home Care items (icon must be one of: 'air-vent', 'droplet' (homeCareIcons in src/widgets/homeCare/icons.ts))
+-- 5. Home Care items (optional: they can also be added in the app with "+ Add Item")
+--    icon: a key from homeCareIcons in src/widgets/homeCare/icons.ts, e.g. 'air-vent', 'droplet',
+--    'refrigerator', 'flame', 'alarm-smoke' (an unknown key shows a wrench)
 --    interval_months: remind every N months, or null for no reminder (can be changed later in the item's History)
 insert into home_care_items (household_id, name, sort_order, icon, model, size, interval_months)
 select h.id, v.name, v.sort_order, v.icon, v.model, v.size, v.interval_months

@@ -47,6 +47,8 @@ export function getReminderText(reminder: Reminder): string {
     return `Due in ${plural(reminder.daysLeft, 'day')}`
 }
 
+export const intervalChoices = [1, 2, 3, 4, 6, 12]   // months offered in the Reminder dropdowns
+
 export function getIntervalText(months: number): string {
     return months === 1 ? 'Every month' : `Every ${months} months`
 }

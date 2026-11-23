@@ -1677,7 +1677,17 @@ Home Care history, the color theme and the location are edited in the app.
     before `buildRows`. **Still to do**: the preview, the overflow warning and the
     arrow skipping, left out while every combination of the three widgets fits;
   - household name editing, its length limit and the name font;
-  - managing Home Care items (add / rename / delete / reorder);
+  - ~~managing Home Care items (add / rename / delete / reorder)~~ — **built November
+    23, 2026, inside Home Care rather than Settings** (rule agreed that day: data
+    several widgets could use, like people and categories, goes in Settings; data one
+    widget owns is managed in that widget). "+ Add Item" at the bottom of the Home Care
+    list opens a form (name, icon picker, model, size, reminder defaulting to every 6
+    months); an item's History page shows its icon and details with a pencil to edit
+    them and "Delete item" at the bottom (its history is deleted with it). Icons come
+    from a list of 14 (`homeCareIcons` in `icons.ts`), drawn through `HomeCareIcon`,
+    and an unknown key falls back to a wrench instead of crashing the dashboard.
+    Migration `20261123230000_manage_home_care_items.sql`. New items go to the end;
+    **reordering is not built** (rarely matters with a few items);
   - ~~managing calendar categories and people, and the category color picker~~ —
     **built November 23, 2026**: Settings has Theme / People / Categories tabs.
     People and categories can be added, renamed and deleted in the app (migration
