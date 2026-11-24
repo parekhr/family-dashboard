@@ -90,7 +90,7 @@ export function CalendarWidget() {
         <div className="relative flex flex-col flex-1 min-h-0 rounded-3xl overflow-hidden">
             <div className={`grid grid-cols-[1fr_auto_1fr] items-center px-4 py-2 ${seasonalTheme.header}`}>
                 <div className="justify-self-start flex items-center gap-1">
-                    <button className="px-2 h-11 rounded-lg cursor-pointer text-primary font-semibold active:bg-muted/15 hover:bg-muted/10"
+                    <button className="px-2 h-11 rounded-lg cursor-pointer text-ink font-semibold active:bg-black/10 hover:bg-black/5"
                         onClick={() => { setMonth(today.getMonth() + 1); setYear(today.getFullYear()); }}>
                         Today
                     </button>

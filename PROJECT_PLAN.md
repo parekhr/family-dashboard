@@ -1771,6 +1771,19 @@ Home Care history, the color theme and the location are edited in the app.
     + ESPN team id; migration `20261124020000_favorite_teams.sql`), shared through
     `SportsContext`. A small star marks favorites on the cards.
   - New widgets start off (see `resolveWidgets`), so Sports has to be turned on.
+- **Updates reach tablets on their own — built November 24, 2026.** Pushing to `main`
+  deploys on Vercel, but a wall tablet keeps the page it loaded until it reloads (until
+  now: the kiosk browser's "Go to Start URL"). Now each build gets an ID (short commit +
+  build time; `vite.config.ts` bakes it in as `__BUILD_ID__` and writes
+  `dist/version.json`). `useAutoReload` (in `App`) fetches `version.json` every 15
+  minutes and, when the live ID differs, reloads once the screen has been untouched for
+  3 minutes; it also reloads nightly around 3 AM (backup for a missed check, and a fresh
+  start). Off in `npm run dev`. Settings shows "Last updated: Nov 24, 2026" and the commit
+  at the bottom, to check a tablet picked up an update. Added `@types/node` for the
+  config. **Release routine with several households sharing one database**: push a
+  migration before the code that needs it; migrations only add (new columns with
+  defaults, new tables) so tablets still on the old version keep working; remove or
+  rename in a later release, once every tablet has reloaded.
 - **Ideas noted November 23, 2026** (not planned yet; written down so they aren't lost):
   - **Chores widget** for daily or every-few-days tasks (feed Hazelnut, water plants).
     Kept out of Home Care on purpose: Home Care is rare maintenance behind the header

@@ -11,9 +11,11 @@ import { useHomeCareData } from './widgets/homeCare/useHomeCareData'
 import { HomeCareContext } from './widgets/homeCare/HomeCareContext'
 import { useCalendarData } from './widgets/calendar/useCalendarData'
 import { CalendarContext } from './widgets/calendar/CalendarContext'
+import { useAutoReload } from './hooks/useAutoReload'
 import { SportsContext } from './widgets/sports/SportsContext'
 
 function App() {
+  useAutoReload()   // picks up new deploys (and reloads nightly) on its own, when nobody's using the screen
 
   const [pickedTheme, setPickedTheme] = useState<string | null>(null)
   const [pickedWidgets, setPickedWidgets] = useState<WidgetChoices | null>(null)   // set from Settings' Widgets tab, like pickedTheme

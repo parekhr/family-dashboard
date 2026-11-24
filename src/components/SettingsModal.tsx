@@ -105,6 +105,13 @@ export function SettingsModal({ themeKey, onThemeChange, widgets, onWidgetsChang
                 {tab === 'people' && <PeopleSettings />}
                 {tab === 'categories' && <CategorySettings />}
             </ScrollArea>
+
+            {/* which version this tablet is running: the update's date and its git commit,
+                for checking a tablet picked up an update (see useAutoReload) */}
+            <div className="mt-3 flex justify-between text-xs text-muted">
+                <span>Last updated: {new Date(__BUILD_TIME__).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                <span className="font-mono">{__BUILD_COMMIT__}</span>
+            </div>
         </Modal>
     )
 }
