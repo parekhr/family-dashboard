@@ -7,6 +7,7 @@ import { CategorySettings } from './settings/CategorySettings'
 import { WidgetSettings } from './settings/WidgetSettings'
 import { HomeCareItemsPage } from './settings/HomeCareItemsPage'
 import type { WidgetChoices } from '../widgets/registry'
+import { ScrollArea } from './ScrollArea'
 
 type SettingsModalProps = {
     themeKey: string
@@ -70,7 +71,7 @@ export function SettingsModal({ themeKey, onThemeChange, widgets, onWidgetsChang
             </div>
 
             {/* fixed height, so switching tabs doesn't make the pop-up jump in size */}
-            <div className="mt-4 h-[400px] overflow-y-auto pr-1">
+            <ScrollArea className="mt-4 h-[400px] pr-1">
                 {tab === 'theme' && (
                     <>
                         <div className="text-sm font-semibold text-muted">Color theme</div>
@@ -103,7 +104,7 @@ export function SettingsModal({ themeKey, onThemeChange, widgets, onWidgetsChang
                 {tab === 'widgets' && <WidgetSettings widgets={widgets} onChange={onWidgetsChange} onOpenPage={setPage} />}
                 {tab === 'people' && <PeopleSettings />}
                 {tab === 'categories' && <CategorySettings />}
-            </div>
+            </ScrollArea>
         </Modal>
     )
 }

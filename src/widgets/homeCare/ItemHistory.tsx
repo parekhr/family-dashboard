@@ -2,6 +2,7 @@ import type { HomeCareItem } from "./useHomeCareData"
 import { Trash2, Pencil } from "lucide-react"
 import { formatDate, getTodayISO } from "../../lib/dates"
 import { useState } from "react"
+import { ScrollArea } from '../../components/ScrollArea'
 
 type ItemHistoryProps = {
     item: HomeCareItem
@@ -88,7 +89,7 @@ export function ItemHistory({ item, onDelete, onAdd, onEdit }: ItemHistoryProps)
             )}
 
             <div className="mt-4 text-sm font-semibold text-muted">History</div>
-            <div className="max-h-[260px] overflow-y-auto">
+            <ScrollArea className="max-h-[260px]">
                 {item.history.length === 0 && <p className="py-3 text-sm text-muted">No entries yet</p>}
                 {[...item.history].sort().reverse().map((date) => (
                     <div key={date} className="flex items-center justify-between py-2 border-b border-muted/20">
@@ -142,7 +143,7 @@ export function ItemHistory({ item, onDelete, onAdd, onEdit }: ItemHistoryProps)
                         )}
                     </div>
                 ))}
-            </div>
+            </ScrollArea>
             {adding ? (
                 <div className="mt-4 flex min-h-[52px] flex-col justify-center gap-2">
                     <div className="flex items-center gap-2">

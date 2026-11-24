@@ -81,12 +81,20 @@ export function GameCard({ game, league, favorites }: GameCardProps) {
         )
     }
 
-    // Three rows. The header's first cell says "Live" with the clock while a game is on.
-    // A finished game shows nothing there (the scores speak for themselves), except an
-    // unusual ending ESPN reports instead of "Final", like "Postponed" or "Canceled".
+    // Three rows. The header's first cell says "Live" with the clock (and channel) while a
+    // game is on. A finished game says ESPN's "Final" / "Final/OT" (or an unusual ending
+    // like "Postponed") in plain grey, so it can't be mistaken for a live game in a list
+    // that mixes both, without drawing the eye the way the red "Live" does.
     const status = live
-        ? <span className="flex items-center gap-2"><span className="font-bold text-red-600">Live</span><span className="tabular-nums">{game.detail}</span></span>
-        : game.detail.startsWith('Final') ? null : game.detail
+        ? (
+            <span className="flex min-w-0 items-center gap-2">
+                <span className="font-bold text-red-600">Live</span>
+                <span className="shrink-0 tabular-nums">{game.detail}</span>
+                {/* where to watch it, while it's on (shown before tip-off too) */}
+                {game.broadcast && <span className="truncate font-bold text-ink/70">{game.broadcast}</span>}
+            </span>
+        )
+        : <span className="font-normal">{game.detail}</span>
 
     return (
         <div className="rounded-2xl bg-card px-3 py-2 shadow-sm">

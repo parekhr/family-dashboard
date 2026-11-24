@@ -3,6 +3,7 @@ import type { CalendarEvent, Category, Person } from './useCalendarData'
 import { getTodayISO } from '../../lib/dates'
 import { ChevronDown, Users } from 'lucide-react'
 import { Modal } from '../../components/Modal'
+import { ScrollArea } from '../../components/ScrollArea'
 
 type EventFormProps = {
     onClose: () => void
@@ -79,7 +80,7 @@ export function EventForm({ onClose, onSave, categories, people, event }: EventF
                     ✕
                 </button>
             </div>
-            <div className="mt-4 flex-1 min-h-0 overflow-y-auto pr-1">
+            <ScrollArea className="mt-4 flex-1 min-h-0 pr-1">
                 <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-2 gap-3">
                         <label className={labelClass}>
@@ -160,7 +161,7 @@ export function EventForm({ onClose, onSave, categories, people, event }: EventF
 
                     <button type="submit" className="h-11 rounded-xl bg-primary font-semibold text-white cursor-pointer hover:bg-primary-hover active:bg-primary-hover transition-colors">Save</button>
                 </form>
-            </div>
+            </ScrollArea>
         </Modal>
     )
 }

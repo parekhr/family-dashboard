@@ -2,6 +2,7 @@ import { formatDate } from '../../lib/dates'
 import { useHomeCare } from './HomeCareContext'
 import { HomeCareIcon } from './HomeCareIcon'
 import { getDueDate, getLastChanged } from './reminders'
+import { ScrollArea } from '../../components/ScrollArea'
 
 // The Home Care widget's item cards: what's due, and the one button used day to day.
 // Everything else (adding, editing, deleting items, and their history) is in
@@ -10,7 +11,7 @@ export function HomeCareCards() {
   const { items, logToday, error } = useHomeCare()
 
   return (
-    <div className="flex flex-col gap-3 flex-1 min-h-0 overflow-y-auto">
+    <ScrollArea className="flex flex-col gap-3 flex-1 min-h-0">
       {!error && items.length === 0 && (
         <p className="py-3 text-sm text-muted">No items yet. Add them in Settings, under Widgets, Home Care items.</p>
       )}
@@ -52,6 +53,6 @@ export function HomeCareCards() {
           </div>
         )
       })}
-    </div>
+    </ScrollArea>
   )
 }

@@ -4,6 +4,7 @@ import { Modal } from '../../components/Modal'
 import { leagues, type League, type TeamInfo } from './espn'
 import { useLeagueTeams } from './useLeagueTeams'
 import { useSports } from './SportsContext'
+import { ScrollArea } from '../../components/ScrollArea'
 
 type FavoriteTeamsModalProps = {
     onClose: () => void
@@ -61,8 +62,10 @@ export function FavoriteTeamsModal({ onClose }: FavoriteTeamsModalProps) {
         )
     }
 
+    // One division per row: NBA divisions have 5 teams, NFL divisions 4. A–Z uses the
+    // same columns, so tiles stay the same size when switching sort
     function grid(list: TeamInfo[]) {
-        return <div className="grid grid-cols-4 gap-1.5">{list.map(tile)}</div>
+        return <div className={`grid gap-1.5 ${league === 'nba' ? 'grid-cols-5' : 'grid-cols-4'}`}>{list.map(tile)}</div>
     }
 
     let body
@@ -80,8 +83,9 @@ export function FavoriteTeamsModal({ onClose }: FavoriteTeamsModalProps) {
         ))
     }
 
+    // 620px wide so five tiles fit across with the longest name (Timberwolves)
     return (
-        <Modal onClose={onClose} className="flex w-[480px] flex-col">
+        <Modal onClose={onClose} className="flex w-[620px] flex-col">
             <div className="flex items-center gap-2">
                 <h3 className="flex-1 font-sports text-[28px] leading-none tracking-wide">Favorite teams</h3>
                 <button className={closeButtonClass} aria-label="Close" onClick={onClose}>✕</button>
@@ -116,7 +120,7 @@ export function FavoriteTeamsModal({ onClose }: FavoriteTeamsModalProps) {
                 </div>
             </div>
 
-            <div className="mt-2 h-[400px] overflow-y-auto p-0.5 pr-1">{body}</div>
+            <ScrollArea className="mt-2 h-[400px] p-0.5 pr-1">{body}</ScrollArea>
         </Modal>
     )
 }

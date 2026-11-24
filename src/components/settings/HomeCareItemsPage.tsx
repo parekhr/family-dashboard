@@ -6,6 +6,7 @@ import { ItemDetailsForm } from '../../widgets/homeCare/ItemDetailsForm'
 import { ItemHistory } from '../../widgets/homeCare/ItemHistory'
 import { getIntervalText } from '../../widgets/homeCare/reminders'
 import { addButtonClass, iconButtonClass } from './shared'
+import { ScrollArea } from '../ScrollArea'
 
 type HomeCareItemsPageProps = {
     onBack: () => void
@@ -47,7 +48,7 @@ export function HomeCareItemsPage({ onBack, onClose }: HomeCareItemsPageProps) {
         return (
             <>
                 {header}
-                <div className="mt-4 h-[452px] overflow-y-auto pr-1">
+                <ScrollArea className="mt-4 h-[452px] pr-1">
                     <ItemDetailsForm
                         key={editing}
                         initial={editingItem}
@@ -66,7 +67,7 @@ export function HomeCareItemsPage({ onBack, onClose }: HomeCareItemsPageProps) {
                         }}
                         onCancel={() => setEditing(null)}
                     />
-                </div>
+                </ScrollArea>
             </>
         )
     }
@@ -76,14 +77,14 @@ export function HomeCareItemsPage({ onBack, onClose }: HomeCareItemsPageProps) {
         return (
             <>
                 {header}
-                <div className="mt-4 h-[452px] overflow-y-auto pr-1">
+                <ScrollArea className="mt-4 h-[452px] pr-1">
                     <ItemHistory
                         item={historyItem}
                         onAdd={(date) => addHistoryEntry(historyItem.id, date)}
                         onEdit={(oldDate, newDate) => editHistoryEntry(historyItem.id, oldDate, newDate)}
                         onDelete={(date) => deleteHistoryEntry(historyItem.id, date)}
                     />
-                </div>
+                </ScrollArea>
             </>
         )
     }
@@ -92,7 +93,7 @@ export function HomeCareItemsPage({ onBack, onClose }: HomeCareItemsPageProps) {
         <>
             {header}
             {/* same height as the Settings tabs this page replaces */}
-            <div className="mt-4 h-[452px] overflow-y-auto pr-1">
+            <ScrollArea className="mt-4 h-[452px] pr-1">
                 {error && <p className="py-3 text-sm text-muted">Couldn't load Home Care.</p>}
                 {!error && items.length === 0 && <p className="py-3 text-sm text-muted">No items yet</p>}
 
@@ -152,7 +153,7 @@ export function HomeCareItemsPage({ onBack, onClose }: HomeCareItemsPageProps) {
                 <button className={addButtonClass} onClick={() => { setConfirmingId(null); setEditing('new') }}>
                     + Add Item
                 </button>
-            </div>
+            </ScrollArea>
         </>
     )
 }

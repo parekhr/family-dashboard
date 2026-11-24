@@ -4,6 +4,7 @@ import { CalendarRange } from 'lucide-react'
 import { useState } from 'react'
 import { Modal } from '../../components/Modal'
 import { EventCard } from './EventCard'
+import { ScrollArea } from '../../components/ScrollArea'
 
 type AllEventsModalProps = {
     onClose: () => void
@@ -66,7 +67,7 @@ export function AllEventsModal({ onClose, events, people, categories, onEdit, on
                     ✕
                 </button>
             </div>
-            <div className="max-h-[420px] overflow-y-auto mt-4">
+            <ScrollArea className="max-h-[420px] mt-4">
                 {upcoming.length === 0 && <p className="py-3 text-sm text-muted">No events</p>}
                 {[...groups].map(([day, dayEvents]) => (
                     <div key={day} className="mb-4">
@@ -86,7 +87,7 @@ export function AllEventsModal({ onClose, events, people, categories, onEdit, on
                         ))}
                     </div>
                 ))}
-            </div>
+            </ScrollArea>
         </Modal>
     )
 }

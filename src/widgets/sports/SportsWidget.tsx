@@ -9,6 +9,7 @@ import { GameCard } from './GameCard'
 import { SportsBackground } from './SportsBackground'
 import { bandColors } from './bandColors'
 import { FavoriteTeamsModal } from './FavoriteTeamsModal'
+import { ScrollArea } from '../../components/ScrollArea'
 
 const leagueKeys = Object.keys(leagues) as League[]
 // the calendar's month arrows: no circle at rest, a soft one only on hover / press
@@ -138,7 +139,7 @@ export function SportsWidget() {
             {/* the court or field, with the games on top */}
             <div className="relative flex flex-1 min-h-0 flex-col">
             <SportsBackground league={league} />
-            <div className="relative flex flex-1 min-h-0 flex-col gap-2 overflow-y-auto p-3 pr-2">
+            <ScrollArea className="relative flex flex-1 min-h-0 flex-col gap-2 p-3 pr-2">
                 {scoreboard.status === 'loading' && <p className="rounded-2xl bg-card/90 py-6 text-center text-sm font-semibold text-muted">Loading scores…</p>}
                 {scoreboard.status === 'error' && <p className="rounded-2xl bg-card/90 py-6 text-center text-sm font-semibold text-muted">Scores unavailable right now</p>}
                 {board && sorted.length === 0 && (
@@ -154,7 +155,7 @@ export function SportsWidget() {
                     </>
                 )}
                 {otherGames.map(game => <GameCard key={game.id} game={game} league={league} favorites={favorites} />)}
-            </div>
+            </ScrollArea>
             </div>
         </div>
     )

@@ -2,6 +2,7 @@ import type { WeatherAlert } from './useWeatherData'
 import { Modal } from '../../components/Modal'
 import { getAlertTiming } from './alertTiming'
 import { severityColors } from './alertColors'
+import { ScrollArea } from '../../components/ScrollArea'
 
 type AlertModalProps = {
     onClose: () => void
@@ -37,7 +38,7 @@ export function AlertsModal({ onClose, alerts, now }: AlertModalProps) {
                 </button>
             </div>
 
-            <div className="mt-4 h-[480px] overflow-y-auto">
+            <ScrollArea className="mt-4 h-[480px]">
                 {alerts.map((alert, index) => (
                     <div key={index}
                         className="mb-4 rounded-2xl bg-muted/10 p-4 border-l-[6px]"
@@ -60,7 +61,7 @@ export function AlertsModal({ onClose, alerts, now }: AlertModalProps) {
                         )}
                     </div>
                 ))}
-            </div>
+            </ScrollArea>
         </Modal>
     )
 }

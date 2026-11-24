@@ -5,6 +5,7 @@ import { CalendarDays } from 'lucide-react'
 import { useState } from 'react'
 import { Modal } from '../../components/Modal'
 import { EventCard } from './EventCard'
+import { ScrollArea } from '../../components/ScrollArea'
 
 type DayModalProps = {
     iso: string
@@ -64,7 +65,7 @@ export function DayModal({ iso, onClose, events, people, categories, holiday, on
                     </button>
                 </div>
             )}
-            <div className={`${showTabs ? 'h-[320px]' : 'max-h-[320px]'} overflow-y-auto mt-4`}>
+            <ScrollArea className={`${showTabs ? 'h-[320px]' : 'max-h-[320px]'} mt-4`}>
                 {events.length === 0 && <p className="py-3 text-sm text-muted">No events</p>}
                 {events.map((event) => (
                     <EventCard
@@ -79,7 +80,7 @@ export function DayModal({ iso, onClose, events, people, categories, holiday, on
                         onDelete={onDelete}
                     />
                 ))}
-            </div>
+            </ScrollArea>
         </Modal>
     )
 }

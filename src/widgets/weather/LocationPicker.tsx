@@ -3,6 +3,7 @@ import { Check, Search } from 'lucide-react'
 import { Modal } from '../../components/Modal'
 import type { Location } from '../../hooks/useHouseholdData'
 import { searchLocations } from './searchLocations'
+import { ScrollArea } from '../../components/ScrollArea'
 
 type LocationPickerProps = {
     current: Location | undefined
@@ -62,7 +63,7 @@ export function LocationPicker({ current, onChoose, onClose }: LocationPickerPro
                 />
             </label>
             <p className="mt-2 text-xs text-muted">US only. Currently {current?.name ?? 'not set'}.</p>
-            <div className="mt-3 flex h-[220px] flex-col gap-1.5 overflow-y-auto">
+            <ScrollArea className="mt-3 flex h-[220px] flex-col gap-1.5">
                 {query.trim().length >= 2 && (
                     <>
                         {failed && <p className="text-sm text-muted">Couldn't search right now. Try again in a moment.</p>}
@@ -82,7 +83,7 @@ export function LocationPicker({ current, onChoose, onClose }: LocationPickerPro
                         ))}
                     </>
                 )}
-            </div>
+            </ScrollArea>
             {/* Open-Meteo credits */}
             <p className="mt-3 text-center text-[11px] text-muted">
                 Location search by <a href="https://open-meteo.com/" target="_blank" rel="noreferrer" className="underline">Open-Meteo</a>, data from GeoNames
