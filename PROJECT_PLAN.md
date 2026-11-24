@@ -1735,8 +1735,10 @@ Home Care history, the color theme and the location are edited in the app.
   wouldn't fit (720px per page below the header; full-width rows count 250, half-width
   rows 400) starts the next page, and each page stretches its rows as one page always
   did. `DashboardPages.tsx` slides between pages: swipe sideways (80px, mostly
-  horizontal, so list scrolling and taps still reach the widgets) or tap the dots drawn
-  over the bottom padding; after a minute untouched it returns to page 1. Every widget
+  horizontal, so list scrolling and taps still reach the widgets); fingers are read
+  with touch events, since the tablet's browser cancels pointer events part-way through
+  a drag. Dots over the bottom padding only show which page is up (not buttons). After
+  a minute untouched it returns to page 1. Every widget
   stays loaded on every page. The Widgets tab notes "Half width, page 2" once there's
   more than one page, so the arrows double as "what's on the main page". This replaces
   the plan's fit limit and overflow warning: nothing is ever blocked or hidden.

@@ -26,29 +26,34 @@ export function DashboardPages({ onWidgets }: DashboardPagesProps) {
         return () => clearTimeout(timer)
     }, [page, touchCount])
 
-    function handlePointerDown(e: React.PointerEvent) {
+    function dragFrom(x: number, y: number) {
         setTouchCount(n => n + 1)
-        dragStart.current = { x: e.clientX, y: e.clientY }
+        dragStart.current = { x, y }
     }
 
     // A mostly sideways drag far enough turns the page; anything else (taps, scrolling a
     // list up and down) is left alone for the widgets
-    function handlePointerUp(e: React.PointerEvent) {
+    function dragTo(x: number, y: number) {
         const start = dragStart.current
         dragStart.current = null
         if (!start || pages.length < 2) return
-        const dx = e.clientX - start.x
-        const dy = e.clientY - start.y
+        const dx = x - start.x
+        const dy = y - start.y
         if (Math.abs(dx) < SWIPE_DISTANCE || Math.abs(dx) < Math.abs(dy) * 1.5) return
         setChosenPage(Math.max(0, Math.min(pages.length - 1, page + (dx < 0 ? 1 : -1))))
     }
 
+    // Fingers use touch events: on a touch screen the browser takes over a drag for its own
+    // scrolling and cancels the pointer events part-way (which is why swiping first did
+    // nothing on the tablet), but touch events still report where the finger lifted.
+    // A mouse (testing on a computer) uses pointer events.
     return (
         <div
-            className="relative flex-1 min-h-0 overflow-hidden"
-            onPointerDown={handlePointerDown}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={() => { dragStart.current = null }}
+            className="relative flex-1 min-h-0 overflow-hidden touch-pan-y"
+            onTouchStart={e => dragFrom(e.touches[0].clientX, e.touches[0].clientY)}
+            onTouchEnd={e => dragTo(e.changedTouches[0].clientX, e.changedTouches[0].clientY)}
+            onPointerDown={e => { if (e.pointerType === 'mouse') dragFrom(e.clientX, e.clientY) }}
+            onPointerUp={e => { if (e.pointerType === 'mouse') dragTo(e.clientX, e.clientY) }}
         >
             {/* every page side by side; sliding the strip shows one at a time */}
             <div
@@ -78,20 +83,13 @@ export function DashboardPages({ onWidgets }: DashboardPagesProps) {
                 })}
             </div>
 
-            {/* page dots, only when there's more than one page; drawn over the bottom
-                padding so they take no room from the widgets */}
+            {/* page dots, only when there's more than one page: just an indicator of which
+                page is showing (swipe to change pages); drawn over the bottom padding so they
+                take no room from the widgets */}
             {pages.length > 1 && (
-                <div className="absolute inset-x-0 bottom-0 flex justify-center">
+                <div className="pointer-events-none absolute inset-x-0 bottom-1 flex justify-center gap-2" aria-label={`Page ${page + 1} of ${pages.length}`}>
                     {pages.map((_, index) => (
-                        <button
-                            key={index}
-                            className="flex h-4 w-6 cursor-pointer items-center justify-center"
-                            aria-label={`Page ${index + 1}`}
-                            aria-current={index === page}
-                            onClick={() => setChosenPage(index)}
-                        >
-                            <span className={`h-2 w-2 rounded-full transition-colors ${index === page ? 'bg-primary' : 'bg-muted/40'}`} />
-                        </button>
+                        <span key={index} className={`h-2 w-2 rounded-full transition-colors ${index === page ? 'bg-primary' : 'bg-muted/40'}`} />
                     ))}
                 </div>
             )}
