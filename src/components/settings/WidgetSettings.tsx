@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ChevronDown, ChevronRight, ChevronUp } from 'lucide-react'
-import { registry, type WidgetChoices, type WidgetId } from '../../widgets/registry'
+import { pageOf, registry, type WidgetChoices, type WidgetId } from '../../widgets/registry'
 import type { SettingsPage } from '../SettingsModal'
 
 type WidgetSettingsProps = {
@@ -22,7 +22,11 @@ const arrowClass = 'flex h-11 w-11 shrink-0 cursor-pointer items-center justify-
 // behind the pop-up is the preview, as with themes) and are saved on the household.
 export function WidgetSettings({ widgets, onChange, onOpenPage }: WidgetSettingsProps) {
     const { order, hidden } = widgets
-    const onCount = order.filter(id => !hidden.includes(id)).length
+    const onWidgets = order.filter(id => !hidden.includes(id))
+    const onCount = onWidgets.length
+    // which page each widget lands on; only mentioned once there's more than one page
+    const pages = pageOf(onWidgets)
+    const pageCount = Math.max(1, ...Object.values(pages).map(n => n ?? 1))
 
     // The widget whose "keep one on" note is showing: only after someone tries to turn
     // off the last widget, and only for a few seconds, so it isn't on screen all the time
@@ -59,7 +63,9 @@ export function WidgetSettings({ widgets, onChange, onOpenPage }: WidgetSettings
                 const def = registry[id]
                 const on = !hidden.includes(id)
                 const warning = warningId === id
-                const note = warning ? 'Keep at least one widget on' : def.shape === 'full' ? 'Full width' : 'Half width'
+                const width = def.shape === 'full' ? 'Full width' : 'Half width'
+                const page = pages[id]
+                const note = warning ? 'Keep at least one widget on' : pageCount > 1 && page ? `${width}, page ${page}` : width
 
                 return (
                     <div key={id} className="flex items-center gap-1 border-b border-muted/20 py-2">

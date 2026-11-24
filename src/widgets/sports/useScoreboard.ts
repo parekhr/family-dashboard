@@ -6,6 +6,11 @@ const IDLE_REFRESH_MS = 5 * 60_000  // nothing live: just catch start times and 
 
 type Result = { key: string; board?: Scoreboard; error?: boolean }
 
+// The latest scoreboard seen for each day / week, kept for the whole visit, so switching
+// back to a tab (NBA → NFL → NBA) shows its scores straight away while they refresh,
+// instead of a blank "Loading" moment
+const seen = new Map<string, Scoreboard>()
+
 // One league's scoreboard for one day or week (`query`, see fetchScoreboard), refreshed in
 // the background: every 30 seconds while a game is live, every 5 minutes otherwise.
 export function useScoreboard(league: League, query: string) {
@@ -16,7 +21,10 @@ export function useScoreboard(league: League, query: string) {
     useEffect(() => {
         let ignore = false
         fetchScoreboard(league, query)
-            .then(board => { if (!ignore) setResult({ key, board }) })
+            .then(board => {
+                seen.set(key, board)
+                if (!ignore) setResult({ key, board })
+            })
             .catch(error => {
                 console.error(error)
                 // a failed refresh keeps the scores already showing; only a first load shows the error
@@ -33,7 +41,19 @@ export function useScoreboard(league: League, query: string) {
         return () => clearInterval(timer)
     }, [live, key])
 
-    if (!current) return { status: 'loading' as const }
+    if (!current) {
+        // Already seen this day / week this visit (e.g. switching back to a tab): show
+        // those scores right away; the fetch above refreshes them
+        const earlier = seen.get(key)
+        if (earlier) return { status: 'ready' as const, board: earlier, stale: false }
+        // Stepping to another day or week in the same league: keep showing the scores
+        // already on screen until the new ones arrive, instead of flashing "Loading"
+        // (`stale` says they're from the previous day / week)
+        if (result?.board && result.key.startsWith(`${league}?`)) {
+            return { status: 'ready' as const, board: result.board, stale: true }
+        }
+        return { status: 'loading' as const }
+    }
     if (current.error || !current.board) return { status: 'error' as const }
-    return { status: 'ready' as const, board: current.board }
+    return { status: 'ready' as const, board: current.board, stale: false }
 }

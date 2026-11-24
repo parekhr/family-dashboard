@@ -1729,7 +1729,17 @@ Home Care history, the color theme and the location are edited in the app.
     text-safe colors plus "No color" (`src/lib/categoryColors.ts`). Calendar data
     (`useCalendarData`) now loads once in `App` and is shared through
     `CalendarContext`, like Home Care, so Settings changes show in the calendar at once.
-- **Paged screens** for households that outgrow one screen.
+- ~~**Paged screens** for households that outgrow one screen~~ — **built November 24,
+  2026** (with all four widgets on, the second half-width row was squeezing everything).
+  `buildPages()` in `registry.ts` fills pages in the household's order: a row that
+  wouldn't fit (720px per page below the header; full-width rows count 250, half-width
+  rows 400) starts the next page, and each page stretches its rows as one page always
+  did. `DashboardPages.tsx` slides between pages: swipe sideways (80px, mostly
+  horizontal, so list scrolling and taps still reach the widgets) or tap the dots drawn
+  over the bottom padding; after a minute untouched it returns to page 1. Every widget
+  stays loaded on every page. The Widgets tab notes "Half width, page 2" once there's
+  more than one page, so the arrows double as "what's on the main page". This replaces
+  the plan's fit limit and overflow warning: nothing is ever blocked or hidden.
 - **Atomic event edits**: move `editEvent`'s update, link delete and link insert into
   one Postgres function called with `supabase.rpc(...)`, so they save together or not
   at all (see Supabase stage 5's known gap). Saving an event with its people in

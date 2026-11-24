@@ -1,4 +1,5 @@
-import { buildRows, registry, resolveWidgets, type WidgetChoices } from './widgets/registry'
+import { resolveWidgets, type WidgetChoices } from './widgets/registry'
+import { DashboardPages } from './components/DashboardPages'
 import { HouseholdContext, useFetchHousehold } from './hooks/useHouseholdData'
 import { Header } from './components/Header'
 import { getColorTheme } from './lib/colorThemes'
@@ -44,11 +45,6 @@ function App() {
   // widgets newer than the saved order added at the end, off); the ones that are on get drawn
   const widgets = pickedWidgets ?? resolveWidgets(household.widgetLayout, household.hiddenWidgets)
   const onWidgets = widgets.order.filter(id => !widgets.hidden.includes(id))
-  const rows = buildRows(onWidgets, registry)
-  // Half-width rows stretch to fill the screen, with full-width rows at a fixed 250px.
-  // With no half-width widget on, the full-width rows share the screen instead, so any
-  // set of widgets fills it (each widget has to look right at any height).
-  const hasHalfRow = rows.some(row => registry[row[0]].shape === 'half')
 
   function handleWidgetsChange(next: WidgetChoices) {
     setPickedWidgets(next)
@@ -98,20 +94,8 @@ function App() {
           onWidgetsChange={handleWidgetsChange}
         />
 
-        <div className="flex-1 flex flex-col min-h-0">
-          {rows.map((row) => (
-            <div key={row.join('-')} className={registry[row[0]].shape === 'full' && hasHalfRow ? 'flex h-[250px]' : 'flex flex-1 min-h-0'}>
-              {row.map((id) => {
-                const Component = registry[id].component
-                return (
-                  <div key={id} className="flex-1 flex flex-col min-h-0 p-4">
-                    <Component />
-                  </div>
-                )
-              })}
-            </div>
-          ))}
-        </div>
+        {/* the widgets, on as many pages as they need (see buildPages) */}
+        <DashboardPages onWidgets={onWidgets} />
       </SportsContext.Provider>
       </CalendarContext.Provider>
       </HomeCareContext.Provider>

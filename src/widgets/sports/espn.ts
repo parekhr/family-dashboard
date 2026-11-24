@@ -36,7 +36,7 @@ export type Game = {
 }
 
 // An NFL week (or a playoff round); the NFL tab steps through these instead of days
-export type NflWeek = { seasonType: number; week: number; label: string; detail?: string }
+export type NflWeek = { seasonType: number; week: number; label: string; detail?: string; start?: string; end?: string }
 
 export type Scoreboard = {
     games: Game[]
@@ -64,7 +64,7 @@ type RawEvent = {
     status: { period: number; type: { state: 'pre' | 'in' | 'post'; shortDetail: string } }
     competitions: { competitors: RawCompetitor[]; broadcast?: string }[]
 }
-type RawCalendar = { label: string; value: string; entries?: { label: string; value: string; detail?: string }[] }
+type RawCalendar = { label: string; value: string; entries?: { label: string; value: string; detail?: string; startDate?: string; endDate?: string }[] }
 type RawScoreboard = {
     events?: RawEvent[]
     leagues?: { calendar?: RawCalendar[] | string[] }[]
@@ -113,6 +113,8 @@ function toWeeks(calendar: RawCalendar[]): NflWeek[] {
             week: Number(entry.value),
             label: part.value === '1' ? `Preseason ${entry.label}` : entry.label,
             detail: entry.detail,
+            start: entry.startDate,
+            end: entry.endDate,
         })))
 }
 

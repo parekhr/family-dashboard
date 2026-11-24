@@ -63,11 +63,19 @@ export function GameCard({ game, league, favorites }: GameCardProps) {
         return (
             <tr className={dim ? 'text-muted' : ''}>
                 <td className="py-0.5 pr-2"><TeamLabel team={team} favorite={isFavorite(team)} /></td>
-                {labels.map((_, i) => (
-                    <td key={i} className={`text-center text-xs tabular-nums ${i === currentPeriod ? 'font-bold text-red-600' : 'text-muted'}`}>
-                        {team.periods[i] ?? '–'}
-                    </td>
-                ))}
+                {labels.map((_, i) => {
+                    const points = team.periods[i]
+                    const otherPoints = other.periods[i]
+                    // the quarter in progress stays red; a finished quarter's higher score is
+                    // bold and dark (a tied quarter has no winner, so neither is)
+                    const wonQuarter = i !== currentPeriod && points !== undefined && otherPoints !== undefined && points > otherPoints
+                    const style = i === currentPeriod ? 'font-bold text-red-600' : wonQuarter ? 'font-bold text-ink' : 'text-muted'
+                    return (
+                        <td key={i} className={`text-center text-xs tabular-nums ${style}`}>
+                            {points ?? '–'}
+                        </td>
+                    )
+                })}
                 <td className={`text-center font-sports text-[22px] leading-none tracking-wide ${dim ? 'text-muted' : ''}`}>{team.score ?? '–'}</td>
             </tr>
         )
@@ -77,7 +85,7 @@ export function GameCard({ game, league, favorites }: GameCardProps) {
     // A finished game shows nothing there (the scores speak for themselves), except an
     // unusual ending ESPN reports instead of "Final", like "Postponed" or "Canceled".
     const status = live
-        ? <><span className="text-red-600">Live</span> <span className="tabular-nums">{game.detail}</span></>
+        ? <span className="flex items-center gap-2"><span className="font-bold text-red-600">Live</span><span className="tabular-nums">{game.detail}</span></span>
         : game.detail.startsWith('Final') ? null : game.detail
 
     return (
@@ -92,15 +100,15 @@ export function GameCard({ game, league, favorites }: GameCardProps) {
                     <tr className="text-xs font-bold text-ink">
                         {/* the live status on the left; a "Q" on the right, labelling the
                             quarter columns that follow (1 2 3 4, then OT if there was one) */}
-                        <th className="pr-1 text-xs font-semibold text-muted">
+                        <th className="pb-1.5 pr-1 text-xs font-semibold text-muted">
                             <span className="flex items-center justify-between gap-2">
                                 <span className="truncate text-left">{status}</span>
                                 <span className="shrink-0 font-bold text-ink">Q</span>
                             </span>
                         </th>
-                        {labels.map(label => <th key={label} className="text-center font-bold">{label}</th>)}
+                        {labels.map(label => <th key={label} className="pb-1.5 text-center font-bold">{label}</th>)}
                         {/* centered over the totals, which are centered too */}
-                        <th className="text-center font-bold">T</th>
+                        <th className="pb-1.5 text-center font-bold">T</th>
                     </tr>
                 </thead>
                 <tbody>
