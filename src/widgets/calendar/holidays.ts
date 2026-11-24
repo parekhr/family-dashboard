@@ -79,6 +79,17 @@ const chineseNewYearDates: Record<number, { month: number, day: number }> = {
     2050: { month: 1, day: 23 },
 }
 
+// Diwali (the main day, Lakshmi Puja) follows the Hindu lunar calendar (the new moon of
+// Kartik), so like Chinese New Year it's a table, not a rule. Dates from Drik Panchang;
+// sources agree through 2029 but disagree for 2030, so add each year once it's settled
+// (check drikpanchang.com/hindu-festivals/diwali/diwali.html).
+const diwaliDates: Record<number, { month: number, day: number }> = {
+    2026: { month: 11, day: 8 },
+    2027: { month: 10, day: 29 },
+    2028: { month: 10, day: 17 },
+    2029: { month: 11, day: 5 },
+}
+
 export function checkHoliday(iso: string): Holiday | undefined {
     const month = Number(iso.slice(-5, -3))
     const day = Number(iso.slice(-2))
@@ -92,7 +103,8 @@ export function checkHoliday(iso: string): Holiday | undefined {
     return fixedHolidays.find(holiday => holiday.month === month && holiday.day === day) ?? 
            floatingHolidays.find(holiday => holiday.month === month && holiday.weekday === weekday && (holiday.occurrence === occurrence || (holiday.occurrence === 'last' && day + 7 > monthLength))) ??
            (easter?.month === month && easter?.day === day ? easter : undefined) ??
-           (getChineseNewYear(year)?.month === month && getChineseNewYear(year)?.day === day ? getChineseNewYear(year) : undefined)
+           (getChineseNewYear(year)?.month === month && getChineseNewYear(year)?.day === day ? getChineseNewYear(year) : undefined) ??
+           (getDiwali(year)?.month === month && getDiwali(year)?.day === day ? getDiwali(year) : undefined)
 }
 
 // Calculate the date of Easter for a given year using the Anonymous Gregorian algorithm
@@ -114,4 +126,10 @@ export function getChineseNewYear(year: number): FixedHoliday | undefined {
     const date = chineseNewYearDates[year]
     if (!date) return undefined
     return { name: "Chinese New Year", month: date.month, day: date.day, color: '#C8102E' }
+}
+
+export function getDiwali(year: number): FixedHoliday | undefined {
+    const date = diwaliDates[year]
+    if (!date) return undefined
+    return { name: "Diwali", month: date.month, day: date.day, color: '#E8960C' }   // marigold, like the diyas
 }
