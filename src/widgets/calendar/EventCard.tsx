@@ -66,7 +66,7 @@ export function EventCard({ event, people, categories, confirming, onConfirmStar
                 )}
             </div>
 
-            {/* edit + delete, same buttons as Home Care's History modal.
+            {/* edit + delete, same buttons as a reminder's history.
                 The trash asks first: "Delete?" replaces the time, and the buttons swap to
                 confirm / cancel at the same size, so the card never changes shape.
                 Cancel sits where the trash was, so a double tap can't delete. */}

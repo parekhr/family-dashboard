@@ -79,6 +79,20 @@ export function formatTimeAgo(timestamp: string, now = new Date()): string {
   return rtf.format(-Math.floor(secs / 3600), 'hour')
 }
 
+// "Dec 3" for a date this year, "May 25, 2027" for any other year, so a date months away
+// (a reminder logged early, a 12-month interval) can't be read as this year's
+export function formatShortDateWithYear(iso: string, todayISO: string = getTodayISO()): string {
+  const [year, month, day] = iso.split('-').map(Number)
+  const date = new Date(year, month - 1, day)
+  const sameYear = iso.slice(0, 4) === todayISO.slice(0, 4)
+
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    ...(sameYear ? {} : { year: 'numeric' }),
+  })
+}
+
 export function formatWeekdayTime(timestamp: string): string {
   const date = new Date(timestamp)
   return date.toLocaleDateString('en-US', {

@@ -1,19 +1,21 @@
-import type { HomeCareItem } from "./useHomeCareData"
+import type { ReminderItem } from "./useRemindersData"
+import { getDueDate, getIntervalText } from "./reminders"
 import { Trash2, Pencil } from "lucide-react"
-import { formatDate, getTodayISO } from "../../lib/dates"
+import { formatDate, getTodayISO } from "../lib/dates"
 import { useState } from "react"
-import { ScrollArea } from '../../components/ScrollArea'
-import { addButtonClass, cancelButtonClass, dangerIconButtonClass, iconButtonClass, raisedPrimaryClass } from '../../components/styles'
+import { ScrollArea } from '../components/ScrollArea'
+import { addButtonClass, cancelButtonClass, dangerIconButtonClass, iconButtonClass, raisedPrimaryClass } from '../components/styles'
 
 type ItemHistoryProps = {
-    item: HomeCareItem
+    item: ReminderItem
     onDelete: (date: string) => void
     onAdd: (date: string) => void
     onEdit: (oldDate: string, newDate: string) => void
 }
 
-// One item's details and history (see, add, fix or delete the dates it was done), shown
-// inside Settings → Widgets → Home Care → Home Care items when an item is tapped.
+// One reminder's details and history (see, add, fix or delete the dates it was done), shown
+// in Set up reminders when a reminder is tapped. Adding a date is how to log one done on
+// another day; the next reminder counts from the latest date.
 export function ItemHistory({ item, onDelete, onAdd, onEdit }: ItemHistoryProps) {
 
     const [editingDate, setEditingDate] = useState<string | null>(null)   // which row is being edited (null = none)
@@ -79,15 +81,15 @@ export function ItemHistory({ item, onDelete, onAdd, onEdit }: ItemHistoryProps)
         cancelEditing()
     }
 
+    const dueDate = getDueDate(item)
+
     return (
         <>
             {/* what it is, for reference (the pencil on the list changes these) */}
-            {(item.model || item.size) && (
-                <div className="flex flex-col text-sm text-muted">
-                    {item.model && <span>Model: {item.model}</span>}
-                    {item.size && <span>Size: {item.size}</span>}
-                </div>
-            )}
+            <div className="flex flex-col gap-0.5 text-sm text-muted">
+                {item.interval && <span>{getIntervalText(item.interval)}{dueDate && `, next due ${formatDate(dueDate)}`}</span>}
+                {item.notes && <span className="whitespace-pre-line text-ink">{item.notes}</span>}
+            </div>
 
             <div className="mt-4 text-sm font-semibold text-muted">History</div>
             <ScrollArea className="max-h-[260px]">
@@ -114,7 +116,7 @@ export function ItemHistory({ item, onDelete, onAdd, onEdit }: ItemHistoryProps)
                                         Save
                                     </button>
                                     <button
-                                        className="h-11 cursor-pointer px-3 text-muted"
+                                        className={cancelButtonClass}
                                         onClick={cancelEditing}
                                     >
                                         Cancel

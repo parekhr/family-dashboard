@@ -6,7 +6,6 @@ import { formatTimeAgo } from '../lib/dates'
 import { PeopleSettings } from './settings/PeopleSettings'
 import { CategorySettings } from './settings/CategorySettings'
 import { WidgetSettings } from './settings/WidgetSettings'
-import { HomeCareItemsPage } from './settings/HomeCareItemsPage'
 import { HouseholdNameSetting } from './settings/HouseholdNameSetting'
 import { NameFontSetting } from './settings/NameFontSetting'
 import type { WidgetChoices } from '../widgets/registry'
@@ -27,9 +26,6 @@ type SettingsModalProps = {
 
 type Tab = 'household' | 'widgets' | 'people' | 'categories'
 
-// A widget's own settings page, opened from its row in the Widgets tab
-export type SettingsPage = 'homeCareItems'
-
 const tabs: { key: Tab; label: string }[] = [
     { key: 'household', label: 'Household' },
     { key: 'widgets', label: 'Widgets' },
@@ -39,17 +35,6 @@ const tabs: { key: Tab; label: string }[] = [
 
 export function SettingsModal({ householdName, onHouseholdNameChange, nameFont, onNameFontChange, themeKey, onThemeChange, widgets, onWidgetsChange, onClose }: SettingsModalProps) {
     const [tab, setTab] = useState<Tab>('household')
-    const [page, setPage] = useState<SettingsPage | null>(null)
-
-    // A widget's settings page replaces the tabs; its back arrow returns to the Widgets tab.
-    // Every widget's own settings are reached from its row there, so they're all in one place.
-    if (page) {
-        return (
-            <Modal onClose={onClose} className="flex w-[480px] flex-col">
-                {page === 'homeCareItems' && <HomeCareItemsPage onBack={() => setPage(null)} onClose={onClose} />}
-            </Modal>
-        )
-    }
 
     return (
         <Modal onClose={onClose} className="flex w-[480px] flex-col">
@@ -112,7 +97,7 @@ export function SettingsModal({ householdName, onHouseholdNameChange, nameFont, 
                         </div>
                     </>
                 )}
-                {tab === 'widgets' && <WidgetSettings widgets={widgets} onChange={onWidgetsChange} onOpenPage={setPage} />}
+                {tab === 'widgets' && <WidgetSettings widgets={widgets} onChange={onWidgetsChange} />}
                 {tab === 'people' && <PeopleSettings />}
                 {tab === 'categories' && <CategorySettings />}
             </ScrollArea>

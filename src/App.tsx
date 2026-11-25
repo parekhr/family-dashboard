@@ -7,8 +7,8 @@ import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import type { Session } from '@supabase/supabase-js'
 import { SignIn } from './components/SignIn'
-import { useHomeCareData } from './widgets/homeCare/useHomeCareData'
-import { HomeCareContext } from './widgets/homeCare/HomeCareContext'
+import { useRemindersData } from './reminders/useRemindersData'
+import { RemindersContext } from './reminders/RemindersContext'
 import { useCalendarData } from './widgets/calendar/useCalendarData'
 import { CalendarContext } from './widgets/calendar/CalendarContext'
 import { useAutoReload } from './hooks/useAutoReload'
@@ -24,7 +24,7 @@ function App() {
   const [pickedNameFont, setPickedNameFont] = useState<string | null>(null)        // same tab
   const [session, setSession] = useState<Session | null | undefined>(undefined)
   const { household, error } = useFetchHousehold(session?.user.id)
-  const homeCare = useHomeCareData(session?.user.id)   // loaded here so the header's reminders work without the widget
+  const reminders = useRemindersData(session?.user.id)   // loaded here for the header's reminders bell
   const calendar = useCalendarData(session?.user.id)   // loaded here so Settings can manage categories and people
 
   const themeKey = pickedTheme ?? household?.colorTheme ?? 'sage'
@@ -105,7 +105,7 @@ function App() {
       style={{ '--color-primary': theme.primary, '--color-primary-hover': theme.primaryHover } as React.CSSProperties}
     >
       <HouseholdContext.Provider value={household}>
-      <HomeCareContext.Provider value={homeCare}>
+      <RemindersContext.Provider value={reminders}>
       <CalendarContext.Provider value={calendar}>
       <SportsContext.Provider value={sports}>
         <Header
@@ -123,7 +123,7 @@ function App() {
         <DashboardPages onWidgets={onWidgets} />
       </SportsContext.Provider>
       </CalendarContext.Provider>
-      </HomeCareContext.Provider>
+      </RemindersContext.Provider>
       </HouseholdContext.Provider>
     </div>
   )

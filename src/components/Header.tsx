@@ -2,7 +2,7 @@ import { useNow } from '../hooks/useNow'
 import { Settings } from 'lucide-react'
 import { SettingsModal } from './SettingsModal'
 import { useState } from 'react'
-import { RemindersBell } from '../widgets/homeCare/RemindersBell'
+import { RemindersBell } from '../reminders/RemindersBell'
 import type { WidgetChoices } from '../widgets/registry'
 import { getNameFont } from '../lib/nameFonts'
 

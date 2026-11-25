@@ -21,7 +21,7 @@ export const modalTitleClass = 'text-[28px] font-semibold leading-none'
 // The small pop-up under the reminders bell
 export const smallTitleClass = 'text-[22px] font-semibold leading-none'
 
-// Widget titles on the dashboard (Home Care, the calendar's month). Sports keeps its
+// Widget titles on the dashboard (the calendar's month). Sports keeps its
 // scoreboard font (font-sports).
 export const widgetTitleClass = 'font-ui text-[26px] font-semibold text-ink'
 
@@ -32,6 +32,10 @@ export const raisedPrimaryClass = `${raised} border-edge bg-primary font-semibol
 
 // Everything else that's a button (unselected tabs, close, Cancel)
 export const raisedNeutralClass = `${raised} border-edge-soft bg-muted/15 font-medium text-ink hover:bg-muted/25`
+
+// A theme-tinted button: stands out from the cream and grey more than the grey button,
+// without being the main action (the bell's ✓ and "Set up reminders")
+export const raisedTintClass = `${raised} border-edge-soft bg-primary/15 font-semibold text-primary hover:bg-primary/25`
 
 export const closeButtonClass = `flex h-11 w-11 shrink-0 items-center justify-center rounded-control text-lg ${raisedNeutralClass}`
 export const smallCloseButtonClass = `flex h-9 w-9 shrink-0 items-center justify-center rounded-control-sm ${raisedNeutralClass}`

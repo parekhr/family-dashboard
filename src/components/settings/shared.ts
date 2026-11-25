@@ -1,5 +1,5 @@
 // Styles and checks shared by the People and Categories tabs in Settings.
-// The class strings match the event form and the Home Care History modal.
+// The class strings match the event form and a reminder's history.
 // The buttons are the house style's (../styles.ts), re-exported here so the tabs' imports stay put.
 
 import { raisedPrimaryClass } from '../styles'

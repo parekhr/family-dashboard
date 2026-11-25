@@ -1626,10 +1626,7 @@ family-dashboard/
 │   │   │   ├── holidays.ts           # holiday lists, Easter, Chinese New Year, checkHoliday()
 │   │   │   ├── seasonalThemes.ts     # one theme per month
 │   │   │   └── customIcons.ts        # maple leaf, pumpkin, spider, spider web
-│   │   └── homeCare/
-│   │       ├── HomeCareWidget.tsx
-│   │       ├── HistoryModal.tsx      # per-item history: add/edit/delete dates
-│   │       └── useHomeCareData.ts    # items + history from Supabase; log/add/edit/delete history
+│   │   └── (homeCare/ was here until November 25, 2026: it became src/reminders/, see "Reminders")
 │   ├── settings/
 │   │   ├── SettingsPanel.tsx
 │   │   ├── WidgetToggleList.tsx
@@ -1719,6 +1716,8 @@ Home Care history, the color theme and the location are edited in the app.
     and "+ Add Item"; the form (name, icon picker, model, size, reminder defaulting to
     every 6 months) takes over the page while open. Tapping an item opens its history
     there too (see, add, fix, delete dates; `ItemHistory.tsx`).
+  - *(Home Care's part of this was replaced on November 25, 2026: it's no longer a widget,
+    see "Reminders" below.)*
   - **Where things live (settled November 24, 2026)**, for every widget: **use** a widget
     on the dashboard while it's on; a widget that's off shows nowhere, except that
     **reminders** reach the header bell; **setup and records** are in Settings → Widgets
@@ -1800,6 +1799,46 @@ Home Care history, the color theme and the location are edited in the app.
   migration before the code that needs it; migrations only add (new columns with
   defaults, new tables) so tablets still on the old version keep working; remove or
   rename in a later release, once every tablet has reloaded.
+- **Reminders — Home Care became the bell, November 25, 2026.** The rule: *a reminder is
+  "after this amount of time, remind me to do this"*. Anything that behaves differently
+  (a one-off date, a live event) belongs somewhere else, not in Reminders. So:
+  - **Not a widget any more.** The Home Care widget (cards, "I changed this today") and its
+    Settings → Widgets row are gone; `homeCare` left the registry, and `resolveWidgets`
+    already drops ids it doesn't know from saved layouts. A "widget" now means only a tile
+    on the dashboard grid.
+  - **All in the bell** (`src/reminders/RemindersBell.tsx`): due reminders with Done and
+    Snooze, then an Upcoming list where every row has its own Done, for doing it early.
+    Done (now or early) logs today and clears any snooze, and the next reminder counts from
+    the latest log (last done + interval), so logging early pushes the next one along. The
+    list scrolls. "Set up reminders ›" at the bottom opens the setup pop-up.
+  - **Set up reminders** (`ReminderSetup.tsx`, was Settings → Widgets → Home Care items):
+    list, add, edit, delete, and tap one for its history (add, fix or delete dates).
+  - **How often**: required (no more "Off", and no "Never": something that never repeats
+    isn't a reminder; its history still tracks it). Old items without one show "Set how
+    often" in red until edited. Picked from a 3-across grid of raised choices (Daily,
+    Weekly, 2 weeks, Monthly, 2 / 3 / 4 / 6 months, Yearly), not a dropdown: the browser's
+    native list ignored the house style, and its hover highlight read as the selected value.
+    New reminders start at 6 months. Stored as `interval_count` + `interval_unit` ('day' / 'week' / 'month'). How
+    early a reminder shows and how long Snooze hides it scale with the unit: daily shows on
+    the day and snoozes a day; weekly shows a day early and snoozes a day; monthly shows a
+    week early and snoozes a week.
+  - **Details**: one optional **Notes** (up to 300 characters) for everything: model, size,
+    part number, where to buy it. Model and size were their own fields until the same day;
+    migration `20261125030000_notes_only.sql` folded them into the start of notes ("Model:
+    …" / "Size: …" lines). The form is now Name, Repeats, Icon, Notes.
+  - **Bell colors**: rows stay light grey; the ✓ (done early) and "Set up reminders" use
+    `raisedTintClass` (theme-tinted, green text) so they read as buttons next to the
+    solid-green Done.
+  - **Database**: migration `20261125020000_reminders.sql` adds `notes`, `interval_count`
+    and `interval_unit` and copies `interval_months` across. The tables keep their
+    `home_care_*` names, and `interval_months` is still written for monthly reminders, so
+    tablets on the old version keep working. **Later cleanup release**: rename the tables,
+    drop `interval_months`, `model` and `size`, and take `homeCare` out of the `widget_layout` /
+    `hidden_widgets` defaults.
+  - Code: `src/reminders/` (was `src/widgets/homeCare/`): `useRemindersData`,
+    `RemindersContext`, `ReminderForm`, `ReminderSetup`, `ItemHistory`, `ReminderIcon`,
+    `reminders.ts` (the interval math). Settings' "a widget's own page" mechanism went with
+    it, since nothing else used it.
 - **House style for pop-ups — "warm and friendly", November 25, 2026** (picked from
   three mockups: warm and friendly, editorial, default font with new shapes). The old
   modals were the stock Tailwind look (extrabold system font, flat pills, grey ✕ circle).

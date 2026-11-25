@@ -85,7 +85,7 @@ function toCalendarEvent(row: CalendarEventRow): CalendarEvent {
 }
 
 
-// Called once in App (like useHomeCareData), so the calendar and Settings share one copy:
+// Called once in App (like useRemindersData), so the calendar and Settings share one copy:
 // renaming a category or person in Settings shows up in the calendar straight away.
 // Waits for the signed-in user.
 export function useCalendarData(userId: string | undefined) {

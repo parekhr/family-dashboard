@@ -2,8 +2,8 @@ import { AirVent, AlarmSmoke, Battery, Car, Droplet, Fan, Flame, Heater, Lightbu
 import type { LucideIcon } from 'lucide-react'
 
 // The icons an item can have, in the order the picker shows them.
-// The `icon` column on home_care_items stores one of these keys.
-export const homeCareIcons: { key: string; label: string; Icon: LucideIcon }[] = [
+// The `icon` column on home_care_items (the reminders table) stores one of these keys.
+export const reminderIcons: { key: string; label: string; Icon: LucideIcon }[] = [
   { key: 'air-vent', label: 'Air vent', Icon: AirVent },
   { key: 'droplet', label: 'Water', Icon: Droplet },
   { key: 'refrigerator', label: 'Refrigerator', Icon: Refrigerator },
@@ -22,6 +22,6 @@ export const homeCareIcons: { key: string; label: string; Icon: LucideIcon }[] =
 
 // An unknown key (a typo in the database, or an icon since removed) falls back to the
 // wrench instead of drawing nothing, which would crash the whole dashboard.
-export function getHomeCareIcon(key: string): LucideIcon {
-  return homeCareIcons.find(icon => icon.key === key)?.Icon ?? Wrench
+export function getReminderIcon(key: string): LucideIcon {
+  return reminderIcons.find(icon => icon.key === key)?.Icon ?? Wrench
 }
