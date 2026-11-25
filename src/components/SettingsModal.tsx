@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Check } from 'lucide-react'
 import { Modal } from './Modal'
 import { colorThemes } from '../lib/colorThemes'
+import { formatTimeAgo } from '../lib/dates'
 import { PeopleSettings } from './settings/PeopleSettings'
 import { CategorySettings } from './settings/CategorySettings'
 import { WidgetSettings } from './settings/WidgetSettings'
@@ -109,7 +110,7 @@ export function SettingsModal({ themeKey, onThemeChange, widgets, onWidgetsChang
             {/* which version this tablet is running: the update's date and its git commit,
                 for checking a tablet picked up an update (see useAutoReload) */}
             <div className="mt-3 flex justify-between text-xs text-muted">
-                <span>Last updated: {new Date(__BUILD_TIME__).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                <span>Last updated: {formatTimeAgo(__BUILD_TIME__)}</span>
                 <span className="font-mono">{__BUILD_COMMIT__}</span>
             </div>
         </Modal>

@@ -63,6 +63,22 @@ export function formatShortDate(iso: string): string {
   })
 }
 
+// "32 seconds ago" / "14 minutes ago" / "3 hours ago" while it's still the same day,
+// then a plain date ("Nov 23, 2026") once the day has turned over.
+export function formatTimeAgo(timestamp: string, now = new Date()): string {
+  const date = new Date(timestamp)
+
+  if (toISO(date) !== toISO(now)) {
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  }
+
+  const secs = Math.max(0, Math.floor((now.getTime() - date.getTime()) / 1000))
+  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
+  if (secs < 60) return rtf.format(-secs, 'second')
+  if (secs < 3600) return rtf.format(-Math.floor(secs / 60), 'minute')
+  return rtf.format(-Math.floor(secs / 3600), 'hour')
+}
+
 export function formatWeekdayTime(timestamp: string): string {
   const date = new Date(timestamp)
   return date.toLocaleDateString('en-US', {
