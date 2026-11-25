@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { modalFontClass } from './styles'
 
 type ModalProps = {
     onClose: () => void
@@ -12,7 +13,7 @@ type ModalProps = {
 export function Modal({ onClose, className = '', children }: ModalProps) {
     return createPortal(
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
-            <div className={`rounded-3xl bg-card p-6 text-ink ${className}`} onClick={(e) => e.stopPropagation()}>
+            <div className={`rounded-3xl bg-card p-6 text-ink ${modalFontClass} ${className}`} onClick={(e) => e.stopPropagation()}>
                 {children}
             </div>
         </div>,

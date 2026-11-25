@@ -7,6 +7,8 @@
 @import "@fontsource/playfair-display/latin-700.css";
 @import "@fontsource/caveat/latin-700.css";
 @import "@fontsource/dancing-script/latin-700.css";
+@import "@fontsource/fredoka/latin-400.css";   /* 400 and 500: Fredoka is also the pop-ups' font (components/styles.ts) */
+@import "@fontsource/fredoka/latin-500.css";
 @import "@fontsource/fredoka/latin-600.css";
 
 html,

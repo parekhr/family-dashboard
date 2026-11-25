@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { Modal } from '../../components/Modal'
 import { EventCard } from './EventCard'
 import { ScrollArea } from '../../components/ScrollArea'
+import { closeButtonClass, modalTitleClass, tabClass } from '../../components/styles'
 
 type DayModalProps = {
     iso: string
@@ -30,7 +31,7 @@ export function DayModal({ iso, onClose, events, people, categories, holiday, on
             <div className="flex items-center justify-between">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col">
-                        <h3 className="flex items-center gap-2 text-xl font-extrabold">
+                        <h3 className={`flex items-center gap-2 ${modalTitleClass}`}>
                             <CalendarDays className="w-5 h-5 text-muted" />
                             {formatDate(iso)}
                         </h3>
@@ -43,7 +44,8 @@ export function DayModal({ iso, onClose, events, people, categories, holiday, on
 
                 </div>
                 <button
-                    className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors"
+                    className={closeButtonClass}
+                    aria-label="Close"
                     onClick={onClose}
                 >
                     ✕
@@ -52,13 +54,13 @@ export function DayModal({ iso, onClose, events, people, categories, holiday, on
             {showTabs && (
                 <div className="flex gap-2 mt-4">
                     <button
-                        className={`flex-1 h-11 rounded-full font-semibold cursor-pointer transition-colors ${activeTab === 'today' ? 'bg-primary text-white' : 'bg-muted/15 text-ink hover:bg-muted/25'}`}
+                        className={tabClass(activeTab === 'today')}
                         onClick={() => onTabChange?.('today')}
                     >
                         Today
                     </button>
                     <button
-                        className={`flex-1 h-11 rounded-full font-semibold cursor-pointer transition-colors ${activeTab === 'tomorrow' ? 'bg-primary text-white' : 'bg-muted/15 text-ink hover:bg-muted/25'}`}
+                        className={tabClass(activeTab === 'tomorrow')}
                         onClick={() => onTabChange?.('tomorrow')}
                     >
                         Tomorrow

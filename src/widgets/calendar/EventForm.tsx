@@ -4,6 +4,7 @@ import { getTodayISO } from '../../lib/dates'
 import { ChevronDown, Users } from 'lucide-react'
 import { Modal } from '../../components/Modal'
 import { ScrollArea } from '../../components/ScrollArea'
+import { closeButtonClass, modalTitleClass, raisedPrimaryClass } from '../../components/styles'
 
 type EventFormProps = {
     onClose: () => void
@@ -72,9 +73,9 @@ export function EventForm({ onClose, onSave, categories, people, event }: EventF
     return (
         <Modal onClose={onClose} className="flex max-h-[calc(100%-2rem)] w-[480px] flex-col">
             <div className="flex items-center justify-between">
-                <h3 className="text-xl font-extrabold">{event ? 'Edit Event' : 'Add Event'}</h3>
+                <h3 className={modalTitleClass}>{event ? 'Edit Event' : 'Add Event'}</h3>
                 <button
-                    className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors"
+                    className={closeButtonClass}
                     onClick={onClose}
                 >
                     ✕
@@ -159,7 +160,7 @@ export function EventForm({ onClose, onSave, categories, people, event }: EventF
                         <span className="text-sm font-semibold text-today">{error}</span>
                     )}
 
-                    <button type="submit" className="h-11 rounded-xl bg-primary font-semibold text-white cursor-pointer hover:bg-primary-hover active:bg-primary-hover transition-colors">Save</button>
+                    <button type="submit" className={`h-11 rounded-2xl ${raisedPrimaryClass}`}>Save</button>
                 </form>
             </ScrollArea>
         </Modal>

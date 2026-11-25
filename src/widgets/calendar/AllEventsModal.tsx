@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Modal } from '../../components/Modal'
 import { EventCard } from './EventCard'
 import { ScrollArea } from '../../components/ScrollArea'
+import { closeButtonClass, modalTitleClass } from '../../components/styles'
 
 type AllEventsModalProps = {
     onClose: () => void
@@ -56,12 +57,12 @@ export function AllEventsModal({ onClose, events, people, categories, onEdit, on
     return (
         <Modal onClose={onClose} className="w-[480px]">
             <div className="flex items-center justify-between">
-                <h3 className="flex items-center gap-2 text-xl font-extrabold">
+                <h3 className={`flex items-center gap-2 ${modalTitleClass}`}>
                     <CalendarRange className="w-5 h-5 text-muted" />
                     Upcoming Events
                 </h3>
                 <button
-                    className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors"
+                    className={closeButtonClass}
                     onClick={onClose}
                 >
                     ✕

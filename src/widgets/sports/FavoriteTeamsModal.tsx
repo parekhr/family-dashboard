@@ -5,6 +5,7 @@ import { leagues, type League, type TeamInfo } from './espn'
 import { useLeagueTeams } from './useLeagueTeams'
 import { useSports } from './SportsContext'
 import { ScrollArea } from '../../components/ScrollArea'
+import { closeButtonClass, tabClass } from '../../components/styles'
 
 type FavoriteTeamsModalProps = {
     onClose: () => void
@@ -22,7 +23,6 @@ function readSort(): Sort {
 }
 
 const leagueKeys = Object.keys(leagues) as League[]
-const closeButtonClass = 'flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors'
 
 // Opened by the star in the Sports widget's header: every team in a league as a grid of
 // logos. Tapping one favorites it (saved right away); favorites' games show first.
@@ -95,7 +95,7 @@ export function FavoriteTeamsModal({ onClose }: FavoriteTeamsModalProps) {
                 {leagueKeys.map(key => (
                     <button
                         key={key}
-                        className={`h-11 flex-1 cursor-pointer rounded-full font-semibold transition-colors ${league === key ? 'bg-primary text-white' : 'bg-muted/15 text-ink hover:bg-muted/25'}`}
+                        className={tabClass(league === key)}
                         aria-pressed={league === key}
                         onClick={() => setLeague(key)}
                     >

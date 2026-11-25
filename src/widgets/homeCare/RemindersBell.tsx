@@ -6,6 +6,7 @@ import { HomeCareIcon } from './HomeCareIcon'
 import { SNOOZE_DAYS, getDueDate, getIntervalText, getLastChanged, getReminder, getReminderText, isSnoozed } from './reminders'
 import type { Reminder } from './reminders'
 import type { HomeCareItem } from './useHomeCareData'
+import { modalFontClass, raisedNeutralClass, raisedPrimaryClass, smallCloseButtonClass, smallTitleClass } from '../../components/styles'
 
 // One line for an item with nothing due, so dates are visible without opening Home Care
 function getQuietText(item: HomeCareItem, todayISO: string): string {
@@ -51,11 +52,11 @@ export function RemindersBell() {
                     {/* invisible layer behind the panel: tapping anywhere else closes it */}
                     <div className="fixed inset-0 z-40" onClick={() => setPanelOpen(false)} />
 
-                    <div className="absolute right-0 top-full z-50 mt-2 w-[360px] rounded-3xl bg-card p-4 text-ink shadow-lg">
+                    <div className={`absolute right-0 top-full z-50 mt-2 w-[360px] rounded-3xl bg-card p-4 text-ink shadow-lg ${modalFontClass}`}>
                         <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-extrabold">Reminders</h3>
+                            <h3 className={smallTitleClass}>Reminders</h3>
                             <button
-                                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-muted/15 hover:bg-muted/25 active:bg-muted/35 transition-colors"
+                                className={smallCloseButtonClass}
                                 aria-label="Close"
                                 onClick={() => setPanelOpen(false)}
                             >
@@ -84,14 +85,14 @@ export function RemindersBell() {
                                     </div>
                                     <div className="ml-7 mt-2 flex gap-2">
                                         <button
-                                            className="flex h-11 cursor-pointer items-center gap-1.5 rounded-full bg-primary px-4 font-semibold text-white hover:bg-primary-hover active:bg-primary-hover"
+                                            className={`flex h-11 items-center gap-1.5 rounded-2xl px-4 ${raisedPrimaryClass}`}
                                             onClick={() => logToday(item.id)}
                                         >
                                             <Check size={16} />
                                             Done
                                         </button>
                                         <button
-                                            className="flex h-11 cursor-pointer items-center gap-1.5 rounded-full border border-muted/30 px-4 font-semibold hover:bg-muted/10"
+                                            className={`flex h-11 items-center gap-1.5 rounded-2xl px-4 ${raisedNeutralClass}`}
                                             onClick={() => snooze(item.id, addDaysISO(todayISO, SNOOZE_DAYS))}
                                         >
                                             <Clock size={16} />

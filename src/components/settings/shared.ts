@@ -1,11 +1,14 @@
 // Styles and checks shared by the People and Categories tabs in Settings.
 // The class strings match the event form and the Home Care History modal.
+// Save and Cancel follow the house style in ../styles.ts.
+
+import { raisedPrimaryClass } from '../styles'
 
 export const MAX_NAME_LENGTH = 30
 
-export const inputClass = 'h-11 w-full rounded-xl border border-muted/30 bg-white px-3 text-base font-normal text-ink'
-export const saveButtonClass = 'h-11 shrink-0 cursor-pointer rounded-xl bg-primary px-4 font-bold text-white hover:bg-primary-hover active:bg-primary-hover'
-export const cancelButtonClass = 'h-11 shrink-0 cursor-pointer px-3 text-muted'
+export const inputClass = 'h-11 w-full rounded-2xl border border-muted/30 bg-white px-3 text-base font-normal text-ink'
+export const saveButtonClass = `h-11 shrink-0 rounded-2xl px-4 ${raisedPrimaryClass}`
+export const cancelButtonClass = 'h-11 shrink-0 cursor-pointer px-3 font-medium text-muted'
 export const iconButtonClass = 'flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-muted/30'
 export const addButtonClass = 'mt-3 h-[52px] w-full shrink-0 cursor-pointer rounded-full border-2 border-dashed border-muted/40 font-bold'
 

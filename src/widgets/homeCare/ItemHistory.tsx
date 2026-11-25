@@ -3,6 +3,7 @@ import { Trash2, Pencil } from "lucide-react"
 import { formatDate, getTodayISO } from "../../lib/dates"
 import { useState } from "react"
 import { ScrollArea } from '../../components/ScrollArea'
+import { raisedPrimaryClass } from '../../components/styles'
 
 type ItemHistoryProps = {
     item: HomeCareItem
@@ -107,7 +108,7 @@ export function ItemHistory({ item, onDelete, onAdd, onEdit }: ItemHistoryProps)
                                         }}
                                     />
                                     <button
-                                        className="h-11 cursor-pointer rounded-xl bg-primary px-4 font-bold text-white"
+                                        className={`h-11 rounded-2xl px-4 ${raisedPrimaryClass}`}
                                         onClick={() => handleEditSave(date)}
                                     >
                                         Save
@@ -157,7 +158,7 @@ export function ItemHistory({ item, onDelete, onAdd, onEdit }: ItemHistoryProps)
                                 setError('')
                             }}
                         />
-                        <button className="h-11 cursor-pointer rounded-xl bg-primary px-4 font-bold text-white" onClick={handleSave}>Save</button>
+                        <button className={`h-11 rounded-2xl px-4 ${raisedPrimaryClass}`} onClick={handleSave}>Save</button>
                         <button className="h-11 cursor-pointer px-3 text-muted" onClick={() => { setAdding(false); setNewDate(''); setError(''); }}>Cancel</button>
                     </div>
                     {error && <p className="text-sm text-red-600">{error}</p>}

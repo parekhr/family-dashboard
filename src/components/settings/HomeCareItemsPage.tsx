@@ -7,13 +7,13 @@ import { ItemHistory } from '../../widgets/homeCare/ItemHistory'
 import { getIntervalText } from '../../widgets/homeCare/reminders'
 import { addButtonClass, iconButtonClass } from './shared'
 import { ScrollArea } from '../ScrollArea'
+import { closeButtonClass, modalTitleClass } from '../styles'
 
 type HomeCareItemsPageProps = {
     onBack: () => void
     onClose: () => void
 }
 
-const closeButtonClass = 'flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors'
 
 // Settings → Widgets → Home Care → Home Care items: the one place Home Care is managed,
 // whether the widget is on or off. Add, edit (name / icon / model / size / reminder) and
@@ -36,7 +36,7 @@ export function HomeCareItemsPage({ onBack, onClose }: HomeCareItemsPageProps) {
             <button className={closeButtonClass} aria-label="Back" onClick={formOpen ? () => setEditing(null) : historyItem ? () => setHistoryId(null) : onBack}>
                 <ArrowLeft size={20} />
             </button>
-            <h3 className="min-w-0 flex-1 truncate text-xl font-extrabold">
+            <h3 className={`min-w-0 flex-1 truncate ${modalTitleClass}`}>
                 {editing === 'new' ? 'Add item' : editingItem ? `Edit ${editingItem.name}` : historyItem ? historyItem.name : 'Home Care items'}
             </h3>
             <button className={closeButtonClass} aria-label="Close" onClick={onClose}>✕</button>

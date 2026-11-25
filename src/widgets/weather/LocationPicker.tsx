@@ -4,6 +4,7 @@ import { Modal } from '../../components/Modal'
 import type { Location } from '../../hooks/useHouseholdData'
 import { searchLocations } from './searchLocations'
 import { ScrollArea } from '../../components/ScrollArea'
+import { closeButtonClass, modalTitleClass } from '../../components/styles'
 
 type LocationPickerProps = {
     current: Location | undefined
@@ -43,9 +44,9 @@ export function LocationPicker({ current, onChoose, onClose }: LocationPickerPro
     return (
         <Modal onClose={onClose} className="w-[420px]">
             <div className="flex items-center justify-between">
-                <h3 className="text-xl font-extrabold">Weather location</h3>
+                <h3 className={modalTitleClass}>Weather location</h3>
                 <button
-                    className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors"
+                    className={closeButtonClass}
                     onClick={onClose}
                 >
                     ✕

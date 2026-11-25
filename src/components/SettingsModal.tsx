@@ -11,6 +11,7 @@ import { HouseholdNameSetting } from './settings/HouseholdNameSetting'
 import { NameFontSetting } from './settings/NameFontSetting'
 import type { WidgetChoices } from '../widgets/registry'
 import { ScrollArea } from './ScrollArea'
+import { closeButtonClass, modalTitleClass, tabClass } from './styles'
 
 type SettingsModalProps = {
     householdName?: string
@@ -53,9 +54,9 @@ export function SettingsModal({ householdName, onHouseholdNameChange, nameFont, 
     return (
         <Modal onClose={onClose} className="flex w-[480px] flex-col">
             <div className="flex items-center justify-between gap-10">
-                <h3 className="text-xl font-extrabold">Settings</h3>
+                <h3 className={modalTitleClass}>Settings</h3>
                 <button
-                    className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors"
+                    className={closeButtonClass}
                     aria-label="Close"
                     onClick={onClose}
                 >
@@ -63,12 +64,12 @@ export function SettingsModal({ householdName, onHouseholdNameChange, nameFont, 
                 </button>
             </div>
 
-            {/* same pill tabs as the day modal's Today / Tomorrow */}
+            {/* raised tabs, the house style being tried here first (see styles.ts) */}
             <div className="mt-4 flex gap-2">
                 {tabs.map(({ key, label }) => (
                     <button
                         key={key}
-                        className={`h-11 flex-1 cursor-pointer rounded-full font-semibold transition-colors ${tab === key ? 'bg-primary text-white' : 'bg-muted/15 text-ink hover:bg-muted/25'}`}
+                        className={tabClass(tab === key)}
                         aria-pressed={tab === key}
                         onClick={() => setTab(key)}
                     >

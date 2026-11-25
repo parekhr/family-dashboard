@@ -3,6 +3,7 @@ import { Modal } from '../../components/Modal'
 import { getAlertTiming } from './alertTiming'
 import { severityColors } from './alertColors'
 import { ScrollArea } from '../../components/ScrollArea'
+import { closeButtonClass, modalTitleClass } from '../../components/styles'
 
 type AlertModalProps = {
     onClose: () => void
@@ -29,9 +30,9 @@ export function AlertsModal({ onClose, alerts, now }: AlertModalProps) {
     return (
         <Modal onClose={onClose} className="w-[600px]">
             <div className="flex items-center justify-between">
-                <h3 className="text-xl font-extrabold">Weather Alerts</h3>
+                <h3 className={modalTitleClass}>Weather Alerts</h3>
                 <button
-                    className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-muted/15 text-lg hover:bg-muted/25 active:bg-muted/35 transition-colors"
+                    className={closeButtonClass}
                     onClick={onClose}
                 >
                     ✕

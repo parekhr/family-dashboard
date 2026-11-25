@@ -13,6 +13,7 @@ import { EventForm } from './EventForm'
 import { reminderEvents } from './reminderEvents'
 import { getCategoryText } from './categories'
 import { useNow } from '../../hooks/useNow'
+import { widgetTitleClass } from '../../components/styles'
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -107,7 +108,7 @@ export function CalendarWidget() {
                     <button onClick={handlePrevMonth} className="flex items-center justify-center cursor-pointer text-ink w-11 h-11 rounded-full active:bg-muted/15 hover:bg-muted/10">
                         <ChevronLeft />
                     </button>
-                    <h2 className="w-[200px] text-center text-[22px] font-extrabold text-ink">
+                    <h2 className={`w-[200px] text-center ${widgetTitleClass}`}>
                         {monthNames[month - 1]} {year}
                     </h2>
                     <button onClick={handleNextMonth} className="flex items-center justify-center cursor-pointer text-ink w-11 h-11 rounded-full active:bg-muted/15 hover:bg-muted/10">
