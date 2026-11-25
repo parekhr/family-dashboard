@@ -4,16 +4,20 @@ import { SettingsModal } from './SettingsModal'
 import { useState } from 'react'
 import { RemindersBell } from '../widgets/homeCare/RemindersBell'
 import type { WidgetChoices } from '../widgets/registry'
+import { getNameFont } from '../lib/nameFonts'
 
 type HeaderProps = {
     name?: string
+    onNameChange: (name: string) => void
+    nameFont: string
+    onNameFontChange: (key: string) => void
     themeKey: string
     onThemeChange: (key: string) => void
     widgets: WidgetChoices
     onWidgetsChange: (widgets: WidgetChoices) => void
 }
 
-export function Header({ name, themeKey, onThemeChange, widgets, onWidgetsChange }: HeaderProps) {
+export function Header({ name, onNameChange, nameFont, onNameFontChange, themeKey, onThemeChange, widgets, onWidgetsChange }: HeaderProps) {
 
     const now = useNow()
     const [time, period] = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).split(' ')
@@ -33,7 +37,7 @@ export function Header({ name, themeKey, onThemeChange, widgets, onWidgetsChange
             </div>
 
             {/* Household name section */}
-            <div className="text-center text-xl font-bold truncate">{name}</div>
+            <div className={`text-center truncate ${getNameFont(nameFont).className}`}>{name}</div>
 
             {/* Location and settings section */}
             <div className="flex items-center justify-end gap-2">
@@ -48,6 +52,10 @@ export function Header({ name, themeKey, onThemeChange, widgets, onWidgetsChange
             </div>
             {settingsOpen && (
                 <SettingsModal
+                    householdName={name}
+                    onHouseholdNameChange={onNameChange}
+                    nameFont={nameFont}
+                    onNameFontChange={onNameFontChange}
                     themeKey={themeKey}
                     onThemeChange={onThemeChange}
                     widgets={widgets}

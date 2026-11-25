@@ -20,6 +20,8 @@ function App() {
   const [pickedTheme, setPickedTheme] = useState<string | null>(null)
   const [pickedWidgets, setPickedWidgets] = useState<WidgetChoices | null>(null)   // set from Settings' Widgets tab, like pickedTheme
   const [pickedFavorites, setPickedFavorites] = useState<string[] | null>(null)    // set from Settings' Favorite teams page
+  const [pickedName, setPickedName] = useState<string | null>(null)                // set from Settings' Household tab
+  const [pickedNameFont, setPickedNameFont] = useState<string | null>(null)        // same tab
   const [session, setSession] = useState<Session | null | undefined>(undefined)
   const { household, error } = useFetchHousehold(session?.user.id)
   const homeCare = useHomeCareData(session?.user.id)   // loaded here so the header's reminders work without the widget
@@ -78,6 +80,24 @@ function App() {
       .then(({ error }) => { if (error) console.error(error) })
   }
 
+  function handleNameChange(name: string) {
+    setPickedName(name)
+    if (!household) return   // can't happen in practice: Settings only shows once it's loaded
+    supabase.from('households')
+      .update({ name })
+      .eq('id', household.id)
+      .then(({ error }) => { if (error) console.error(error) })
+  }
+
+  function handleNameFontChange(key: string) {
+    setPickedNameFont(key)
+    if (!household) return   // can't happen in practice: Settings only shows once it's loaded
+    supabase.from('households')
+      .update({ name_font: key })
+      .eq('id', household.id)
+      .then(({ error }) => { if (error) console.error(error) })
+  }
+
   return (
     <div
       id="dashboard"
@@ -89,7 +109,10 @@ function App() {
       <CalendarContext.Provider value={calendar}>
       <SportsContext.Provider value={sports}>
         <Header
-          name={household.name}
+          name={pickedName ?? household.name}
+          onNameChange={handleNameChange}
+          nameFont={pickedNameFont ?? household.nameFont}
+          onNameFontChange={handleNameFontChange}
           themeKey={themeKey}
           onThemeChange={handleThemeChange}
           widgets={widgets}

@@ -1047,7 +1047,7 @@ and in what order — a settings change, not a code change or a per-household fo
   - **Right**: a settings gear button, with no resting background (a soft circle shows
     only on hover/press, like the calendar's month arrows) and an `aria-label`. It
     opens the Settings modal.
-- **Still to come**: the name's font choice and length limit (later features).
+- **Name font and length limit: built November 25, 2026** (see "Name length" and "Name font" below).
 - **Settings (MVP): color theme.** The only setting in the MVP. A handful (about 4–6)
   of hardcoded presets shown as swatches; tapping one applies it.
   - **What it changes: the green accent only**, i.e. everything drawn with
@@ -1113,17 +1113,29 @@ and in what order — a settings change, not a code change or a per-household fo
       `ring-2 ring-primary ring-offset-2 ring-offset-card`, the offset matching the
       cream card instead of Tailwind's white default. `aria-pressed` marks it.
 - **Household name**: optional `name` field on the household. Display label only;
-  `household_id` remains the identifier. For the MVP it's set in Supabase's table
-  editor; editing it in Settings is a later feature.
-- **Name length** (later feature): hard character limit in the Settings field (tentatively ~24; confirm
-  by testing the widest font at the real size in one header column, about 427px wide).
-  Ellipsis truncation stays as a backstop, since font widths vary.
-- **Name font** (later feature): a dropdown of a short curated list (4-6 fonts) with a live preview in
-  Settings. Store a key on the household (e.g. `name_font: "handwritten"`), not CSS;
-  the app maps keys to font-families and falls back to the default for unknown or
-  missing keys. Fonts are bundled with the app (e.g. `@fontsource`) rather than loaded
-  from a CDN, since the tablet's wifi may be flaky. Register them as Tailwind theme
-  fonts. Test every listed font with a maximum-length name.
+  `household_id` remains the identifier. Edited in Settings → Household (built November
+  24, 2026): the first tab, renamed from "Theme", shows the name with a pencil, then the
+  name font, then the color themes. The rename works like a People row (Save / Cancel,
+  "Enter a name"), so a name can't be cleared once set.
+  `HouseholdNameSetting` is in `components/settings/`; `App` keeps it in `pickedName` and
+  saves to `households.name`, like the theme (no migration: households can already update
+  their own row).
+- **Name length: 24 characters** (`MAX_HOUSEHOLD_NAME_LENGTH` in `lib/nameFonts.ts`,
+  built November 25, 2026). Measured in the browser with every font at its header size in
+  the middle column (416px: 1248px inside the padding, over three): Dancing Script is the
+  narrowest fit, at 24 capitals; typical mixed-case names fit 34 or more in every font.
+  So 24 always fits. Ellipsis truncation stays as a backstop, since font widths vary.
+- **Name font: built November 25, 2026.** Five fonts in `lib/nameFonts.ts`: Classic (the
+  app's sans), Elegant (Playfair Display), Handwritten (Caveat), Script (Dancing Script)
+  and Rounded (Fredoka). Not a dropdown: a list in Settings → Household where each row
+  draws the household's own name in that font at header size, so the list is the
+  preview; tapping applies at once, like the color themes. The household saves a key
+  (`name_font`, default 'classic'; migration `20261125010000_name_font.sql`), not CSS;
+  `getNameFont()` falls back to Classic for unknown or missing keys. Fonts are bundled
+  with `@fontsource` (Latin, bold only) and registered as Tailwind theme fonts
+  (`font-elegant` etc.) in `index.css`. Caveat and Dancing Script have small lowercase
+  letters (about 70% of the others'), so they're drawn at 28px instead of 20px to look
+  the same size. `App` keeps the choice in `pickedNameFont`.
 - **The location picker lives in the Weather widget, not the header.** The plan and the
   mockup first put it in the header beside the settings button; it was moved because:
   - it then only exists when the Weather widget does, so no "is Weather enabled?" check
@@ -1696,7 +1708,8 @@ Home Care history, the color theme and the location are edited in the app.
     hourly and weekly rows together with bigger icons, hiding the Hourly / Weekly switch; unknown ids in the saved list are dropped
     before `buildRows`. **Still to do**: the preview, the overflow warning and the
     arrow skipping, left out while every combination of the three widgets fits;
-  - household name editing, its length limit and the name font;
+  - ~~household name editing, its length limit and the name font~~ — **built November
+    24–25, 2026** (Settings → Household, see "Household name");
   - ~~managing Home Care items (add / rename / delete / reorder)~~ — **built November
     23, 2026; moved November 24 to Settings → Widgets → Home Care → "Home Care items ›"**.
     Rule settled the 24th: *every widget's own settings are reached from its row in the
@@ -1778,8 +1791,11 @@ Home Care history, the color theme and the location are edited in the app.
   `dist/version.json`). `useAutoReload` (in `App`) fetches `version.json` every 15
   minutes and, when the live ID differs, reloads once the screen has been untouched for
   3 minutes; it also reloads nightly around 3 AM (backup for a missed check, and a fresh
-  start). Off in `npm run dev`. Settings shows "Last updated: Nov 24, 2026" and the commit
-  at the bottom, to check a tablet picked up an update. Added `@types/node` for the
+  start). Off in `npm run dev`. Settings shows "Last updated:" and the commit
+  at the bottom, to check a tablet picked up an update. The date is relative on the
+  day of the build ("32 seconds ago", "14 minutes ago", "3 hours ago", via
+  `formatTimeAgo` in `lib/dates.ts`), then a plain date ("Nov 24, 2026"); it's worked
+  out each time Settings renders, so it doesn't tick while left open. Added `@types/node` for the
   config. **Release routine with several households sharing one database**: push a
   migration before the code that needs it; migrations only add (new columns with
   defaults, new tables) so tablets still on the old version keep working; remove or

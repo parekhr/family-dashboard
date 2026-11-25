@@ -2,6 +2,12 @@
 /* Bebas Neue for the Sports widget's title, tabs and scores (bundled, not loaded from
    Google, so it works on flaky wifi). Latin only, the one weight it comes in. */
 @import "@fontsource/bebas-neue/latin-400.css";
+/* The household name's font choices (Settings → Household, see lib/nameFonts.ts),
+   bundled the same way. Latin only, bold only: the name is always bold. */
+@import "@fontsource/playfair-display/latin-700.css";
+@import "@fontsource/caveat/latin-700.css";
+@import "@fontsource/dancing-script/latin-700.css";
+@import "@fontsource/fredoka/latin-600.css";
 
 html,
 body,
@@ -16,6 +22,10 @@ body {
 
 @theme {
   --font-sports: 'Bebas Neue', 'Arial Narrow', sans-serif;   /* class: font-sports */
+  --font-elegant: 'Playfair Display', Georgia, serif;          /* household name fonts: */
+  --font-handwritten: 'Caveat', cursive;                       /* font-elegant, font-handwritten, */
+  --font-script: 'Dancing Script', cursive;                    /* font-script, font-rounded */
+  --font-rounded: 'Fredoka', sans-serif;
   --color-page: #edf3f0;
   --color-card: #fffdf8;
   --color-ink: #2b241d;

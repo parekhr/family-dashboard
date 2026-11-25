@@ -13,6 +13,7 @@ type Household = {
     hiddenWidgets: string[]     // the ones that are off
     favoriteTeams: string[]     // Sports widget favorites, e.g. 'nba:2'
     name?: string
+    nameFont: string            // key from lib/nameFonts.ts, e.g. 'handwritten'
     location?: Location
     colorTheme: string
 }
@@ -20,6 +21,7 @@ type Household = {
 type HouseholdRow = {
     id: string
     name: string | null
+    name_font?: string
     location_name: string | null
     latitude: number | null
     longitude: number | null
@@ -41,6 +43,7 @@ export function toHousehold(row: HouseholdRow): Household {
     return {
         id: row.id,
         name: row.name ?? undefined,
+        nameFont: row.name_font ?? 'classic',      // missing until the name_font migration is pushed
         widgetLayout: row.widget_layout,
         hiddenWidgets: row.hidden_widgets ?? [],
         favoriteTeams: row.favorite_teams ?? [],   // missing until the favorite_teams migration is pushed

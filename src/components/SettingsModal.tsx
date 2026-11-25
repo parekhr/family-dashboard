@@ -7,10 +7,16 @@ import { PeopleSettings } from './settings/PeopleSettings'
 import { CategorySettings } from './settings/CategorySettings'
 import { WidgetSettings } from './settings/WidgetSettings'
 import { HomeCareItemsPage } from './settings/HomeCareItemsPage'
+import { HouseholdNameSetting } from './settings/HouseholdNameSetting'
+import { NameFontSetting } from './settings/NameFontSetting'
 import type { WidgetChoices } from '../widgets/registry'
 import { ScrollArea } from './ScrollArea'
 
 type SettingsModalProps = {
+    householdName?: string
+    onHouseholdNameChange: (name: string) => void
+    nameFont: string
+    onNameFontChange: (key: string) => void
     themeKey: string
     onThemeChange: (key: string) => void
     widgets: WidgetChoices
@@ -18,20 +24,20 @@ type SettingsModalProps = {
     onClose: () => void
 }
 
-type Tab = 'theme' | 'widgets' | 'people' | 'categories'
+type Tab = 'household' | 'widgets' | 'people' | 'categories'
 
 // A widget's own settings page, opened from its row in the Widgets tab
 export type SettingsPage = 'homeCareItems'
 
 const tabs: { key: Tab; label: string }[] = [
-    { key: 'theme', label: 'Theme' },
+    { key: 'household', label: 'Household' },
     { key: 'widgets', label: 'Widgets' },
     { key: 'people', label: 'People' },
     { key: 'categories', label: 'Categories' },
 ]
 
-export function SettingsModal({ themeKey, onThemeChange, widgets, onWidgetsChange, onClose }: SettingsModalProps) {
-    const [tab, setTab] = useState<Tab>('theme')
+export function SettingsModal({ householdName, onHouseholdNameChange, nameFont, onNameFontChange, themeKey, onThemeChange, widgets, onWidgetsChange, onClose }: SettingsModalProps) {
+    const [tab, setTab] = useState<Tab>('household')
     const [page, setPage] = useState<SettingsPage | null>(null)
 
     // A widget's settings page replaces the tabs; its back arrow returns to the Widgets tab.
@@ -73,9 +79,12 @@ export function SettingsModal({ themeKey, onThemeChange, widgets, onWidgetsChang
 
             {/* fixed height, so switching tabs doesn't make the pop-up jump in size */}
             <ScrollArea className="mt-4 h-[400px] pr-1">
-                {tab === 'theme' && (
+                {tab === 'household' && (
                     <>
-                        <div className="text-sm font-semibold text-muted">Color theme</div>
+                        <HouseholdNameSetting name={householdName} onChange={onHouseholdNameChange} />
+                        <NameFontSetting name={householdName} fontKey={nameFont} onChange={onNameFontChange} />
+
+                        <div className="mt-5 text-sm font-semibold text-muted">Color theme</div>
 
                         {/* Tapping a color applies it right away; the modal stays open.
                             Tiles fill the tab's width (3 across) now that Settings is a fixed 480px. */}
