@@ -22,7 +22,18 @@ body {
   background: #ffffff;
 }
 
+/* House style (components/styles.ts builds its recipes from these). Change the look here. */
+:root {
+  --edge-size: 4px;           /* raised buttons' darker bottom edge */
+  --edge-size-pressed: 2px;   /* ...while being pressed */
+}
+
 @theme {
+  --font-ui: 'Fredoka', ui-sans-serif, system-ui, sans-serif;   /* class: font-ui (pop-ups, widget titles) */
+  --radius-control: 1rem;                                      /* class: rounded-control (buttons, inputs) */
+  --radius-control-sm: 0.75rem;                                /* class: rounded-control-sm (small buttons) */
+  --color-edge: rgb(0 0 0 / 0.25);                             /* class: border-edge (edge on colored buttons) */
+  --color-edge-soft: rgb(0 0 0 / 0.1);                         /* class: border-edge-soft (edge on grey and light buttons) */
   --font-sports: 'Bebas Neue', 'Arial Narrow', sans-serif;   /* class: font-sports */
   --font-elegant: 'Playfair Display', Georgia, serif;          /* household name fonts: */
   --font-handwritten: 'Caveat', cursive;                       /* font-elegant, font-handwritten, */

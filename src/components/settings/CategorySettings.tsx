@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Ban, Check, ChevronDown, Pencil, Trash2, X } from 'lucide-react'
 import { useCalendar } from '../../widgets/calendar/CalendarContext'
 import { categoryColors } from '../../lib/categoryColors'
-import { MAX_NAME_LENGTH, addButtonClass, cancelButtonClass, checkName, iconButtonClass, inputClass, plural, saveButtonClass } from './shared'
+import { MAX_NAME_LENGTH, addButtonClass, cancelButtonClass, checkName, confirmDeleteButtonClass, dangerIconButtonClass, iconButtonClass, inputClass, plural, saveButtonClass } from './shared'
 
 // The Categories tab: the event types in the event form's Category dropdown.
 export function CategorySettings() {
@@ -149,14 +149,14 @@ export function CategorySettings() {
                             )}
                             {!blocked && (
                                 <button
-                                    className={`${iconButtonClass} border-none bg-red-600 text-white`}
+                                    className={confirmDeleteButtonClass}
                                     aria-label={eventCount > 0 ? `Move events and delete ${category.name}` : `Delete ${category.name}`}
                                     onClick={() => { deleteCategory(category.id, eventCount > 0 ? moveToId : null); closeAll() }}
                                 >
                                     <Trash2 size={18} />
                                 </button>
                             )}
-                            <button className={`${iconButtonClass} text-muted`} aria-label="Cancel" onClick={closeAll}>
+                            <button className={iconButtonClass} aria-label="Cancel" onClick={closeAll}>
                                 <X size={18} />
                             </button>
                         </div>
@@ -173,10 +173,10 @@ export function CategorySettings() {
                         <span className="flex-1 truncate text-base font-semibold" style={{ color: category.color }}>
                             {category.name}
                         </span>
-                        <button className={`${iconButtonClass} text-muted hover:bg-muted/10`} aria-label={`Edit ${category.name}`} onClick={() => startEditing(category.id, category.name, category.color)}>
+                        <button className={iconButtonClass} aria-label={`Edit ${category.name}`} onClick={() => startEditing(category.id, category.name, category.color)}>
                             <Pencil size={18} />
                         </button>
-                        <button className={`${iconButtonClass} text-red-600 hover:bg-red-100`} aria-label={`Delete ${category.name}`} onClick={() => startDeleting(category.id)}>
+                        <button className={dangerIconButtonClass} aria-label={`Delete ${category.name}`} onClick={() => startDeleting(category.id)}>
                             <Trash2 size={18} />
                         </button>
                     </div>

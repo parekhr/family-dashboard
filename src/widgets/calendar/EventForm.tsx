@@ -160,7 +160,7 @@ export function EventForm({ onClose, onSave, categories, people, event }: EventF
                         <span className="text-sm font-semibold text-today">{error}</span>
                     )}
 
-                    <button type="submit" className={`h-11 rounded-2xl ${raisedPrimaryClass}`}>Save</button>
+                    <button type="submit" className={`h-11 rounded-control ${raisedPrimaryClass}`}>Save</button>
                 </form>
             </ScrollArea>
         </Modal>

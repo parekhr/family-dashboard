@@ -85,14 +85,14 @@ export function RemindersBell() {
                                     </div>
                                     <div className="ml-7 mt-2 flex gap-2">
                                         <button
-                                            className={`flex h-11 items-center gap-1.5 rounded-2xl px-4 ${raisedPrimaryClass}`}
+                                            className={`flex h-11 items-center gap-1.5 rounded-control px-4 ${raisedPrimaryClass}`}
                                             onClick={() => logToday(item.id)}
                                         >
                                             <Check size={16} />
                                             Done
                                         </button>
                                         <button
-                                            className={`flex h-11 items-center gap-1.5 rounded-2xl px-4 ${raisedNeutralClass}`}
+                                            className={`flex h-11 items-center gap-1.5 rounded-control px-4 ${raisedNeutralClass}`}
                                             onClick={() => snooze(item.id, addDaysISO(todayISO, SNOOZE_DAYS))}
                                         >
                                             <Clock size={16} />

@@ -56,7 +56,7 @@ export function HouseholdNameSetting({ name, onChange }: HouseholdNameSettingPro
             ) : (
                 <div className="mt-1.5 flex items-center gap-2">
                     <span className={`flex-1 truncate text-base font-semibold ${name ? '' : 'text-muted'}`}>{name || 'No name yet'}</span>
-                    <button className={`${iconButtonClass} text-muted hover:bg-muted/10`} aria-label="Rename household" onClick={startEditing}>
+                    <button className={iconButtonClass} aria-label="Rename household" onClick={startEditing}>
                         <Pencil size={18} />
                     </button>
                 </div>

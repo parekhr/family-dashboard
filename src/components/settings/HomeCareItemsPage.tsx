@@ -5,7 +5,7 @@ import { HomeCareIcon } from '../../widgets/homeCare/HomeCareIcon'
 import { ItemDetailsForm } from '../../widgets/homeCare/ItemDetailsForm'
 import { ItemHistory } from '../../widgets/homeCare/ItemHistory'
 import { getIntervalText } from '../../widgets/homeCare/reminders'
-import { addButtonClass, iconButtonClass } from './shared'
+import { addButtonClass, confirmDeleteButtonClass, dangerIconButtonClass, iconButtonClass } from './shared'
 import { ScrollArea } from '../ScrollArea'
 import { closeButtonClass, modalTitleClass } from '../styles'
 
@@ -108,13 +108,13 @@ export function HomeCareItemsPage({ onBack, onClose }: HomeCareItemsPageProps) {
                                     <span className="truncate text-sm text-muted">Its history is deleted too</span>
                                 </div>
                                 <button
-                                    className={`${iconButtonClass} border-none bg-red-600 text-white`}
+                                    className={confirmDeleteButtonClass}
                                     aria-label={`Delete ${item.name}`}
                                     onClick={() => { deleteItem(item.id); setConfirmingId(null) }}
                                 >
                                     <Trash2 size={18} />
                                 </button>
-                                <button className={`${iconButtonClass} text-muted`} aria-label="Cancel" onClick={() => setConfirmingId(null)}>
+                                <button className={iconButtonClass} aria-label="Cancel" onClick={() => setConfirmingId(null)}>
                                     <X size={18} />
                                 </button>
                             </div>
@@ -140,10 +140,10 @@ export function HomeCareItemsPage({ onBack, onClose }: HomeCareItemsPageProps) {
                                     <ChevronRight size={16} />
                                 </span>
                             </button>
-                            <button className={`${iconButtonClass} text-muted hover:bg-muted/10`} aria-label={`Edit ${item.name}`} onClick={() => { setConfirmingId(null); setEditing(item.id) }}>
+                            <button className={iconButtonClass} aria-label={`Edit ${item.name}`} onClick={() => { setConfirmingId(null); setEditing(item.id) }}>
                                 <Pencil size={18} />
                             </button>
-                            <button className={`${iconButtonClass} text-red-600 hover:bg-red-100`} aria-label={`Delete ${item.name}`} onClick={() => setConfirmingId(item.id)}>
+                            <button className={dangerIconButtonClass} aria-label={`Delete ${item.name}`} onClick={() => setConfirmingId(item.id)}>
                                 <Trash2 size={18} />
                             </button>
                         </div>

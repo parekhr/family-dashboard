@@ -1800,6 +1800,21 @@ Home Care history, the color theme and the location are edited in the app.
   migration before the code that needs it; migrations only add (new columns with
   defaults, new tables) so tablets still on the old version keep working; remove or
   rename in a later release, once every tablet has reloaded.
+- **House style for pop-ups — "warm and friendly", November 25, 2026** (picked from
+  three mockups: warm and friendly, editorial, default font with new shapes). The old
+  modals were the stock Tailwind look (extrabold system font, flat pills, grey ✕ circle).
+  Now every pop-up (through `Modal`), the reminders pop-up and the sign-in card use
+  Fredoka, a 28px title, and raised buttons: a darker bottom edge (translucent black
+  over the button's own color, so it suits any color theme) that thins when pressed.
+  Covers close, tabs, Save, Cancel, "+ Add …", and the pencil / trash / confirm-delete
+  squares. Widget titles (Home Care, the calendar's month) use Fredoka too; Sports keeps
+  Bebas Neue. Widget controls (Add Event, "I changed this today", the sliding switches)
+  and pickers (chips, icons, theme and font tiles) are unchanged for now.
+  **Two layers, like the color themes**: the values are CSS variables in `index.css`
+  ("House style": `--font-ui`, `--radius-control`, `--color-edge`, `--edge-size`…), the
+  recipes are in `components/styles.ts`. A selectable style later would be another set
+  of variables, not new recipes; not built, since every style would need testing on
+  every screen.
 - **Ideas noted November 23, 2026** (not planned yet; written down so they aren't lost):
   - **Chores widget** for daily or every-few-days tasks (feed Hazelnut, water plants).
     Kept out of Home Care on purpose: Home Care is rare maintenance behind the header

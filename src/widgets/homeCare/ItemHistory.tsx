@@ -3,7 +3,7 @@ import { Trash2, Pencil } from "lucide-react"
 import { formatDate, getTodayISO } from "../../lib/dates"
 import { useState } from "react"
 import { ScrollArea } from '../../components/ScrollArea'
-import { raisedPrimaryClass } from '../../components/styles'
+import { addButtonClass, cancelButtonClass, dangerIconButtonClass, iconButtonClass, raisedPrimaryClass } from '../../components/styles'
 
 type ItemHistoryProps = {
     item: HomeCareItem
@@ -100,7 +100,7 @@ export function ItemHistory({ item, onDelete, onAdd, onEdit }: ItemHistoryProps)
                                     <input
                                         type="date"
                                         max={getTodayISO()}
-                                        className="h-11 flex-1 rounded-xl border border-muted/40 px-3"
+                                        className="h-11 flex-1 rounded-control border border-muted/40 px-3"
                                         value={editValue}
                                         onChange={(e) => {
                                             setEditValue(e.target.value)
@@ -108,7 +108,7 @@ export function ItemHistory({ item, onDelete, onAdd, onEdit }: ItemHistoryProps)
                                         }}
                                     />
                                     <button
-                                        className={`h-11 rounded-2xl px-4 ${raisedPrimaryClass}`}
+                                        className={`h-11 rounded-control px-4 ${raisedPrimaryClass}`}
                                         onClick={() => handleEditSave(date)}
                                     >
                                         Save
@@ -128,13 +128,13 @@ export function ItemHistory({ item, onDelete, onAdd, onEdit }: ItemHistoryProps)
 
                                 <div className="flex items-center gap-2">
                                     <button
-                                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-muted hover:bg-muted/10"
+                                        className={iconButtonClass}
                                         onClick={() => startEditing(date)}
                                     >
                                         <Pencil size={18} />
                                     </button>
                                     <button
-                                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-muted/30 text-red-600 hover:bg-red-100"
+                                        className={dangerIconButtonClass}
                                         onClick={() => onDelete(date)}
                                     >
                                         <Trash2 size={18} />
@@ -151,21 +151,21 @@ export function ItemHistory({ item, onDelete, onAdd, onEdit }: ItemHistoryProps)
                         <input
                             type="date"
                             max={getTodayISO()}
-                            className="h-11 flex-1 rounded-xl border border-muted/40 px-3"
+                            className="h-11 flex-1 rounded-control border border-muted/40 px-3"
                             value={newDate}
                             onChange={(e) => {
                                 setNewDate(e.target.value)
                                 setError('')
                             }}
                         />
-                        <button className={`h-11 rounded-2xl px-4 ${raisedPrimaryClass}`} onClick={handleSave}>Save</button>
-                        <button className="h-11 cursor-pointer px-3 text-muted" onClick={() => { setAdding(false); setNewDate(''); setError(''); }}>Cancel</button>
+                        <button className={`h-11 rounded-control px-4 ${raisedPrimaryClass}`} onClick={handleSave}>Save</button>
+                        <button className={cancelButtonClass} onClick={() => { setAdding(false); setNewDate(''); setError(''); }}>Cancel</button>
                     </div>
                     {error && <p className="text-sm text-red-600">{error}</p>}
                 </div>
             ) : (
                 <button
-                    className="mt-4 h-[52px] w-full cursor-pointer rounded-full border-2 border-dashed border-muted/40 font-bold"
+                    className={addButtonClass}
                     onClick={() => {
                         cancelEditing()   // only one form open at a time: close any row edit
                         setAdding(true)

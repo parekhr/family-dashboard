@@ -23,17 +23,17 @@ export function SignIn() {
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="h-11 rounded-2xl border border-muted/30 bg-white px-3"
+                    className="h-11 rounded-control border border-muted/30 bg-white px-3"
                 />
                 <input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="h-11 rounded-2xl border border-muted/30 bg-white px-3"
+                    className="h-11 rounded-control border border-muted/30 bg-white px-3"
                 />
                 {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
-                <button type="submit" className={`h-11 rounded-2xl ${raisedPrimaryClass}`}>
+                <button type="submit" className={`h-11 rounded-control ${raisedPrimaryClass}`}>
                     Sign in
                 </button>
             </form>

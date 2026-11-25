@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Pencil, Trash2, X } from 'lucide-react'
 import { useCalendar } from '../../widgets/calendar/CalendarContext'
-import { MAX_NAME_LENGTH, addButtonClass, cancelButtonClass, checkName, iconButtonClass, inputClass, plural, saveButtonClass } from './shared'
+import { MAX_NAME_LENGTH, addButtonClass, cancelButtonClass, checkName, confirmDeleteButtonClass, dangerIconButtonClass, iconButtonClass, inputClass, plural, saveButtonClass } from './shared'
 
 // The People tab: the names shown as chips in the event form and on event cards.
 export function PeopleSettings() {
@@ -86,13 +86,13 @@ export function PeopleSettings() {
                                 )}
                             </span>
                             <button
-                                className={`${iconButtonClass} border-none bg-red-600 text-white`}
+                                className={confirmDeleteButtonClass}
                                 aria-label={`Delete ${person.name}`}
                                 onClick={() => { deletePerson(person.id); closeAll() }}
                             >
                                 <Trash2 size={18} />
                             </button>
-                            <button className={`${iconButtonClass} text-muted`} aria-label="Cancel" onClick={closeAll}>
+                            <button className={iconButtonClass} aria-label="Cancel" onClick={closeAll}>
                                 <X size={18} />
                             </button>
                         </div>
@@ -102,10 +102,10 @@ export function PeopleSettings() {
                 return (
                     <div key={person.id} className="flex items-center gap-2 border-b border-muted/20 py-2">
                         <span className="flex-1 truncate text-base font-semibold">{person.name}</span>
-                        <button className={`${iconButtonClass} text-muted hover:bg-muted/10`} aria-label={`Rename ${person.name}`} onClick={() => startEditing(person.id, person.name)}>
+                        <button className={iconButtonClass} aria-label={`Rename ${person.name}`} onClick={() => startEditing(person.id, person.name)}>
                             <Pencil size={18} />
                         </button>
-                        <button className={`${iconButtonClass} text-red-600 hover:bg-red-100`} aria-label={`Delete ${person.name}`} onClick={() => { closeAll(); setConfirmingId(person.id) }}>
+                        <button className={dangerIconButtonClass} aria-label={`Delete ${person.name}`} onClick={() => { closeAll(); setConfirmingId(person.id) }}>
                             <Trash2 size={18} />
                         </button>
                     </div>
